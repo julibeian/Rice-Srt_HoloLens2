@@ -1,0 +1,22 @@
+[
+  {
+    "File": "PerceptionSimulationInput.exe",
+    "CatalogVerified": true,
+    "Catalog": "cata5e7d387ce97b3387ef442454aff5a18.cat"
+  },
+  {
+    "File": "PerceptionSimulationInput.dll",
+    "CatalogVerified": true,
+    "Catalog": "cata5e7d387ce97b3387ef442454aff5a18.cat"
+  },
+  {
+    "File": "PerceptionSimulationManager.dll",
+    "CatalogVerified": true,
+    "Catalog": "cat3a24b17afdccde8feaafe9c5125b0a78.cat"
+  },
+  {
+    "File": "InputController.dll",
+    "CatalogVerified": true,
+    "Catalog": "cat3a24b17afdccde8feaafe9c5125b0a78.cat"
+  }
+]

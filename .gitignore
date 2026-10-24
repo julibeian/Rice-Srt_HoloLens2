@@ -1,0 +1,76 @@
+# Local configuration, credentials and device state.
+/config.json
+/AGENTS.md
+.state/
+.env
+.env.*
+!.env.example
+*.clixml
+*.pfx
+*.p12
+*.pem
+*.key
+*.cer
+session.json
+
+# Installed tools, runtimes and dependencies.
+/.tools/
+/runtime/powershell/
+node_modules/
+__pycache__/
+.cache/
+bin/
+obj/
+*.pyc
+*.o
+*.obj
+*.exe
+*.dll
+*.lib
+*.msi
+*.cab
+*.vhd
+*.appx
+*.appxbundle
+*.ppkg
+*.zip
+*.whl
+*.tgz
+*.tar.gz
+*.log
+*.pid
+*.tmp
+
+# Preserve SDK recipes, not installed vendor payloads.
+/tools/perception-simulation/*
+!/tools/perception-simulation/Extract-PreviewSdk.ps1
+!/tools/perception-simulation/catalog-verification.json
+
+# Raw device runs and individual environment records stay outside publication.
+/reports/
+/device-settings/
+/docs/evidence/
+/docs/关键转折与决策.md
+/docs/仓库维护说明.md
+/docs/*.json
+/tools/Verify-Archive.py
+
+# Prototype build/runtime output and one-environment deployment receipts.
+/capture-app/device/
+/capture-app/device-research/package/
+/capture-app/device-research/*.json
+/capture-app/ops/deployment*.json
+/capture-app/ops/release-review*.json
+/capture-app/ops/prepare_release.py
+/capture-app/ops/Deploy-ReviewedRelease.ps1
+/capture-app/ops/Measure-UsbInferencePath.ps1
+/capture-app/uwp/qa/
+/capture-app/web/tests/qa/
+/capture-app/server/runtime-ssh-audit.txt
+/capture-app/server/deployment-source-manifest.json
+
+# Large samples and rendered document output.
+/data/raw/
+/data/processed/
+*.docx
+*.pdf

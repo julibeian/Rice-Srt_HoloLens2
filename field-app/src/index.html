@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: ms-appdata: https://tile.openstreetmap.org https://server.arcgisonline.com; connect-src 'self' https://rice-srt.cn; media-src 'self' blob: mediastream:; object-src 'none'">
+<title>稻视界</title><link rel="stylesheet" href="vendor/leaflet/leaflet.css"><link rel="stylesheet" href="shell.css">
+<script src="boot.js"></script><script src="vendor/leaflet/leaflet.js" defer></script><script src="capture-quality.js" defer></script><script src="camera-controls.js" defer></script><script src="native.js" defer></script><script src="bridge.js" defer></script><script src="miniapp.js" defer></script><script src="app.js" defer></script></head>
+<body><main id="app" class="field-layout camera-full" aria-label="稻视界"><button id="menu-toggle" class="menu-toggle">功能</button>
+<nav class="tool-rail" aria-label="操作">
+<button id="tab-camera" class="rail-button active" data-view="camera" aria-pressed="true">拍照</button>
+<button id="tab-result" class="rail-button" data-view="result" aria-pressed="false">结果</button>
+<button id="tab-map" class="rail-button" data-view="map" aria-pressed="false">地图</button>
+<button id="tab-history" class="rail-button" data-view="history" aria-pressed="false">记录</button>
+<button id="tab-settings" class="rail-button" data-view="settings" aria-pressed="false">设置</button>
+<span id="service-indicator" class="service-indicator" role="status">连接中</span></nav>
+<div class="work-area" data-view="camera">
+<section id="view-camera" class="workspace camera-workspace" aria-label="拍照">
+<div id="camera-video" aria-label="相机实时画面"></div><div id="camera-target" class="camera-target" hidden aria-hidden="true"><span>只识别框内</span></div><p id="camera-message" class="camera-message" role="status">正在开启相机…</p>
+<button id="album-button" class="floating-button album-button">选图片</button><button id="camera-region-size" class="floating-button region-size">范围：中</button><button id="camera-retry" class="floating-button camera-retry" hidden>重开相机</button><button id="camera-cancel" class="floating-button camera-cancel" hidden>取消拍摄</button><button id="camera-shutter" class="shutter" disabled>拍照</button></section>
+<section id="view-map" class="workspace map-workspace" aria-label="地图" hidden><div id="field-map" class="field-map"></div><div class="map-tools"><button id="locate-button">定位</button><button id="map-type">卫星图</button><button id="map-edit">给照片标位置</button></div><p id="map-status" class="map-status" role="status">正在获取设备位置…</p></section>
+<section id="view-history" class="workspace history-workspace" aria-label="检测记录" hidden><h1>检测记录</h1><div id="history-list" class="history-list"></div><div class="pager"><button id="history-previous">上一页</button><span id="history-page"></span><button id="history-next">下一页</button></div></section>
+<section id="view-settings" class="workspace settings-workspace" aria-label="设置" hidden><h1>设置</h1><p id="connection-status" role="status">正在连接识别服务…</p><div class="pair-controls"><input id="pair-code" type="text" inputmode="numeric" maxlength="8" placeholder="设备配对码" aria-label="设备配对码"><button id="pair-button">连接</button><button id="connect-button">重试连接</button></div><p id="location-status" role="status">正在定位…</p><div class="setting-actions"><button id="location-settings">位置权限</button><button id="location-retry">重新定位</button></div><p id="camera-capabilities" class="muted">相机能力待检测</p><p id="version" class="muted"></p></section>
+<aside id="result-panel" class="result-panel" aria-label="识别结果"><div class="result-heading"><span id="result-label">识别结果</span><span id="result-time" class="muted"></span></div><img id="result-image" class="result-image" alt="本次识别照片" hidden><div class="result-text"><h1 id="result-title">对准叶片，手势点拍照</h1><p id="result-confidence" hidden></p><p id="result-message" role="status" aria-live="polite">拍完自动上传并显示结果</p><p id="result-location" class="muted"></p></div><div class="result-actions"><button id="upload-retry" hidden>重试上传</button><button id="show-original" hidden>查看原图</button><button id="next-photo" hidden>继续拍照</button></div></aside>
+</div></main><div id="toast" role="status" aria-live="polite" hidden></div></body></html>
+

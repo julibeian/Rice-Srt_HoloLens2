@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="referrer" content="no-referrer">
+  <meta name="color-scheme" content="dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <meta name="capture-predict-endpoint" content="/hololens/api/predict">
+  <meta name="capture-events-endpoint" content="/hololens/api/events">
+  <title>稻视界 单张拍照识别</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="./app.bundle.js"></script>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="app-header">
+      <div>
+        <p class="eyebrow">稻视界 · 眼镜拍照</p>
+        <h1>单张拍照识别</h1>
+      </div>
+      <span id="camera-status" class="status-pill" role="status">相机未开启</span>
+    </header>
+
+    <p id="session-note" class="session-note" hidden></p>
+
+    <section class="workspace" aria-label="拍照和识别结果">
+      <div class="capture-panel">
+        <div id="viewfinder" class="viewfinder">
+          <video id="camera-preview" autoplay playsinline muted aria-label="相机实时画面" hidden></video>
+          <img id="captured-photo" alt="本次拍摄的照片" hidden>
+          <div id="camera-placeholder" class="camera-placeholder">
+            <svg viewBox="0 0 96 72" width="80" height="60" aria-hidden="true"><path d="M8 19h19l7-11h28l7 11h19v45H8z"/><circle cx="48" cy="41" r="17"/></svg>
+            <p>先开启相机，再对准一片叶片</p>
+            <span>保持画面稳定，让叶片清晰地占据画面</span>
+          </div>
+          <div id="capture-label" class="capture-label" hidden>本次照片</div>
+        </div>
+        <div class="controls">
+          <button id="camera-button" class="button button-secondary" type="button">开启相机</button>
+          <button id="capture-button" class="button button-primary" type="button" disabled>拍摄并识别</button>
+          <button id="cancel-button" class="button button-danger" type="button" hidden>取消识别</button>
+          <button id="retake-button" class="button button-secondary" type="button" hidden>返回取景</button>
+        </div>
+        <p id="capture-hint" class="capture-hint">相机只在你开启后使用。每次只识别一张新拍照片。</p>
+      </div>
+
+      <section id="result-panel" class="result-panel" data-state="idle" aria-labelledby="result-title" aria-busy="false">
+        <p class="eyebrow">本次结果</p>
+        <h2 id="result-title" tabindex="-1">等待拍摄</h2>
+        <p id="result-message" class="result-message" aria-live="polite">开启相机后，点击“拍摄并识别”。</p>
+        <div id="score-row" class="score-row" hidden>
+          <span>模型分数</span>
+          <strong id="result-score"></strong>
+        </div>
+        <p id="result-detail" class="result-detail" hidden></p>
+        <p id="result-reference" class="result-reference" hidden></p>
+        <div class="result-notice">
+          <strong>研究验证结果</strong>
+          <p>模型分数不等于实际正确率。结果需要现场复核，无法确认时请重拍或请专业人员判断。</p>
+        </div>
+      </section>
+    </section>
+
+    <footer class="app-footer">
+      <span>建议距离叶片约 30 厘米或更远，并等待画面清晰。</span>
+      <span id="run-label"></span>
+    </footer>
+  </main>
+  <noscript>本页面需要启用 JavaScript 才能拍照并显示识别结果。</noscript>
+</body>
+</html>

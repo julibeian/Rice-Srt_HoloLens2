@@ -1,0 +1,104 @@
+<view class="map-page">
+  <view class="map-header tool-page-header" style="padding-top: {{headerTopInset}}px;">
+    <view class="tool-header-title-row" style="min-height: {{headerNavHeight}}px; padding-right: {{headerRightInset}}px;">
+      <text class="tool-header-title">田块记录地图</text>
+    </view>
+    <view class="tool-header-bottom"><text class="tool-header-desc">查看本机标记的照片，追踪田块状况</text></view>
+  </view>
+
+  <view class="map-toolbar">
+    <view class="map-stats">
+      <view class="map-stat" bindtap="onViewPoints" data-filter="all" hover-class="map-stat--pressed" aria-role="button" aria-label="查看{{markedCount}}个照片位置">
+        <text class="map-stat-value">{{markedCount}}</text>
+        <text class="map-stat-label">照片位置</text>
+        <text class="map-stat-arrow">›</text>
+      </view>
+      <view class="map-stat map-stat--risk" bindtap="onViewPoints" data-filter="disease" hover-class="map-stat--pressed" aria-role="button" aria-label="查看{{diseaseCount}}张疑似病害照片">
+        <text class="map-stat-value">{{diseaseCount}}</text>
+        <text class="map-stat-label">疑似病害</text>
+        <text class="map-stat-arrow">›</text>
+      </view>
+    </view>
+
+    <view class="filter-row">
+      <view class="filter-chip {{activeFilter === 'all' ? 'filter-chip--active' : ''}}" bindtap="onFilterChange" data-filter="all">全部</view>
+      <view class="filter-chip {{activeFilter === 'disease' ? 'filter-chip--active' : ''}}" bindtap="onFilterChange" data-filter="disease">病害</view>
+      <view class="filter-chip {{activeFilter === 'healthy' ? 'filter-chip--active' : ''}}" bindtap="onFilterChange" data-filter="healthy">健康</view>
+    </view>
+  </view>
+
+  <view class="map-body">
+    <map
+      id="diseaseMap"
+      class="disease-map"
+      longitude="{{longitude}}"
+      latitude="{{latitude}}"
+      scale="{{scale}}"
+      layer-style="1"
+      enable-satellite="{{mapType === 'satellite'}}"
+      enable-poi="{{true}}"
+      enable-building="{{true}}"
+      show-scale="{{true}}"
+      show-location="{{showLocation}}"
+      markers="{{markers}}"
+      bindcallouttap="onOpenMarker"
+      bindregionchange="onRegionChange"
+    >
+      <cover-view class="map-controls">
+        <cover-view class="location-orb {{locating ? 'location-orb--loading' : ''}}" bindtap="onLocate" aria-role="button" aria-label="定位到当前位置">
+          <cover-image class="locate-icon" src="/assets/icons/locate-white.png"></cover-image>
+        </cover-view>
+        <cover-view class="map-type-switch">
+          <cover-view class="map-type-option {{mapType === 'standard' ? 'map-type-option--active' : ''}}" bindtap="onMapTypeChange" data-type="standard" aria-role="button" aria-label="普通地图">普通</cover-view>
+          <cover-view class="map-type-option {{mapType === 'satellite' ? 'map-type-option--active' : ''}}" bindtap="onMapTypeChange" data-type="satellite" aria-role="button" aria-label="卫星地图">卫星</cover-view>
+        </cover-view>
+      </cover-view>
+      <cover-view class="map-empty-card" wx:if="{{mapError}}">
+        <cover-view class="empty-title">地图记录暂不可读取</cover-view>
+        <cover-view class="empty-desc">{{mapError}}</cover-view>
+        <cover-view class="empty-action" bindtap="_refreshMarkers">重试</cover-view>
+      </cover-view>
+
+      <cover-view class="map-empty-card" wx:elif="{{markedCount === 0}}">
+        <cover-image class="empty-cover-icon" src="/assets/icons/map-pin-green.png"></cover-image>
+        <cover-view class="empty-title">还没有地图标记</cover-view>
+        <cover-view class="empty-desc">在检测记录中补充照片位置并标记，即可显示在这里。</cover-view>
+        <cover-view class="empty-action" bindtap="onGoHistory">去标记记录</cover-view>
+      </cover-view>
+
+      <cover-view class="map-empty-card" wx:elif="{{markers.length === 0}}">
+        <cover-image class="empty-cover-icon" src="/assets/icons/filter-green.png"></cover-image>
+        <cover-view class="empty-title">当前筛选没有记录</cover-view>
+        <cover-view class="empty-desc">切换到“全部”查看所有已标记位置。</cover-view>
+      </cover-view>
+    </map>
+  </view>
+
+  <bottom-navigation id="bottom-navigation" active="map"></bottom-navigation>
+
+  <view class="points-overlay" wx:if="{{showPointList}}">
+    <view class="points-mask" bindtap="onClosePointList" catchtouchmove="onStopPointTouch"></view>
+    <view class="points-sheet" aria-role="dialog" aria-label="{{pointListTitle}}">
+      <view class="points-heading">
+        <view><text class="points-title">{{pointListTitle}}</text><text class="points-count">{{mapPhotos.length}} 个位置</text></view>
+        <view class="points-close" bindtap="onClosePointList" aria-role="button" aria-label="关闭照片列表">关闭</view>
+      </view>
+      <scroll-view scroll-y class="points-scroll">
+        <view class="points-empty" wx:if="{{mapError || mapPhotos.length === 0}}">{{mapError || (activeFilter === 'disease' ? '暂无已标记的疑似病害照片' : '暂无已标记的照片位置')}}</view>
+        <view class="point-photo" wx:for="{{mapPhotos}}" wx:key="key">
+          <view class="point-report" bindtap="onOpenPhotoReport" data-marker-id="{{item.markerId}}" aria-role="button" aria-label="查看{{item.name}}报告">
+            <image class="point-thumb" wx:if="{{item.imagePath}}" src="{{item.imagePath}}" mode="aspectFill"></image>
+            <view class="point-thumb point-thumb--empty" wx:else><image src="/assets/icons/leaf-green.png" mode="aspectFit"></image></view>
+            <view class="point-copy">
+              <text class="point-name {{item.status === 'disease' ? 'point-name--risk' : ''}}">{{item.name}}</text>
+              <text class="point-meta">{{item.imageLabel}} · {{item.time}}</text>
+              <text class="point-source">{{item.locationText}}</text>
+              <text class="point-report-link">查看报告 ›</text>
+            </view>
+          </view>
+          <view class="point-focus" bindtap="onFocusPhoto" data-marker-id="{{item.markerId}}" aria-role="button" aria-label="定位这张照片">定位</view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+</view>

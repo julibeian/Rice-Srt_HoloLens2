@@ -1,0 +1,28 @@
+name: 产品问题
+description: 报告应用、接口或实验工具中的可复现问题
+title: "[问题] "
+body:
+  - type: input
+    id: version
+    attributes:
+      label: 版本与环境
+      description: 应用/工具版本、设备类型、相关服务
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: 复现步骤
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: 实际现象与期望行为
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 错误与验证材料
+      description: 提供必要的脱敏错误码、截图或实验引用；移除凭据和个人环境信息

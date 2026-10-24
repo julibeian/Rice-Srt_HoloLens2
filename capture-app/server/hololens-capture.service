@@ -1,0 +1,23 @@
+[Unit]
+Description=HoloLens single-photo capture gateway
+After=network.target rice-disease.service
+
+[Service]
+Type=simple
+User=admin
+Group=admin
+WorkingDirectory=/opt/hololens-capture/current/server
+ExecStart=/usr/bin/python3 -B /opt/hololens-capture/current/server/server.py serve --session-file /var/lib/hololens-capture/session.json --data-dir /var/lib/hololens-capture/evidence --web-root /opt/hololens-capture/current/web --host 127.0.0.1 --port 9012
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=10
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/hololens-capture
+UMask=0077
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

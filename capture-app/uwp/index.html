@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>稻视界 单张拍照识别</title>
+  <link href="styles.css" rel="stylesheet">
+  <script src="capture-core.js" defer></script>
+  <script src="native-runtime.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main class="shell">
+    <header class="header">
+      <div><p class="eyebrow">稻视界 · 眼镜拍照</p><h1>单张拍照识别</h1></div>
+      <span id="camera-status" class="status">相机未开启</span>
+    </header>
+    <p id="session-note" class="note" hidden></p>
+    <div class="workspace">
+      <section class="photo-section" aria-label="本次照片">
+        <div class="photo-frame">
+          <img id="photo" alt="本次新拍摄的照片" hidden>
+          <div id="photo-placeholder" class="placeholder"><h2>对准一片清晰叶片</h2><p>建议距离约 30 厘米或更远</p><p>保持头部稳定，再按一次拍摄</p></div>
+          <span id="photo-label" class="photo-label" hidden>本次照片</span>
+        </div>
+        <div class="controls"><button id="capture-button" class="primary" type="button" disabled>拍摄并识别</button><button id="cancel-button" class="secondary" type="button" hidden>取消本次操作</button></div>
+        <p id="capture-hint" class="hint">正在准备本次会话。应用只拍摄新照片，不读取已有媒体。</p>
+      </section>
+      <section id="result-panel" class="result-panel" data-state="idle" aria-labelledby="result-title" aria-busy="false">
+        <p class="eyebrow">本次结果</p><h2 id="result-title">正在准备</h2>
+        <p id="result-message" class="message" aria-live="polite">请保持应用在前台。</p>
+        <div id="score-row" class="score-row" hidden><span>模型分数</span><strong id="score"></strong></div>
+        <p id="result-reference" class="reference" hidden></p>
+        <div class="disclosure"><strong>研究验证结果</strong><p>模型分数不等于实际正确率。结果需要现场复核，无法确认时请重拍或请专业人员判断。</p></div>
+      </section>
+    </div>
+    <footer><span>拍照完成立即关闭相机，随后传回本张照片的结果。</span><span id="run-label"></span></footer>
+  </main>
+</body>
+</html>

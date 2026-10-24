@@ -1,0 +1,22 @@
+[Unit]
+Description=Rice HoloLens standalone application channel
+After=network.target rice-disease.service
+
+[Service]
+Type=simple
+User=admin
+Group=admin
+UMask=0077
+ExecStart=/usr/bin/python3 /opt/rice-hololens-app/current/server.py serve --data-dir /var/lib/rice-hololens-app --upstream-key-file /var/lib/rice-hololens-app/upstream.key --port 9013
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/rice-hololens-app
+MemoryMax=220M
+TasksMax=40
+
+[Install]
+WantedBy=multi-user.target

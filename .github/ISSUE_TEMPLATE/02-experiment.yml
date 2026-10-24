@@ -1,0 +1,37 @@
+name: 实验记录
+description: 提交实验方案、采样结果或验证结论
+title: "[实验] "
+body:
+  - type: input
+    id: experiment
+    attributes:
+      label: 实验编号与应用版本
+      placeholder: EXP-LEAF-001 / v1.0.0.22
+    validations:
+      required: true
+  - type: textarea
+    id: protocol
+    attributes:
+      label: 问题与实验方法
+      description: 协议、对照条件和判定方法
+    validations:
+      required: true
+  - type: textarea
+    id: samples
+    attributes:
+      label: 样本与条件
+      description: 批次、实际样本数、光照、设备类型与人工标注
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: 结果或预期交付
+      description: 实验已执行时填写实际结果，否则明确标为方案
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: 资料引用与限制
+      description: 脱敏资料引用、文件哈希、失败情况与尚不能支持的结论

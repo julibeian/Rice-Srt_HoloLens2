@@ -1,0 +1,16 @@
+{
+  "record_type": "template",
+  "experiment_id": "EXP-LEAF-001",
+  "app_version": "1.0.0.22",
+  "batch_id": "BATCH-001",
+  "leaf_id": "LEAF-001",
+  "image_id": "IMAGE-001",
+  "device_type": "HoloLens 2",
+  "lighting": "待填写",
+  "ground_truth": {"label": "待标注", "method": "待填写"},
+  "source_image": {"artifact_ref": "", "sha256": "", "width": null, "height": null},
+  "crop_image": {"artifact_ref": "", "sha256": "", "width": null, "height": null},
+  "quality": {"exposure_ev": null, "sharpness": null, "highlight_fraction": null, "shadow_fraction": null},
+  "prediction": {"class_name": "", "is_valid": null, "binding_verified": null},
+  "notes": "模板，非已完成采样"
+}

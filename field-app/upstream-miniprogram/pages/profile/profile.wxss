@@ -1,0 +1,48 @@
+.profile-page { padding: 22rpx 28rpx calc(40rpx + env(safe-area-inset-bottom)); }
+.settings-brand { display: flex; align-items: center; padding: 10rpx 4rpx 30rpx; }
+.settings-logo { flex-shrink: 0; width: 80rpx; height: 80rpx; background: #FFFFFF; border: 1rpx solid #DFE8DA; border-radius: 50%; }
+.settings-brand-copy { flex: 1; min-width: 0; margin-left: 18rpx; }
+.settings-app-name { display: block; color: #176B3A; font-size: 32rpx; font-weight: 750; }
+.settings-brand-note { display: block; margin-top: 6rpx; color: #7C8A82; font-size: 21rpx; }
+.version-text { flex-shrink: 0; margin-left: 12rpx; padding: 7rpx 14rpx; color: #657369; font-size: 21rpx; background: #E9EDE3; border-radius: 18rpx; }
+.settings-intro { padding: 6rpx 4rpx 8rpx; }
+.settings-intro .page-title { display: block; font-size: 40rpx; }
+.settings-subtitle { display: block; margin-top: 10rpx; color: #7C8A82; font-size: 24rpx; line-height: 1.6; }
+.settings-group-label { display: block; padding: 28rpx 6rpx 13rpx; color: #7C8A82; font-size: 23rpx; }
+.settings-card { overflow: hidden; }
+.settings-row { display: flex; align-items: center; width: 100%; margin: 0; padding: 26rpx 24rpx; text-align: left; background: #FFFFFF; border-radius: 0; }
+.settings-icon-wrap { display: flex; flex-shrink: 0; align-items: center; justify-content: center; width: 64rpx; height: 64rpx; margin-right: 16rpx; background: #EDF5E9; border-radius: 20rpx; }
+.settings-icon-wrap image { width: 36rpx; height: 36rpx; }
+.settings-row-copy { flex: 1; min-width: 0; }
+.settings-row-title { display: block; color: #17352A; font-size: 28rpx; font-weight: 650; line-height: 1.45; }
+.settings-row-note { display: block; margin-top: 5rpx; color: #839087; font-size: 21rpx; line-height: 1.5; }
+.settings-chevron { flex-shrink: 0; width: 24rpx; height: 24rpx; margin-left: 12rpx; }
+.settings-chevron--open { transform: rotate(90deg); }
+.permission-state { flex-shrink: 0; margin-left: 10rpx; padding: 6rpx 12rpx; color: #657369; font-size: 21rpx; line-height: 1.5; background: #F0F2ED; border-radius: 20rpx; }
+.permission-state--allowed { color: #176B3A; background: #E8F2E6; }
+.permission-state--denied, .permission-state--unavailable { color: #9F5145; background: #FAEDEA; }
+.permission-row--busy { opacity: 0.65; }
+.permission-note { display: block; margin: 0 24rpx; padding: 18rpx 0 24rpx; color: #839087; font-size: 22rpx; line-height: 1.7; border-top: 1rpx solid #EDF0E9; }
+.storage-card { padding: 26rpx 24rpx 22rpx; }
+.storage-heading, .storage-summary, .storage-actions { display: flex; align-items: center; justify-content: space-between; }
+.storage-badge { color: #7C8A82; font-size: 21rpx; }
+.storage-summary { align-items: baseline; margin-top: 18rpx; }
+.storage-count { flex-shrink: 0; color: #176B3A; font-size: 52rpx; font-weight: 750; }
+.storage-unit { color: #7C8A82; font-size: 24rpx; font-weight: 400; }
+.storage-description { margin-left: 12rpx; color: #7C8A82; font-size: 20rpx; }
+.storage-progress { height: 9rpx; margin-top: 16rpx; overflow: hidden; background: #EAF0E5; border-radius: 8rpx; }
+.storage-progress-fill { height: 100%; background: #5F9863; border-radius: 8rpx; }
+.storage-actions { gap: 16rpx; margin-top: 26rpx; }
+.manage-records-button, .clear-history-button { flex: 1; min-width: 0; margin: 0; padding: 15rpx 12rpx; color: #176B3A; font-size: 24rpx; font-weight: 650; line-height: 48rpx; background: #E8F2E6; border-radius: 20rpx; }
+.clear-history-button { color: #B04A40; background: #FAEDEA; }
+.manage-records-button[disabled], .clear-history-button[disabled] { color: #97A098; background: #F0F2ED; }
+.storage-note { display: block; margin-top: 18rpx; color: #839087; font-size: 22rpx; line-height: 1.7; }
+.settings-error { display: block; margin-top: 16rpx; color: #B04A40; font-size: 24rpx; line-height: 1.6; }
+.privacy-toggle-label { flex-shrink: 0; margin-left: 12rpx; color: #176B3A; font-size: 22rpx; }
+.privacy-details { padding: 0 24rpx 24rpx; }
+.privacy-row { padding-top: 22rpx; margin-top: 18rpx; border-top: 1rpx solid #ECEEEA; }
+.privacy-row:first-child { margin-top: 0; }
+.privacy-label { display: block; color: #17352A; font-size: 25rpx; font-weight: 650; }
+.settings-body { display: block; margin-top: 10rpx; color: #7C8A82; font-size: 23rpx; line-height: 1.8; }
+.settings-about { padding: 30rpx 8rpx 0; }
+.about-title { display: block; color: #657369; font-size: 24rpx; font-weight: 650; }

@@ -1,0 +1,103 @@
+. (Join-Path $PSScriptRoot 'HoloLens.Common.ps1')
+$mutex = [Threading.Mutex]::new($false, ('Local\' + $script:HlPipeName))
+$ownsMutex = $false
+try { $ownsMutex = $mutex.WaitOne(0) } catch [Threading.AbandonedMutexException] { $ownsMutex=$true }
+if (-not $ownsMutex) { $mutex.Dispose(); exit 0 }
+$client = $null
+$address = $null
+$pipe = $null
+$stopping = $false
+$nextCheck = [DateTime]::MinValue
+$lastLoggedState = ''
+$status = [ordered]@{ State='starting'; Device=$script:HlConfig.DeviceName; Address=$null; ProcessId=$PID; StartedAt=[DateTimeOffset]::Now.ToString('o'); LastHeartbeat=$null; LastError=$null; Connections=0; Pipe=$script:HlPipeName }
+
+function Save-HlStatus {
+    $temporary = Join-Path $script:HlStateDirectory 'status.tmp'
+    $destination = Join-Path $script:HlStateDirectory 'status.json'
+    [IO.File]::WriteAllText($temporary,($status | ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
+    [IO.File]::Move($temporary,$destination,$true)
+}
+
+function Write-HlLog([string]$Message) {
+    $path = Join-Path $script:HlStateDirectory 'bridge.log'
+    if ((Test-Path -LiteralPath $path) -and (Get-Item -LiteralPath $path).Length -gt 1MB) { [IO.File]::Move($path,($path+'.1'),$true) }
+    [IO.File]::AppendAllText($path,([DateTimeOffset]::Now.ToString('o') + ' ' + $Message + [Environment]::NewLine),[Text.UTF8Encoding]::new($false))
+}
+
+try {
+    Import-HlSdk
+    Save-HlStatus
+    Write-HlLog 'Bridge started; local current-user named pipe only.'
+    while (-not $stopping) {
+        if ($null -eq $pipe) {
+            $options = [IO.Pipes.PipeOptions]::Asynchronous -bor [IO.Pipes.PipeOptions]::CurrentUserOnly
+            $pipe = [IO.Pipes.NamedPipeServerStream]::new($script:HlPipeName,[IO.Pipes.PipeDirection]::InOut,1,[IO.Pipes.PipeTransmissionMode]::Byte,$options)
+            $pendingConnection = $pipe.WaitForConnectionAsync()
+        }
+        if ($pendingConnection.IsCompleted) {
+            try {
+                $pendingConnection.GetAwaiter().GetResult()
+                $reader = [IO.StreamReader]::new($pipe,[Text.UTF8Encoding]::new($false),$false,4096,$true)
+                $writer = [IO.StreamWriter]::new($pipe,[Text.UTF8Encoding]::new($false),4096,$true)
+                $writer.AutoFlush = $true
+                $pendingRequest = $reader.ReadLineAsync()
+                if (-not $pendingRequest.Wait(5000)) { throw 'Client request timeout.' }
+                $request = $pendingRequest.Result | ConvertFrom-Json -AsHashtable
+                try {
+                    switch ([string]$request.action) {
+                        'status' { $data=$status }
+                        'stop' { $stopping=$true; $data=@{ Stopping=$true } }
+                        'reconnect' {
+                            if ($client) { try { $client.Disconnect() } catch {}; $client=$null }
+                            $status.State='reconnecting'; $status.LastError=$null; $nextCheck=[DateTime]::MinValue
+                            Save-HlStatus
+                            $data=$status
+                        }
+                        default {
+                            if ($null -eq $client -or $status.State -ne 'connected') { throw "HoloLens is $($status.State). The bridge is retrying automatically." }
+                            $data=Invoke-HlOperation $client $request $address
+                        }
+                    }
+                    $response=@{ ok=$true; data=$data }
+                } catch { $response=@{ ok=$false; error=([string]$request.action+': '+(Get-HlErrorMessage $_.Exception)) } }
+                $writer.WriteLine(($response | ConvertTo-Json -Depth 12 -Compress))
+            } catch { Write-HlLog ('Pipe error: ' + (Get-HlErrorMessage $_.Exception)) }
+            finally { $pipe.Dispose(); $pipe=$null }
+        }
+        if (-not $stopping -and [DateTime]::UtcNow -ge $nextCheck) {
+            try {
+                if ($null -eq $client) {
+                    $status.State='discovering'; Save-HlStatus
+                    $address=Find-HlDevice
+                    $client=Connect-HlDevice $address
+                    $status.Address=$address
+                    $status.Connections++
+                    Write-HlLog ('Authenticated SSH connected to ' + $address)
+                }
+                if (-not $client.RemoteDevice.Ping()) { throw 'SSH keepalive failed.' }
+                $status.State='connected'
+                $status.LastError=$null
+                $status.LastHeartbeat=[DateTimeOffset]::Now.ToString('o')
+                $nextCheck=[DateTime]::UtcNow.AddSeconds($script:HlConfig.KeepAliveSeconds)
+            } catch {
+                $status.State='waiting_for_device'
+                $status.LastError=Get-HlErrorMessage $_.Exception
+                if ($client) { try { $client.Disconnect() } catch {}; $client=$null }
+                $nextCheck=[DateTime]::UtcNow.AddSeconds($script:HlConfig.ReconnectSeconds)
+            }
+            if ($status.State -ne $lastLoggedState) { Write-HlLog ($status.State + $(if($status.LastError){': '+$status.LastError}else{''})); $lastLoggedState=$status.State }
+            Save-HlStatus
+        }
+        if (-not $stopping) { $null=$pendingConnection.Wait(250) }
+    }
+} catch {
+    $status.State='failed'; $status.LastError=Get-HlErrorMessage $_.Exception
+    try { Save-HlStatus; Write-HlLog ('Fatal: '+$status.LastError) } catch {}
+    exit 1
+} finally {
+    if ($pipe) { $pipe.Dispose() }
+    if ($client) { try { $client.Disconnect() } catch {} }
+    if ($status.State -ne 'failed') { $status.State='stopped'; try { Save-HlStatus; Write-HlLog 'Bridge stopped.' } catch {} }
+    if ($ownsMutex) { $mutex.ReleaseMutex() }
+    $mutex.Dispose()
+}

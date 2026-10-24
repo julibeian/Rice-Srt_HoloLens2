@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" IgnorableNamespaces="uap">
+ <Identity Name="Rice.HoloLens.Field" Publisher="CN=RiceHoloLensCapture" Version="1.0.0.0" ProcessorArchitecture="neutral" />
+ <Properties><DisplayName>稻视界</DisplayName><PublisherDisplayName>Rice Project</PublisherDisplayName><Logo>AppAssets\Logo50.png</Logo></Properties>
+ <Dependencies><TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.19041.0" MaxVersionTested="10.0.22621.0" /></Dependencies>
+ <Resources><Resource Language="zh-CN" /></Resources>
+ <Applications><Application Id="Field" StartPage="index.html"><uap:VisualElements DisplayName="稻视界" Description="水稻叶片拍照识别、诊断报告与田块记录" Square150x150Logo="AppAssets\Logo150.png" Square44x44Logo="AppAssets\Logo44.png" BackgroundColor="#176B3A" />
+ <Extensions><uap:Extension Category="windows.protocol"><uap:Protocol Name="rice-hololens-field"><uap:DisplayName>稻视界</uap:DisplayName></uap:Protocol></uap:Extension></Extensions>
+ </Application></Applications>
+ <Capabilities><Capability Name="internetClient" /><uap:Capability Name="picturesLibrary" /><DeviceCapability Name="webcam" /><DeviceCapability Name="location" /></Capabilities>
+</Package>

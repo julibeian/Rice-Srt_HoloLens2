@@ -1,0 +1,2 @@
+# Preserve exact source bytes for build-input and release SHA256 manifests.
+* -text whitespace=cr-at-eol

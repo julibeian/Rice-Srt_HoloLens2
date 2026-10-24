@@ -1,0 +1,28 @@
+{
+  "version": "1.0.0.22",
+  "channel": "experimental-preview",
+  "platform": "HoloLens 2 / ARM64 / UWP",
+  "application_identity": "Rice.HoloLens.Field_r5420n6798s24!Field",
+  "package": {
+    "file": "Rice.HoloLens.Field_1.0.0.22_neutral.appx",
+    "bytes": 2538814,
+    "sha256": "d84baff9465a0689c16b62fbc4842dd1de44857a0a5d903fb0b25a9b6c8cbc79",
+    "type": "development-package"
+  },
+  "validation_reference": "EXP-CAPTURE-001",
+  "package_files_scanned": 99,
+  "configuration_keys": [
+    "version",
+    "apiOrigin",
+    "apiPrefix",
+    "deviceLabel",
+    "cameraDiagnostics"
+  ],
+  "known_credential_signatures_found": false,
+  "raw_photos_and_credentials_included": false,
+  "acceptance_limits": [
+    "Real-leaf accuracy and varied lighting remain unverified.",
+    "Full control coverage, reboot and endurance remain unverified."
+  ],
+  "source_note": "Previously validated development package, preserved without rebuilding; independently rebuilt packages require their own checksums."
+}

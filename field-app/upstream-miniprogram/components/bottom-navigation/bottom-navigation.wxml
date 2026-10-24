@@ -1,0 +1,14 @@
+<view class="bottom-navigation">
+  <view class="nav-item {{active === 'home' ? 'nav-item--active' : ''}}" bindtap="onNavigate" data-target="home">
+    <image class="nav-icon" src="{{active === 'home' ? '/assets/icons/nav-scan-active.png' : '/assets/icons/nav-scan.png'}}" mode="aspectFit"></image>
+    <text class="nav-label">识别</text>
+  </view>
+  <view class="nav-item {{active === 'history' ? 'nav-item--active' : ''}}" bindtap="onNavigate" data-target="history">
+    <image class="nav-icon" src="{{active === 'history' ? '/assets/icons/nav-history-active.png' : '/assets/icons/nav-history.png'}}" mode="aspectFit"></image>
+    <text class="nav-label">记录</text>
+  </view>
+  <view class="nav-item {{active === 'map' ? 'nav-item--active' : ''}}" bindtap="onNavigate" data-target="map">
+    <image class="nav-icon" src="{{active === 'map' ? '/assets/icons/nav-map-active.png' : '/assets/icons/nav-map.png'}}" mode="aspectFit"></image>
+    <text class="nav-label">地图</text>
+  </view>
+</view>

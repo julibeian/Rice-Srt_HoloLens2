@@ -1,0 +1,159 @@
+<view class="history-page">
+  <view class="history-header tool-page-header" style="padding-top: {{headerTopInset}}px;">
+    <view class="tool-header-title-row" style="min-height: {{headerNavHeight}}px; padding-right: {{headerRightInset}}px;">
+      <text class="tool-header-title">检测记录</text>
+      <text class="history-count">{{historyList.length}} 条</text>
+    </view>
+    <view class="tool-header-bottom">
+      <text class="tool-header-desc">回看诊断结果，管理照片位置</text>
+      <view class="settings-entry" bindtap="onOpenProfile" aria-role="button" aria-label="打开权限与数据设置">设置</view>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="history-scroll" enable-back-to-top>
+    <view class="history-content">
+      <view class="list-toolbar" wx:if="{{historyList.length > 0}}">
+        <view>
+          <text class="toolbar-title">{{selectingRecords ? '选择要清理的记录' : '最近诊断'}}</text>
+          <text class="toolbar-note">{{selectingRecords ? '已选择 ' + selectedCount + ' 条' : '本机最多保留 15 条'}}</text>
+        </view>
+        <view class="cancel-selection" wx:if="{{selectingRecords}}" bindtap="onCancelSelection" aria-role="button">取消</view>
+        <view class="clear-action" wx:else bindtap="onManageHistory" aria-role="button" aria-label="选择清理方式">
+          <image src="/assets/icons/trash-red.png" mode="aspectFit"></image>
+          <text>清理</text>
+        </view>
+      </view>
+
+      <view class="empty-state surface-card" wx:if="{{historyError}}">
+        <text class="empty-title">记录暂不可读取</text>
+        <text class="empty-desc">{{historyError}}</text>
+        <view class="empty-button" bindtap="_loadHistory">重试</view>
+      </view>
+
+      <view class="empty-state surface-card" wx:if="{{historyList.length === 0 && !historyError}}">
+        <view class="empty-icon-wrap">
+          <image src="/assets/icons/history-green.png" mode="aspectFit"></image>
+        </view>
+        <text class="empty-title">还没有检测记录</text>
+        <text class="empty-desc">完成一次叶片分析后，结果会自动保存在这里。</text>
+        <navigator url="/pages/index/index" open-type="redirect" class="empty-button">去拍照诊断</navigator>
+      </view>
+
+      <view
+        class="history-card surface-card {{selectingRecords ? 'history-card--selecting' : ''}} {{item.selected ? 'history-card--selected' : ''}}"
+        wx:for="{{historyList}}"
+        wx:key="id"
+        bindtap="onOpenRecord"
+        data-id="{{item.id}}"
+      >
+        <view class="record-checkbox {{item.selected ? 'record-checkbox--checked' : ''}}" wx:if="{{selectingRecords}}">{{item.selected ? '✓' : ''}}</view>
+        <image class="record-thumb" src="{{item.thumbnailPath}}" mode="aspectFill" wx:if="{{item.thumbnailPath}}"></image>
+        <view class="record-thumb record-thumb--empty" wx:else>
+          <image src="/assets/icons/sprout-green.png" mode="aspectFit"></image>
+        </view>
+
+        <view class="record-main">
+          <view class="record-status-row">
+            <view class="record-status record-status--healthy" wx:if="{{item.summary.isAllHealthy}}">
+              <view class="status-dot"></view>
+              <text>状况良好</text>
+            </view>
+            <view class="record-status record-status--disease" wx:elif="{{item.summary.hasDisease}}">
+              <view class="status-dot"></view>
+              <text>{{item.summary.diseaseNamesText}}</text>
+            </view>
+            <view class="record-status record-status--mixed" wx:else>
+              <view class="status-dot"></view>
+              <text>分析完成</text>
+            </view>
+          </view>
+          <text class="record-time">{{item.time}}</text>
+          <text class="record-summary">
+            {{item.summary.diseaseCount || 0}} 张疑似病害 · {{item.summary.healthyCount || 0}} 张健康 · 共 {{item.summary.total || item.imageCount}} 张
+          </text>
+          <view class="record-location-row">
+            <text>{{item.locationSummary}}</text>
+            <text class="location-edit" wx:if="{{!selectingRecords && item.locationEligibleCount > 0}}" catchtap="onEditLocation" data-id="{{item.id}}">{{item.hasAnyGps ? '修正位置' : '补充位置'}}</text>
+          </view>
+        </view>
+
+        <view class="record-side" wx:if="{{!selectingRecords}}">
+          <view
+            class="map-action {{!item.hasAnyGps ? 'map-action--disabled' : ''}} {{item.isMapMarked ? 'map-action--active' : ''}}"
+            catchtap="onToggleMapMark"
+            data-id="{{item.id}}"
+          >
+            <image src="/assets/icons/map-pin-green.png" mode="aspectFit"></image>
+            <text>{{item.isMapMarked ? '已标记' : (!item.hasAnyGps ? '无定位' : '标地图')}}</text>
+          </view>
+          <image class="record-chevron" src="/assets/icons/chevron.png" mode="aspectFit"></image>
+        </view>
+      </view>
+    </view>
+    <view class="selection-safe-space" wx:if="{{selectingRecords}}"></view>
+    <view class="bottom-safe-space"></view>
+  </scroll-view>
+
+  <bottom-navigation id="bottom-navigation" active="history"></bottom-navigation>
+
+  <view class="selection-toolbar" wx:if="{{selectingRecords}}">
+    <view class="select-all-action" bindtap="onSelectAll" aria-role="button" aria-label="{{allRecordsSelected ? '取消全选' : '全选记录'}}">
+      <view class="record-checkbox {{allRecordsSelected ? 'record-checkbox--checked' : ''}}">{{allRecordsSelected ? '✓' : ''}}</view>
+      <text>{{allRecordsSelected ? '取消全选' : '全选'}}</text>
+    </view>
+    <button class="delete-selected" bindtap="onDeleteSelected" disabled="{{clearing || selectedCount === 0}}">{{clearing ? '正在处理…' : '删除所选（' + selectedCount + '）'}}</button>
+  </view>
+
+  <view class="location-overlay" wx:if="{{locationSheet}}" catchtouchmove="onStopLocationTouch">
+    <view class="location-mask" bindtap="onCloseLocationSheet"></view>
+    <view class="location-sheet" style="bottom: {{locationKeyboardHeight}}px;" aria-role="dialog" aria-label="照片位置">
+      <view class="location-sheet-heading">
+        <view class="location-heading-main">
+          <text class="location-sheet-title">{{locationSheet === 'photo' ? '选择照片' : (locationHasPoint ? '修正位置' : '补充位置')}}</text>
+          <text class="location-sheet-note">{{locationSheet === 'photo' ? '仅显示有效识别结果' : locationImageLabel}}</text>
+        </view>
+        <view class="location-back" wx:if="{{locationSheet === 'edit' && locationPhotos.length > 1}}" bindtap="onBackLocationPhotos" aria-role="button">换一张</view>
+      </view>
+
+      <block wx:if="{{locationSheet === 'photo'}}">
+        <scroll-view class="location-photo-list" scroll-y style="height: {{locationPhotos.length > 4 ? 480 : locationPhotos.length * 120}}rpx;">
+          <view class="location-photo-row" wx:for="{{locationPhotos}}" wx:key="imageIndex" bindtap="onSelectLocationPhoto" data-image-index="{{item.imageIndex}}" aria-role="button">
+            <text class="location-photo-number">{{item.label}}</text>
+            <view class="location-photo-main">
+              <text class="location-photo-name">{{item.name}}</text>
+              <text class="location-photo-status">{{item.hasPoint ? '已定位，可修正' : '无定位'}}</text>
+            </view>
+            <image class="location-photo-arrow" src="/assets/icons/chevron.png" mode="aspectFit"></image>
+          </view>
+        </scroll-view>
+      </block>
+
+      <scroll-view wx:else class="location-editor-scroll" scroll-y scroll-into-view="{{locationScrollIntoView}}" style="height: {{locationBodyHeight}}px;">
+        <view class="location-editor-body">
+          <button class="location-map-button" bindtap="onChooseMapLocation" loading="{{choosingMap}}" disabled="{{choosingMap}}">在地图上选点</button>
+          <text class="location-manual-title">或手动填写经纬度</text>
+          <view class="coordinate-types">
+            <view class="coordinate-type {{manualCoordSystem === 'wgs84' ? 'coordinate-type--active' : ''}}" bindtap="onCoordinateSystemChange" data-system="wgs84" aria-role="button" aria-label="GPS WGS-84 坐标">GPS · WGS-84</view>
+            <view class="coordinate-type {{manualCoordSystem === 'gcj02' ? 'coordinate-type--active' : ''}}" bindtap="onCoordinateSystemChange" data-system="gcj02" aria-role="button" aria-label="腾讯高德 GCJ-02 坐标">腾讯/高德 · GCJ-02</view>
+          </view>
+          <text class="coordinate-help">按坐标来源选择类型，填写十进制度数。</text>
+          <view class="coordinate-field" id="location-manualLongitude">
+            <text class="coordinate-label">经度</text>
+            <input class="coordinate-input" type="text" value="{{manualLongitude}}" placeholder="例如 118.761116" maxlength="32" data-field="manualLongitude" bindinput="onLocationInput" bindfocus="onLocationFocus" adjust-position="{{false}}" bindkeyboardheightchange="onLocationKeyboardChange" disabled="{{choosingMap}}" aria-label="经度，范围负180到180"></input>
+          </view>
+          <view class="coordinate-field" id="location-manualLatitude">
+            <text class="coordinate-label">纬度</text>
+            <input class="coordinate-input" type="text" value="{{manualLatitude}}" placeholder="例如 32.035957" maxlength="32" data-field="manualLatitude" bindinput="onLocationInput" bindfocus="onLocationFocus" adjust-position="{{false}}" bindkeyboardheightchange="onLocationKeyboardChange" confirm-type="done" disabled="{{choosingMap}}" aria-label="纬度，范围负90到90"></input>
+          </view>
+          <text class="coordinate-range">经度 -180～180；纬度 -90～90，南纬、西经填负数。</text>
+          <text class="coordinate-error" id="location-coordinate-error" wx:if="{{locationFormError}}" aria-role="alert">{{locationFormError}}</text>
+        </view>
+      </scroll-view>
+
+      <view class="location-sheet-actions">
+        <button class="location-cancel" bindtap="onCloseLocationSheet" disabled="{{choosingMap}}">取消</button>
+        <button class="location-save" wx:if="{{locationSheet === 'edit'}}" bindtap="onSaveCoordinates" disabled="{{choosingMap}}">保存经纬度</button>
+      </view>
+    </view>
+  </view>
+</view>

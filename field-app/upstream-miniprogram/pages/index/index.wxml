@@ -1,0 +1,254 @@
+<view class="page-root">
+  <scroll-view scroll-y class="page-scroll" enable-back-to-top scroll-top="{{reportScrollTop}}" scroll-with-animation="{{reportScrollAnimated}}" bindscroll="onReportScroll">
+    <!-- 首页与选图状态 -->
+    <view wx:if="{{!summary.hasResults && !isHistoryView}}">
+      <view class="home-hero">
+        <view class="hero-brand safe-top">
+          <image class="brand-logo" src="/assets/brand-logo.png" mode="aspectFit"></image>
+          <view class="brand-copy">
+            <view class="brand-line">
+              <text class="brand-name">稻视界</text>
+              <text class="brand-tagline">田野助手</text>
+            </view>
+          </view>
+        </view>
+        <image class="hero-photo" src="/assets/hero-rice.jpg" mode="aspectFill"></image>
+        <view class="hero-fade"></view>
+      </view>
+
+      <view class="home-content">
+        <view class="intro-block">
+          <text class="intro-title">拍一张，<text class="intro-emphasis">快速判断</text>水稻健康</text>
+          <text class="intro-desc">识别稻瘟病、霜霉病、褐斑病等常见病害</text>
+        </view>
+
+        <view class="capture-panel" wx:if="{{images.length === 0}}">
+          <view class="camera-entry" bindtap="onTakePhoto">
+            <view class="camera-orb">
+              <image class="camera-icon" src="/assets/icons/camera-white.png" mode="aspectFit"></image>
+            </view>
+            <text class="camera-label">拍照诊断</text>
+          </view>
+
+          <button class="album-button" bindtap="onChooseFromAlbum">
+            <image class="button-icon" src="/assets/icons/gallery-green.png" mode="aspectFit"></image>
+            <text>从相册选择</text>
+          </button>
+          <text class="limit-note">支持一次选择 1–6 张水稻叶片照片</text>
+        </view>
+
+        <view class="selected-panel surface-card" wx:else>
+          <view class="selected-header">
+            <view>
+              <text class="selected-title">已选 {{images.length}} 张照片</text>
+              <text class="selected-desc">{{selecting ? '正在读取照片位置…' : '检查清晰度后开始分析'}}</text>
+            </view>
+            <view class="selected-add-group" wx:if="{{images.length < 6}}">
+              <view class="mini-add" bindtap="onTakePhoto">
+                <image src="/assets/icons/camera-white.png" mode="aspectFit"></image>
+              </view>
+              <view class="mini-add mini-add--light" bindtap="onChooseFromAlbum">
+                <image src="/assets/icons/gallery-green.png" mode="aspectFit"></image>
+              </view>
+            </view>
+          </view>
+
+          <view class="preview-grid">
+            <view class="preview-cell" wx:for="{{images}}" wx:key="index">
+              <image class="preview-image" src="{{item.path}}" mode="aspectFill"></image>
+              <view class="preview-index">{{item.index}}</view>
+              <text class="preview-location">{{item.locationBadge || '未定位'}}</text>
+              <view class="preview-delete" catchtap="onDeleteImage" data-index="{{index}}">
+                <image src="/assets/icons/close-white.png" mode="aspectFit"></image>
+              </view>
+            </view>
+          </view>
+
+          <text class="location-policy">相册照片只使用照片中的拍摄位置；缺少位置时，可在检测记录中补充田块位置。</text>
+          <button class="detect-button" bindtap="onDetect" disabled="{{loading || selecting || savingHistory}}">
+            <image class="detect-icon" src="/assets/icons/scan-white.png" mode="aspectFit"></image>
+            <text>开始分析 {{images.length}} 张照片</text>
+          </button>
+        </view>
+
+        <view class="tips-card surface-card">
+          <view class="tips-heading">
+            <image src="/assets/icons/leaf-green.png" mode="aspectFit"></image>
+            <text>拍照小贴士</text>
+          </view>
+          <view class="tips-grid">
+            <view class="tip-item">
+              <view class="tip-icon-wrap">
+                <image src="/assets/icons/leaf-green.png" mode="aspectFit"></image>
+              </view>
+              <text class="tip-title">拍清叶片</text>
+              <text class="tip-desc">对准病斑与叶缘</text>
+            </view>
+            <view class="tip-divider"></view>
+            <view class="tip-item">
+              <view class="tip-icon-wrap tip-icon-wrap--gold">
+                <image src="/assets/icons/sun-gold.png" mode="aspectFit"></image>
+              </view>
+              <text class="tip-title">保持光线</text>
+              <text class="tip-desc">自然光更准确</text>
+            </view>
+            <view class="tip-divider"></view>
+            <view class="tip-item">
+              <view class="tip-icon-wrap">
+                <image src="/assets/icons/eye-off-green.png" mode="aspectFit"></image>
+              </view>
+              <text class="tip-title">避免遮挡</text>
+              <text class="tip-desc">清理手指与杂叶</text>
+            </view>
+          </view>
+        </view>
+
+        <view class="risk-strip" bindtap="goToMap">
+          <view class="risk-icon-wrap">
+            <image src="/assets/icons/map-pin-green.png" mode="aspectFit"></image>
+          </view>
+          <view class="risk-copy">
+            <text class="risk-title">{{nearbyRiskText}}</text>
+            <text class="risk-desc">继续保持田间管理，定期巡查更安心</text>
+          </view>
+          <image class="risk-arrow" src="/assets/icons/chevron.png" mode="aspectFit"></image>
+        </view>
+      </view>
+    </view>
+
+    <!-- 诊断报告状态 -->
+    <view class="report-page" wx:else>
+      <view class="report-header tool-page-header" style="padding-top: {{headerTopInset}}px;">
+        <view class="tool-header-title-row" style="min-height: {{headerNavHeight}}px; padding-right: {{headerRightInset}}px;">
+          <image class="report-logo" src="/assets/brand-logo.png" mode="aspectFit"></image>
+          <text class="tool-header-title">诊断报告</text>
+        </view>
+        <view class="tool-header-bottom">
+          <text class="report-time">{{historyTime || summary.time}}</text>
+          <view class="history-return" wx:if="{{isHistoryView}}" bindtap="onReturnToHistory" aria-role="button" aria-label="后退到历史记录列表"><text class="history-back-symbol">‹</text><text>返回记录</text></view>
+        </view>
+      </view>
+
+      <view class="report-content" wx:if="{{summary.hasResults}}">
+        <block wx:if="{{!isHistoryView}}">
+        <view class="diagnosis-banner diagnosis-banner--healthy" wx:if="{{summary.isAllHealthy}}">
+          <image src="/assets/icons/status-healthy.png" mode="aspectFit"></image>
+          <view>
+            <text class="diagnosis-title">本批次水稻状况良好</text>
+            <text class="diagnosis-desc">未发现当前模型支持的常见病害</text>
+          </view>
+        </view>
+        <view class="diagnosis-banner diagnosis-banner--disease" wx:elif="{{summary.hasDisease}}">
+          <image src="/assets/icons/status-disease.png" mode="aspectFit"></image>
+          <view>
+            <text class="diagnosis-title">发现疑似病害</text>
+            <text class="diagnosis-desc">{{summary.diseaseNamesText}}</text>
+          </view>
+        </view>
+        <view class="diagnosis-banner diagnosis-banner--mixed" wx:else>
+          <image src="/assets/icons/status-invalid.png" mode="aspectFit"></image>
+          <view>
+            <text class="diagnosis-title">分析完成，部分照片需重拍</text>
+            <text class="diagnosis-desc">请查看各张照片的具体结果</text>
+          </view>
+        </view>
+        </block>
+
+        <view class="report-stats {{isHistoryView ? 'report-stats--history' : ''}}">
+          <view class="stat-cell" bindtap="onJumpToResults" data-status="disease" hover-class="stat-cell--pressed" aria-role="button" aria-label="查看{{summary.diseaseCount || 0}}张疑似病害结果">
+            <text class="stat-value stat-value--disease">{{summary.diseaseCount || 0}}</text>
+            <text class="stat-label">疑似病害</text>
+          </view>
+          <view class="stat-cell" bindtap="onJumpToResults" data-status="healthy" hover-class="stat-cell--pressed" aria-role="button" aria-label="查看{{summary.healthyCount || 0}}张健康结果">
+            <text class="stat-value stat-value--healthy">{{summary.healthyCount || 0}}</text>
+            <text class="stat-label">健康</text>
+          </view>
+          <view class="stat-cell" bindtap="onJumpToResults" data-status="retake" hover-class="stat-cell--pressed" aria-role="button" aria-label="查看{{summary.invalidCount + summary.failCount || 0}}张需重拍结果">
+            <text class="stat-value">{{summary.invalidCount + summary.failCount || 0}}</text>
+            <text class="stat-label">需重拍</text>
+          </view>
+        </view>
+
+        <view class="result-section">
+          <view class="result-heading">
+            <text class="section-title">逐张结果</text>
+            <text class="result-count">共 {{summary.total}} 张</text>
+          </view>
+
+          <view id="report-result-{{index}}" class="result-card surface-card result-card--{{item.displayStatus}}" wx:for="{{sortedResults}}" wx:key="imageIndex">
+            <image class="result-photo" src="{{item.imagePath}}" mode="aspectFill" bindtap="onPreviewImage" data-url="{{item.imagePath}}"></image>
+            <view class="result-main">
+              <view class="result-topline">
+                <text class="result-name">{{item.predicted_class}}</text>
+                <view class="status-pill status-pill--{{item.displayStatus}}">
+                  <text>{{item.displayStatus === 'healthy' ? '健康' : (item.displayStatus === 'disease' ? '疑似病害' : (item.displayStatus === 'invalid' ? '需重拍' : '失败'))}}</text>
+                </view>
+              </view>
+              <text class="result-meta">{{item.displayLabel}} · 置信度 {{item.confidenceText}}</text>
+              <view class="result-info-line">
+                <text class="result-message" wx:if="{{item.message && item.displayStatus !== 'healthy'}}">{{item.message}} · </text>
+                <text class="result-location">{{item.location && item.location.status === 'located' ? item.locationText : '无定位'}}</text>
+              </view>
+            </view>
+
+            <view class="profile-fold" wx:if="{{item.displayStatus === 'disease' && item.profile}}">
+              <view class="profile-head" bindtap="onToggleProfile" data-index="{{item.imageIndex}}" aria-role="button" aria-expanded="{{item.profileOpen}}" aria-label="{{item.predicted_class}}详细">
+                <text class="profile-title">详细</text>
+                <view class="profile-toggle"><text>{{item.profileOpen ? '收起' : '展开'}}</text><view class="profile-chevron {{item.profileOpen ? 'profile-chevron--open' : ''}}"></view></view>
+              </view>
+              <view class="profile-body" wx:if="{{item.profileOpen}}">
+                <view class="detail-photos">
+                  <view class="detail-photo-item" wx:for="{{item.profile.photos}}" wx:for-item="photo" wx:for-index="photoIndex" wx:key="src" bindtap="onPreviewDiseasePhoto" data-result-index="{{item.imageIndex}}" data-photo-index="{{photoIndex}}" aria-role="button" aria-label="{{item.predicted_class}}，{{photo.caption}}，点照片放大">
+                    <image class="detail-photo" src="{{photo.src}}" mode="aspectFit" lazy-load="{{true}}"></image>
+                    <text class="detail-photo-caption">{{photo.caption}}</text>
+                  </view>
+                </view>
+                <text class="judgment-title">判断要点</text>
+                <view class="judgment-row" wx:for="{{item.profile.judgments}}" wx:for-item="judgment" wx:for-index="judgmentIndex" wx:key="*this">
+                  <text class="judgment-index">{{judgmentNumbers[judgmentIndex]}}</text>
+                  <text class="judgment-text">{{judgment}}</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+
+        <view class="report-actions" wx:if="{{!isHistoryView}}">
+          <button class="action-secondary" bindtap="onRetest">
+            <image src="/assets/icons/retest-green.png" mode="aspectFit"></image>
+            <text>再测一次</text>
+          </button>
+          <button class="action-primary" bindtap="onGeneratePoster" disabled="{{!posterReady}}">
+            <image src="/assets/icons/download-white.png" mode="aspectFit"></image>
+            <text>{{posterReady ? '保存报告' : '正在保存'}}</text>
+          </button>
+        </view>
+
+        <view class="report-actions" wx:else>
+          <button class="action-secondary" bindtap="onReturnToHistory">返回记录</button>
+          <button class="action-primary" bindtap="onGeneratePoster">
+            <image src="/assets/icons/download-white.png" mode="aspectFit"></image>
+            <text>保存报告</text>
+          </button>
+        </view>
+      </view>
+      <view class="history-loading" wx:else>正在打开报告…</view>
+    </view>
+
+    <view class="bottom-safe-space"></view>
+  </scroll-view>
+
+  <bottom-navigation id="bottom-navigation" active="{{isHistoryView ? 'history' : 'home'}}"></bottom-navigation>
+
+  <canvas type="2d" id="posterCanvas" class="poster-canvas" style="{{posterStyle}}"></canvas>
+
+  <view class="loading-overlay" wx:if="{{loading}}">
+    <view class="loading-card">
+      <view class="loading-ring">
+        <image src="/assets/icons/nav-scan-active.png" mode="aspectFit"></image>
+      </view>
+      <text class="loading-title">正在分析叶片</text>
+      <text class="loading-text">{{statusText || '请稍候'}}</text>
+    </view>
+  </view>
+</view>

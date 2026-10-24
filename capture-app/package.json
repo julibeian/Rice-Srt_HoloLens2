@@ -1,0 +1,10 @@
+{
+  "name": "rice-hololens-capture-prototype",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "test": "node --test web/tests/core.test.mjs uwp/core.test.cjs",
+    "test:browser": "node web/tests/browser-smoke.mjs && node uwp/ui.test.mjs"
+  },
+  "devDependencies": {"playwright": "1.62.1"}
+}

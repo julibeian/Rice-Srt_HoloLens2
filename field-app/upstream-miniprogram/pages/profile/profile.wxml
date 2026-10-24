@@ -1,0 +1,56 @@
+<view class="profile-page">
+  <view class="settings-brand">
+    <image class="settings-logo" src="/assets/brand-logo.png" mode="aspectFit"></image>
+    <view class="settings-brand-copy"><text class="settings-app-name">稻视界</text><text class="settings-brand-note">田野助手 · 水稻叶片识别</text></view>
+    <text class="version-text">{{versionText}}</text>
+  </view>
+
+  <view class="settings-intro">
+    <text class="page-title">权限与数据</text>
+    <text class="settings-subtitle">查看位置授权，整理本机检测记录</text>
+  </view>
+
+  <text class="settings-group-label">使用权限</text>
+  <view class="settings-card surface-card">
+    <view class="settings-row permission-row {{openingSettings ? 'permission-row--busy' : ''}}" bindtap="onOpenSettings" aria-role="button" aria-disabled="{{openingSettings}}" aria-label="打开微信位置授权设置">
+      <view class="settings-icon-wrap"><image src="/assets/icons/map-pin-green.png" mode="aspectFit"></image></view>
+      <view class="settings-row-copy"><text class="settings-row-title">位置授权</text><text class="settings-row-note">拍照补位、田块选点与地图定位</text></view>
+      <text class="permission-state permission-state--{{locationStatus}}">{{openingSettings ? '打开中' : locationLabel}}</text>
+      <image class="settings-chevron" src="/assets/icons/chevron.png" mode="aspectFit"></image>
+    </view>
+    <text class="permission-note">仅在需要时获取位置，关闭后仍可识别照片。实际定位还受系统定位开关与隐私授权影响。</text>
+  </view>
+
+  <text class="settings-group-label">本机数据</text>
+  <view class="settings-card storage-card surface-card">
+    <view class="storage-heading"><text class="settings-row-title">检测记录</text><text class="storage-badge">仅在本机保存</text></view>
+    <view class="storage-summary">
+      <text class="storage-count">{{historyError ? '—' : recordCount}}<text class="storage-unit"> / {{historyLimit}} 条</text></text>
+      <text class="storage-description">超过上限时移除最旧记录</text>
+    </view>
+    <view class="storage-progress"><view class="storage-progress-fill" style="width: {{historyError ? 0 : recordProgress}}%;"></view></view>
+    <text class="settings-error" wx:if="{{historyError}}">{{historyError}}</text>
+    <view class="storage-actions">
+      <button class="manage-records-button" bindtap="onManageRecords" disabled="{{clearing || recordCount === 0 || historyError}}">选择记录清理</button>
+      <button class="clear-history-button" bindtap="onClearHistory" disabled="{{clearing}}">{{clearing ? '正在处理…' : '全部清空'}}</button>
+    </view>
+    <text class="storage-note">清理会移除对应照片、位置与地图标记。相册中另存的报告需自行删除。</text>
+  </view>
+
+  <text class="settings-group-label">隐私与说明</text>
+  <view class="settings-card surface-card">
+    <view class="settings-row privacy-toggle" bindtap="onTogglePrivacy" aria-role="button" aria-expanded="{{privacyExpanded}}" aria-label="查看照片与位置说明">
+      <view class="settings-icon-wrap"><image src="/assets/icons/shield-green.png" mode="aspectFit"></image></view>
+      <view class="settings-row-copy"><text class="settings-row-title">照片与位置如何使用</text><text class="settings-row-note">照片上传识别，记录保存在本机</text></view>
+      <text class="privacy-toggle-label">{{privacyExpanded ? '收起' : '查看'}}</text>
+      <image class="settings-chevron {{privacyExpanded ? 'settings-chevron--open' : ''}}" src="/assets/icons/chevron.png" mode="aspectFit"></image>
+    </view>
+    <view class="privacy-details" wx:if="{{privacyExpanded}}">
+      <view class="privacy-row"><text class="privacy-label">照片用途</text><text class="settings-body">选中的照片会上传至识别服务进行分析，照片内的原始位置信息可能随图片一同上传。本小程序不提供照片公开展示；服务端的保存情况须以运营方隐私说明为准。</text></view>
+      <view class="privacy-row"><text class="privacy-label">位置用途</text><text class="settings-body">相册照片只读取照片内的位置；新拍照片缺少位置时尝试获取设备位置，也可手动补充田块位置。不会在后台持续定位。地图仅展示本人在本机主动标记的照片位置。</text></view>
+      <view class="privacy-row"><text class="privacy-label">保存与保留</text><text class="settings-body">检测结果、照片位置和回看照片最多保留 {{historyLimit}} 条。清理缓存、卸载或更换设备可能丢失记录。清空本机记录不会删除识别服务端的数据。</text></view>
+    </view>
+  </view>
+
+  <view class="settings-about"><text class="about-title">关于稻视界</text><text class="settings-body">水稻叶片图像识别工具。AI 识别与田间处置提示仅供参考，不能代替田间诊断；施药前请咨询当地农技部门并遵守产品标签。</text></view>
+</view>

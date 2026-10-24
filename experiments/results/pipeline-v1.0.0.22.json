@@ -1,0 +1,78 @@
+{
+  "experiment_id": "EXP-CAPTURE-001",
+  "app_version": "1.0.0.22",
+  "device_type": "HoloLens 2",
+  "sample_kind": "non_leaf_control",
+  "sample_count": 1,
+  "conditions": "Single indoor control scene",
+  "images": {
+    "source": {
+      "bytes": 1348192,
+      "sha256": "dde80a733a9bc9dfbbd95d70848113baecb742605686b0c093f46a433449ea49",
+      "width": 3904,
+      "height": 2196
+    },
+    "crop": {
+      "bytes": 284432,
+      "sha256": "cd1a5587c6f1bda6dcab586e14db499c37a30409a1fb1ecf1a5b718feb1d3eb3",
+      "width": 1318,
+      "height": 1318
+    }
+  },
+  "binding": {
+    "ordered_steps": [
+      "capture_requested",
+      "raw_photo_captured",
+      "photo_captured",
+      "upload_started",
+      "prediction_received",
+      "history_saved"
+    ],
+    "upload_image_sha256": "cd1a5587c6f1bda6dcab586e14db499c37a30409a1fb1ecf1a5b718feb1d3eb3",
+    "prediction_image_sha256": "cd1a5587c6f1bda6dcab586e14db499c37a30409a1fb1ecf1a5b718feb1d3eb3",
+    "uploaded_bytes": 284432,
+    "request_identity_matched": true
+  },
+  "model_result": {
+    "class_name": "其他",
+    "is_valid": false
+  },
+  "quality": {
+    "crop_sharpness_log_value": 141.2,
+    "measurements": [
+      {
+        "kind": "source",
+        "sha256": "dde80a733a9bc9dfbbd95d70848113baecb742605686b0c093f46a433449ea49",
+        "width": 3904,
+        "height": 2196,
+        "luminance_mean": 112.362,
+        "luminance_p05": 49.559,
+        "luminance_p95": 167.219,
+        "highlight_fraction_ge_250": 3e-06,
+        "shadow_fraction_le_5": 6e-06
+      },
+      {
+        "kind": "crop",
+        "sha256": "cd1a5587c6f1bda6dcab586e14db499c37a30409a1fb1ecf1a5b718feb1d3eb3",
+        "width": 1318,
+        "height": 1318,
+        "luminance_mean": 130.161,
+        "luminance_p05": 93.986,
+        "luminance_p95": 200.722,
+        "highlight_fraction_ge_250": 0.0,
+        "shadow_fraction_le_5": 0.0
+      }
+    ]
+  },
+  "visible_controls_verified": [
+    "target_region",
+    "shutter"
+  ],
+  "unverified": {
+    "real_leaf_performance": false,
+    "varied_lighting": false,
+    "all_controls": false,
+    "reboot_and_endurance": false
+  },
+  "artifact_scope": "Summary only. Raw images and technical run records are managed as controlled experimental materials."
+}

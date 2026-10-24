@@ -1,0 +1,35 @@
+name: 资料收集
+description: 补充文献、数据集、官方文档或工具，并说明项目用途
+title: "[资料] "
+body:
+  - type: input
+    id: source
+    attributes:
+      label: 原始来源
+      description: 标题、链接、DOI 或版本
+    validations:
+      required: true
+  - type: dropdown
+    id: category
+    attributes:
+      label: 资料类型
+      options:
+        - 官方文档
+        - 论文
+        - 数据集
+        - 代码或工具
+        - 采集与实验规范
+    validations:
+      required: true
+  - type: textarea
+    id: relevance
+    attributes:
+      label: 与项目的关系
+      description: 对应模块、实验议题，以及可以使用的内容
+    validations:
+      required: true
+  - type: textarea
+    id: limits
+    attributes:
+      label: 依据、限制与许可
+      description: 已阅读内容、适用条件、版权或许可、待核对项

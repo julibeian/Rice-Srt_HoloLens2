@@ -1,0 +1,409 @@
+{
+  "scope": "Nine disease-specific result details, 18 real photographs; not a model accuracy evaluation.",
+  "rights": "Original photographs remain copyrighted by their institutions/authors. Attribution does not grant a new license.",
+  "notes": [
+    "Seventeen JPEG files are byte-for-byte copies of the existing cache. All were visually matched to newly fetched institutional originals.",
+    "Some earlier cached derivatives crop or resize the original. The interface adds no further crop and opens the complete packaged JPEG.",
+    "The TNAU bacterial-streak second image has an unrelated alt attribute on the source site. Classification was checked against the page heading, adjacent caption and photograph, not that alt text.",
+    "Dead heart is a symptom with multiple causes. The two photos illustrate a stem-borer case and a bore hole, not every possible cause.",
+    "Ishikawa photos show rice downy mildew (Japanese name: 黄化萎縮病), with Sclerophthora macrospora identified on the source page."
+  ],
+  "photos": [
+    {
+      "file": "assets/symptoms/blast-leaf.jpg",
+      "guideId": "blast",
+      "credit": "LSU AgCenter / Donald Groth",
+      "pageUrl": "https://www.lsuagcenter.com/topics/crops/rice/diseases/photos/blast",
+      "imageUrl": "https://www.lsuagcenter.com/~/media/system/d/d/8/7/dd872c5887ccd784859a6ed948a4e3f2/blast7.jpg",
+      "sourceSize": [
+        3872,
+        2592
+      ],
+      "sourceSha256": "52d39db54d02ce7b28563b301a9fab0d57f3f50ab575a99bc459e95a6ae2bb2b",
+      "localSize": [
+        720,
+        480
+      ],
+      "localSha256": "40a3d6f85da1d66d3da9b1f4e479694cfe168f8ff6806bcb68090393ee299d05",
+      "reusedCachedJpeg": true,
+      "transform": "Unchanged cached JPEG; previous resize/crop retained. No generated or retouched symptoms.",
+      "verification": "Downloaded the original from the institution page; reviewed it side by side with the cached derivative.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    },
+    {
+      "file": "assets/symptoms/blast-neck.jpg",
+      "guideId": "blast",
+      "credit": "LSU AgCenter / Donald Groth",
+      "pageUrl": "https://www.lsuagcenter.com/topics/crops/rice/diseases/photos/blast",
+      "imageUrl": "https://www.lsuagcenter.com/~/media/system/a/d/c/c/adcca17d11f5b455eb046f8c38141aa0/blast21.jpg",
+      "sourceSize": [
+        3872,
+        2592
+      ],
+      "sourceSha256": "d8b669be938c1b3b56a43a3b86a75784b906ae0969d434f11bad8e7ff0081d71",
+      "localSize": [
+        720,
+        480
+      ],
+      "localSha256": "6b00afd149f28a4d4d6e678c67899f5dfd8867b92b3c70fecd3a0b61278c3bb9",
+      "reusedCachedJpeg": true,
+      "transform": "Unchanged cached JPEG; previous resize/crop retained. No generated or retouched symptoms.",
+      "verification": "Downloaded the original from the institution page; reviewed it side by side with the cached derivative.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    },
+    {
+      "file": "assets/symptoms/brown-spot-close.jpg",
+      "guideId": "brown-spot",
+      "credit": "LSU AgCenter / Donald Groth",
+      "pageUrl": "https://www.lsuagcenter.com/topics/crops/rice/diseases/photos/brown_spot",
+      "imageUrl": "https://www.lsuagcenter.com/~/media/system/a/d/8/5/ad8530570cba97948c70c60bf250afdc/brownspot3.jpg",
+      "sourceSize": [
+        1244,
+        897
+      ],
+      "sourceSha256": "a43aa21f73d2f7c54e185e876231ab14eba4396d1b02f03b8ea3f3df32209be9",
+      "localSize": [
+        720,
+        480
+      ],
+      "localSha256": "2b3861f0cf5c39d9c2bb86bd0f8c554b7bef9382cfed83411921c3a420acc5f9",
+      "reusedCachedJpeg": true,
+      "transform": "Unchanged cached JPEG; previous resize/crop retained. No generated or retouched symptoms.",
+      "verification": "Downloaded the original from the institution page; reviewed it side by side with the cached derivative.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    },
+    {
+      "file": "assets/symptoms/brown-spot-field.jpg",
+      "guideId": "brown-spot",
+      "credit": "LSU AgCenter / Donald Groth",
+      "pageUrl": "https://www.lsuagcenter.com/topics/crops/rice/diseases/photos/brown_spot",
+      "imageUrl": "https://www.lsuagcenter.com/~/media/system/3/8/f/4/38f440a34722ecaa997dfb2fca462d4e/brownspot6.jpg",
+      "sourceSize": [
+        2907,
+        2034
+      ],
+      "sourceSha256": "49ccf155361ef7dfc4f15c9a1dc71652403b3fb037b816c54d8e0f59a08abd7c",
+      "localSize": [
+        720,
+        480
+      ],
+      "localSha256": "cd3f0542c0e8bc08966ef9309d859e1f1c1dc4bc1be60e12f4af3b9c16690597",
+      "reusedCachedJpeg": true,
+      "transform": "Unchanged cached JPEG; previous resize/crop retained. No generated or retouched symptoms.",
+      "verification": "Downloaded the original from the institution page; reviewed it side by side with the cached derivative.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    },
+    {
+      "file": "assets/symptoms/sheath-blight-waterline.jpg",
+      "guideId": "sheath-blight",
+      "credit": "LSU AgCenter / Donald Groth",
+      "pageUrl": "https://www.lsuagcenter.com/topics/crops/rice/diseases/photos/sheath_blight",
+      "imageUrl": "https://www.lsuagcenter.com/~/media/system/6/2/c/d/62cde1eb034b7e5bd5fd446559322cd9/sb21.jpg",
+      "sourceSize": [
+        2206,
+        1562
+      ],
+      "sourceSha256": "ce53cbb7ffaade9d5363e42ba509e2e8fdca3d48495d060efd4269fbb2e033e6",
+      "localSize": [
+        720,
+        480
+      ],
+      "localSha256": "188e68107b5bec99432071a0583d562b306e46ff0392be3b91c329ea380fc127",
+      "reusedCachedJpeg": true,
+      "transform": "Unchanged cached JPEG; previous resize/crop retained. No generated or retouched symptoms.",
+      "verification": "Downloaded the original from the institution page; reviewed it side by side with the cached derivative.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    },
+    {
+      "file": "assets/symptoms/sheath-blight-lesion.jpg",
+      "guideId": "sheath-blight",
+      "credit": "LSU AgCenter / Donald Groth",
+      "pageUrl": "https://www.lsuagcenter.com/topics/crops/rice/diseases/photos/sheath_blight",
+      "imageUrl": "https://www.lsuagcenter.com/~/media/system/2/4/e/a/24ea17291d6595f44dd1a15b80b03442/sb11.jpg",
+      "sourceSize": [
+        3872,
+        2592
+      ],
+      "sourceSha256": "1e355ee41961e90a2e3d52103b44b8039e22d9cbef569df69020f01bd023279d",
+      "localSize": [
+        720,
+        480
+      ],
+      "localSha256": "1fafe5c5a33d00d838469fa187a090bd90befd1f5722ac8ee4919f8f5387b39f",
+      "reusedCachedJpeg": true,
+      "transform": "Unchanged cached JPEG; previous resize/crop retained. No generated or retouched symptoms.",
+      "verification": "Downloaded the original from the institution page; reviewed it side by side with the cached derivative.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    },
+    {
+      "file": "assets/symptoms/bacterial-streak-early.jpg",
+      "guideId": "bacterial-streak",
+      "credit": "Tamil Nadu Agricultural University",
+      "pageUrl": "https://agritech.tnau.ac.in/expert_system/paddy/cpdisbls.html",
+      "imageUrl": "https://agritech.tnau.ac.in/expert_system/paddy/Images/Images/diseases/9.%20bacterial%20leaf%20streak/symptoms/Brown%20to%20greyish%20longitudinal%20streaks%20on%20leaves.jpg",
+      "sourceSize": [
+        150,
+        150
+      ],
+      "sourceSha256": "4781e8f4f16699d118c73baed75b834888f10b9c9b5b340c70351e000e935a67",
+      "localSize": [
+        720,
+        480
+      ],
+      "localSha256": "e8286dbfb79d4b4eebe7052bf2355c6e0b53cfe06c196a5b629da45d61eab941",
+      "reusedCachedJpeg": true,
+      "transform": "Unchanged cached JPEG; previous resize/crop retained. No generated or retouched symptoms.",
+      "verification": "Downloaded the original from the institution page; reviewed it side by side with the cached derivative.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    },
+    {
+      "file": "assets/symptoms/bacterial-streak-severe.jpg",
+      "guideId": "bacterial-streak",
+      "credit": "Tamil Nadu Agricultural University",
+      "pageUrl": "https://agritech.tnau.ac.in/expert_system/paddy/cpdisbls.html",
+      "imageUrl": "https://agritech.tnau.ac.in/expert_system/paddy/Images/Images/diseases/9.%20bacterial%20leaf%20streak/symptoms/Lesions%20turn%20brown%20to%20greyish%20and%20drying%20of%20leaves.jpg",
+      "sourceSize": [
+        150,
+        150
+      ],
+      "sourceSha256": "5ac76930a288b8fa680fc0d75ce0b85efa1ece0306f5845271b530bf53cabb50",
+      "localSize": [
+        720,
+        480
+      ],
+      "localSha256": "2ead8294b0f99a6e9b3085a39cf1523d66e1d4119fcacd88559496f5c7c4aa57",
+      "reusedCachedJpeg": true,
+      "transform": "Unchanged cached JPEG; previous resize/crop retained. No generated or retouched symptoms.",
+      "verification": "Downloaded the original from the institution page; reviewed it side by side with the cached derivative.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    },
+    {
+      "file": "assets/symptoms/bacterial-blight-edge.jpg",
+      "guideId": "bacterial-blight",
+      "credit": "Tamil Nadu Agricultural University",
+      "pageUrl": "https://agritech.tnau.ac.in/expert_system/paddy/cpdisblb.html",
+      "imageUrl": "https://agritech.tnau.ac.in/expert_system/paddy/Images/Images/diseases/3.%20bacterial%20leaf%20blight/symptoms/2-%20Leaves%20with%20Wavy%20yellow%20marginal%20necrosis.JPG",
+      "sourceSize": [
+        150,
+        150
+      ],
+      "sourceSha256": "61be90d442ccff833562ca3abc76b48db4536737e5eb5ffd4371fee0d1055a90",
+      "localSize": [
+        720,
+        480
+      ],
+      "localSha256": "b9db31137e73747407491c534299f8c4224bca3a4d80f9bb899fdae99c7502a1",
+      "reusedCachedJpeg": true,
+      "transform": "Unchanged cached JPEG; previous resize/crop retained. No generated or retouched symptoms.",
+      "verification": "Downloaded the original from the institution page; reviewed it side by side with the cached derivative.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    },
+    {
+      "file": "assets/symptoms/bacterial-blight-severe.jpg",
+      "guideId": "bacterial-blight",
+      "credit": "Tamil Nadu Agricultural University",
+      "pageUrl": "https://agritech.tnau.ac.in/expert_system/paddy/cpdisblb.html",
+      "imageUrl": "https://agritech.tnau.ac.in/expert_system/paddy/Images/Images/diseases/3.%20bacterial%20leaf%20blight/symptoms/4-%20Affected%20Leaves%20with%20Wavy%20yellow%20marginal%20necrosis.JPG",
+      "sourceSize": [
+        150,
+        150
+      ],
+      "sourceSha256": "5cb6c2eba8deb6c119cee32050879d8c554801905e04af14d14a7f60e3c18dd4",
+      "localSize": [
+        720,
+        480
+      ],
+      "localSha256": "c52d9c183be59c4dbc7fc8fa76be64b6ed04c0fe7b44e1e01a98593ac2b214db",
+      "reusedCachedJpeg": true,
+      "transform": "Unchanged cached JPEG; previous resize/crop retained. No generated or retouched symptoms.",
+      "verification": "Downloaded the original from the institution page; reviewed it side by side with the cached derivative.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    },
+    {
+      "file": "assets/symptoms/panicle-blight-compare.jpg",
+      "guideId": "panicle-blight",
+      "credit": "LSU AgCenter / Donald Groth",
+      "pageUrl": "https://www.lsuagcenter.com/topics/crops/rice/diseases/photos/bacterial-panicle-blight",
+      "imageUrl": "https://www.lsuagcenter.com/~/media/system/1/d/8/7/1d87a9774523b3ab4e0a123aab81a966/bpb18.jpg",
+      "sourceSize": [
+        2575,
+        2006
+      ],
+      "sourceSha256": "6627e35ddff548adbd6b9d428f00d16a6af4de74696d1ac7b94ac325c12fead4",
+      "localSize": [
+        720,
+        480
+      ],
+      "localSha256": "17167cbbed36f475ed707a12377bb9459bc2d8b53d720fe60138f908062649df",
+      "reusedCachedJpeg": true,
+      "transform": "Unchanged cached JPEG; previous resize/crop retained. No generated or retouched symptoms.",
+      "verification": "Downloaded the original from the institution page; reviewed it side by side with the cached derivative.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    },
+    {
+      "file": "assets/symptoms/panicle-blight-field.jpg",
+      "guideId": "panicle-blight",
+      "credit": "LSU AgCenter / Donald Groth",
+      "pageUrl": "https://www.lsuagcenter.com/topics/crops/rice/diseases/photos/bacterial-panicle-blight",
+      "imageUrl": "https://www.lsuagcenter.com/~/media/system/a/a/f/a/aafadf87d0bda8675f98493ee8e9d742/bpb5.jpg",
+      "sourceSize": [
+        3872,
+        2592
+      ],
+      "sourceSha256": "b9d81525f883d5288cb402356554f93a0d070ae6869db5429465234f2a9d4683",
+      "localSize": [
+        720,
+        480
+      ],
+      "localSha256": "c497c70a95094c4db935385e9d2c5e5209d5234ac894bec01a98c7b84b042f2e",
+      "reusedCachedJpeg": true,
+      "transform": "Unchanged cached JPEG; previous resize/crop retained. No generated or retouched symptoms.",
+      "verification": "Downloaded the original from the institution page; reviewed it side by side with the cached derivative.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    },
+    {
+      "file": "assets/symptoms/downy-mildew-plant.jpg",
+      "guideId": "downy-mildew",
+      "credit": "石川县农业试验场",
+      "pageUrl": "https://www.pref.ishikawa.lg.jp/noken/noushi/sindanzirei/kensakuitiran/ineoukaisyuku.html",
+      "imageUrl": "https://www.pref.ishikawa.lg.jp/noken/noushi/sindanzirei/kensakuitiran/images/1.jpg",
+      "sourceSize": [
+        480,
+        312
+      ],
+      "sourceSha256": "4959c85f78277ee07805f303b139e3d9916a229aef6098d2d60fa96dec031a6c",
+      "localSize": [
+        720,
+        480
+      ],
+      "localSha256": "ef74382343be0137ab3b799d0d429b90140a95e8d899a7bf16228a24b9b73ca3",
+      "reusedCachedJpeg": true,
+      "transform": "Unchanged cached JPEG; previous resize/crop retained. No generated or retouched symptoms.",
+      "verification": "Downloaded the original from the institution page; reviewed it side by side with the cached derivative.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    },
+    {
+      "file": "assets/symptoms/downy-mildew-leaf.jpg",
+      "guideId": "downy-mildew",
+      "credit": "石川县农业试验场",
+      "pageUrl": "https://www.pref.ishikawa.lg.jp/noken/noushi/sindanzirei/kensakuitiran/ineoukaisyuku.html",
+      "imageUrl": "https://www.pref.ishikawa.lg.jp/noken/noushi/sindanzirei/kensakuitiran/images/2.jpg",
+      "sourceSize": [
+        480,
+        375
+      ],
+      "sourceSha256": "dc5845a15ce1276872e5b471a6dc59892a45e0911aa3d66f079866a20f8f697f",
+      "localSize": [
+        720,
+        480
+      ],
+      "localSha256": "96deb1f41abdfec9932cb61f50d807ec7e118569f9377b312050221ec4b9eacd",
+      "reusedCachedJpeg": true,
+      "transform": "Unchanged cached JPEG; previous resize/crop retained. No generated or retouched symptoms.",
+      "verification": "Downloaded the original from the institution page; reviewed it side by side with the cached derivative.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    },
+    {
+      "file": "assets/symptoms/dead-heart-symptom.jpg",
+      "guideId": "dead-heart",
+      "credit": "Tamil Nadu Agricultural University",
+      "pageUrl": "https://agritech.tnau.ac.in/ta/crop_protection/rice/crop_prot_crop_rice_4.html",
+      "imageUrl": "https://agritech.tnau.ac.in/crop_protection/images/pestc/ricenew/stemborer/deadheart.jpg",
+      "sourceSize": [
+        494,
+        635
+      ],
+      "sourceSha256": "3a5c78f590f1adb8459e60de1305423a60a2ef1ae3a80a5f26748056e8f21018",
+      "localSize": [
+        720,
+        480
+      ],
+      "localSha256": "0421de767fffe6b0d042d373152e199eb54dc881ffbd906206fb68041e00cf57",
+      "reusedCachedJpeg": true,
+      "transform": "Unchanged cached JPEG; previous resize/crop retained. No generated or retouched symptoms.",
+      "verification": "Downloaded the original from the institution page; reviewed it side by side with the cached derivative.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    },
+    {
+      "file": "assets/symptoms/tungro-leaf.jpg",
+      "guideId": "tungro",
+      "credit": "Tamil Nadu Agricultural University",
+      "pageUrl": "https://agritech.tnau.ac.in/expert_system/paddy/cpdistungro.html",
+      "imageUrl": "https://agritech.tnau.ac.in/expert_system/paddy/Images/Images/diseases/4.%20tungro/symptoms/1-yellowing%20from%20tip%20to%20downwards.JPG",
+      "sourceSize": [
+        150,
+        150
+      ],
+      "sourceSha256": "cb3cd3a9e4b317fa3cd1aab9c2717a61c1592535c91f9adae1d7bcbd5a189727",
+      "localSize": [
+        720,
+        480
+      ],
+      "localSha256": "a031e7f73151d8f6606bab3290f72b4e8fae52680efd7f2cefce5d32048138e7",
+      "reusedCachedJpeg": true,
+      "transform": "Unchanged cached JPEG; previous resize/crop retained. No generated or retouched symptoms.",
+      "verification": "Downloaded the original from the institution page; reviewed it side by side with the cached derivative.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    },
+    {
+      "file": "assets/symptoms/tungro-field.jpg",
+      "guideId": "tungro",
+      "credit": "Tamil Nadu Agricultural University",
+      "pageUrl": "https://agritech.tnau.ac.in/expert_system/paddy/cpdistungro.html",
+      "imageUrl": "https://agritech.tnau.ac.in/expert_system/paddy/Images/Images/diseases/4.%20tungro/symptoms/4-Tungro%20affected%20field.jpg",
+      "sourceSize": [
+        150,
+        150
+      ],
+      "sourceSha256": "e4766eb216acbe74a531a3aae86aba99bcec72fcf8e66588dd0d8405c3645267",
+      "localSize": [
+        720,
+        480
+      ],
+      "localSha256": "f115835045fcb19b305d63039ab3a86a6d0986f98f06f553a25bdf05cf9c5b85",
+      "reusedCachedJpeg": true,
+      "transform": "Unchanged cached JPEG; previous resize/crop retained. No generated or retouched symptoms.",
+      "verification": "Downloaded the original from the institution page; reviewed it side by side with the cached derivative.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    },
+    {
+      "file": "assets/symptoms/dead-heart-bore-hole.jpg",
+      "guideId": "dead-heart",
+      "credit": "Tamil Nadu Agricultural University",
+      "pageUrl": "https://agritech.tnau.ac.in/expert_system/paddy/cppests_SB.html",
+      "imageUrl": "https://agritech.tnau.ac.in/expert_system/paddy/Images/Images/Cropprotection/pest%20photos/2.%20stem%20borer/symptoms/3.%20Bore%20hole%20symptom.jpg",
+      "sourceSize": [
+        200,
+        150
+      ],
+      "sourceSha256": "1f0638475a3389f17acf22c250e8dd6a8eba546279aefa6d24ed3eacaee7c00c",
+      "localSize": [
+        200,
+        150
+      ],
+      "localSha256": "1f0638475a3389f17acf22c250e8dd6a8eba546279aefa6d24ed3eacaee7c00c",
+      "reusedCachedJpeg": false,
+      "transform": "Original JPEG unchanged; no enlargement or crop.",
+      "verification": "Downloaded from the Stem borer symptom section, captioned Bore hole; replaces an adult moth example.",
+      "verifiedOn": "2026-10-17",
+      "visualReviewPassed": true
+    }
+  ]
+}

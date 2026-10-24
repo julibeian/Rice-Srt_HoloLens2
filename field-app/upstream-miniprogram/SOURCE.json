@@ -1,0 +1,432 @@
+{
+  "buildInputFiles": 83,
+  "files": [
+    {
+      "path": "assets/brand-logo.png",
+      "bytes": 30920,
+      "sha256": "f30c6a661641a1cfb2b9ea4bd87aef7b5a4427055744a919e81d9ca54a22a19a"
+    },
+    {
+      "path": "assets/brand-source.png",
+      "bytes": 1095484,
+      "sha256": "70028a7e4c049bd5cd6661688921349d1724fcb73e8de285d3d0c4c6aeb32cfe"
+    },
+    {
+      "path": "assets/hero-rice.jpg",
+      "bytes": 54483,
+      "sha256": "bd519315b7d2a457d3829ac0d7c8db81ce0a6535b8aa64a4bc55fef5d6ef3c02"
+    },
+    {
+      "path": "assets/icons/book-white.png",
+      "bytes": 967,
+      "sha256": "36fd2bf5ff6d9d8d4a6b2dee4b6420db41b927265a21cc0753ccd3b6d2013fc9"
+    },
+    {
+      "path": "assets/icons/camera-white.png",
+      "bytes": 1329,
+      "sha256": "e851135e454236c3ed90fce0dd853ea31b7c94736bffa800091117d6fa1a614f"
+    },
+    {
+      "path": "assets/icons/chevron.png",
+      "bytes": 413,
+      "sha256": "c88a973e90c344b3bd2b178b9635eb5341f79a0c48e4f9e80d62c4cdd19dd8ce"
+    },
+    {
+      "path": "assets/icons/clock-gray.png",
+      "bytes": 2328,
+      "sha256": "4eb59147f8fbe7bd679b5dd1dcca00b358ee52abf068e0ee24c8db9bf426d160"
+    },
+    {
+      "path": "assets/icons/close-white.png",
+      "bytes": 535,
+      "sha256": "450952b614e6f269697b5dcdee1cfa3fa434dc6cb11087784c49a13f31b391f2"
+    },
+    {
+      "path": "assets/icons/download-white.png",
+      "bytes": 795,
+      "sha256": "8caab7ad0fc9f51d712cc7819f824924d39f040336863381d44f9baf6664cdd3"
+    },
+    {
+      "path": "assets/icons/eye-off-green.png",
+      "bytes": 2325,
+      "sha256": "35825f27b4e140fe79fe5711f2e89022057bda86d9f6a073fedfbac0727d785a"
+    },
+    {
+      "path": "assets/icons/filter-green.png",
+      "bytes": 330,
+      "sha256": "c70c48bc0b2e314a705b32f0fdc1fddd49d981ab4d34b79bfb3218e3be24be1e"
+    },
+    {
+      "path": "assets/icons/gallery-green.png",
+      "bytes": 1576,
+      "sha256": "81994afde0afb1d946f5aef5dc4eb246b1578c73e530d7d4bad3dc7e84b9ff6e"
+    },
+    {
+      "path": "assets/icons/history-green.png",
+      "bytes": 2236,
+      "sha256": "d39cb57265c9f081b3a469a412272fb2b373db00caa13421a120fb16fcca664a"
+    },
+    {
+      "path": "assets/icons/home-green.png",
+      "bytes": 1371,
+      "sha256": "1aa4776b2735c332058a9decc9b734e49382dd984e3a936db4fae8a67fce56af"
+    },
+    {
+      "path": "assets/icons/image-gray.png",
+      "bytes": 1279,
+      "sha256": "cd2f5fe2de936ca72a32b95f8d500b4b4f60a53e047a33dd20911b076dd341ed"
+    },
+    {
+      "path": "assets/icons/info-green.png",
+      "bytes": 2332,
+      "sha256": "b9efbccc85b6eb5abad61457022b58a86c6f9ffd0592e044a5b0fcb525bb75fb"
+    },
+    {
+      "path": "assets/icons/leaf-green.png",
+      "bytes": 2488,
+      "sha256": "38c5df90d6e57e61cd69b5f4a33de568cff190ce238d72deb473db917a4f2a79"
+    },
+    {
+      "path": "assets/icons/lightbulb-gold.png",
+      "bytes": 1539,
+      "sha256": "5936884c8a2674723a8104675a1a5daad83a6b039aeb5f2da06c763e71e40f9c"
+    },
+    {
+      "path": "assets/icons/locate-white.png",
+      "bytes": 1769,
+      "sha256": "36c5e43e0f3ec7ef1cb85eb353b604501c91bbe6a46069e509c7efcf87a21281"
+    },
+    {
+      "path": "assets/icons/map-pin-green.png",
+      "bytes": 2698,
+      "sha256": "fb7d6861ea2fa3796d79c46b02733a8a54cee194675859537e3833189ffd6c74"
+    },
+    {
+      "path": "assets/icons/microscope-green.png",
+      "bytes": 1578,
+      "sha256": "b16103c9cd796a5b10903ac678320cd11d00687400c1384ebb85f3e2d451ce05"
+    },
+    {
+      "path": "assets/icons/nav-history-active.png",
+      "bytes": 1282,
+      "sha256": "624ff3e306a9346c9b0fdec6a77fc815234432feadc0776dfc566239b233c4c3"
+    },
+    {
+      "path": "assets/icons/nav-history.png",
+      "bytes": 1261,
+      "sha256": "4568eac3a9e99679e1cf63244848bceed93e0a70a2429a246a702cd7c33d8174"
+    },
+    {
+      "path": "assets/icons/nav-map-active.png",
+      "bytes": 1237,
+      "sha256": "43d3d47a80d6e68a0733fcae523af6c0a5bb8b91efecea0d740fbb76f48c1b25"
+    },
+    {
+      "path": "assets/icons/nav-map.png",
+      "bytes": 1220,
+      "sha256": "9cef34b6d88db43869fe8c21097f9599f51e3978ed8b9e6645e2092f126dd084"
+    },
+    {
+      "path": "assets/icons/nav-scan-active.png",
+      "bytes": 895,
+      "sha256": "ea351c7b8f067a33efaf71b28fc02a9eb987912ba544d5878367333b2d3ff77c"
+    },
+    {
+      "path": "assets/icons/nav-scan.png",
+      "bytes": 872,
+      "sha256": "f73bc145b4310eda9e87c7d61a613f11e397c8d8959eba0a6571a381610bb870"
+    },
+    {
+      "path": "assets/icons/navigation-green.png",
+      "bytes": 1386,
+      "sha256": "bf4b54e5825cccf62915d910562f424cc7b7f36bc69c2089267b095e5c0d9616"
+    },
+    {
+      "path": "assets/icons/plus-green.png",
+      "bytes": 392,
+      "sha256": "d9b61f83645233d578be3daa123e3b25361d8e2427d7aa76aa26b44a0085fd71"
+    },
+    {
+      "path": "assets/icons/retest-green.png",
+      "bytes": 2100,
+      "sha256": "631dbbaddb7cd3fe568c0213c5d3bbf96a4f79f8409d7dbed6e0642b4a31ee4d"
+    },
+    {
+      "path": "assets/icons/scan-white.png",
+      "bytes": 757,
+      "sha256": "3b41c9b5b2eafe206a6c2d8d853170cd3a27f7b57d01a283a3cb3a3a05e829a5"
+    },
+    {
+      "path": "assets/icons/search-green.png",
+      "bytes": 1871,
+      "sha256": "f88a07ccddf55e10712e398fad84ce7798c44a4c419884f9064f7dd5dff7878c"
+    },
+    {
+      "path": "assets/icons/shield-green.png",
+      "bytes": 2102,
+      "sha256": "acdaa566ff6a9a2304dba84c4c3d0480ab75860a425a806f6ed5d33cd580abba"
+    },
+    {
+      "path": "assets/icons/sprout-green.png",
+      "bytes": 1808,
+      "sha256": "1057dcfbfc1386fc3c5501d35fc03ef9e1f019f6c0788867c457267f1c0b38fa"
+    },
+    {
+      "path": "assets/icons/status-disease.png",
+      "bytes": 1406,
+      "sha256": "3d4fa4f306148ff57fd7834aceabd0f602a346ef9c4bf90600b3ecd9ed532174"
+    },
+    {
+      "path": "assets/icons/status-healthy.png",
+      "bytes": 2462,
+      "sha256": "a66f34d6d6ae95242b62020c341629bced7515d656a3445d9878ba513752f1ce"
+    },
+    {
+      "path": "assets/icons/status-invalid.png",
+      "bytes": 2372,
+      "sha256": "f995d0c1cb227753231a18e9b8f2af46f52d659383ff737ed857449f0fccdecf"
+    },
+    {
+      "path": "assets/icons/sun-gold.png",
+      "bytes": 1584,
+      "sha256": "73342f5a5b2347fd3fc349ab8dd4ef0c7519db94d12f062b7964fccec272e284"
+    },
+    {
+      "path": "assets/icons/trash-red.png",
+      "bytes": 1121,
+      "sha256": "952316635d505c1db50fb4f5dd284376a556a9c030f0e0738301b05f3cf9246e"
+    },
+    {
+      "path": "assets/symptoms/bacterial-blight-edge.jpg",
+      "bytes": 44572,
+      "sha256": "b9db31137e73747407491c534299f8c4224bca3a4d80f9bb899fdae99c7502a1"
+    },
+    {
+      "path": "assets/symptoms/bacterial-blight-severe.jpg",
+      "bytes": 55548,
+      "sha256": "c52d9c183be59c4dbc7fc8fa76be64b6ed04c0fe7b44e1e01a98593ac2b214db"
+    },
+    {
+      "path": "assets/symptoms/bacterial-streak-early.jpg",
+      "bytes": 52805,
+      "sha256": "e8286dbfb79d4b4eebe7052bf2355c6e0b53cfe06c196a5b629da45d61eab941"
+    },
+    {
+      "path": "assets/symptoms/bacterial-streak-severe.jpg",
+      "bytes": 52533,
+      "sha256": "2ead8294b0f99a6e9b3085a39cf1523d66e1d4119fcacd88559496f5c7c4aa57"
+    },
+    {
+      "path": "assets/symptoms/blast-leaf.jpg",
+      "bytes": 58527,
+      "sha256": "40a3d6f85da1d66d3da9b1f4e479694cfe168f8ff6806bcb68090393ee299d05"
+    },
+    {
+      "path": "assets/symptoms/blast-neck.jpg",
+      "bytes": 37638,
+      "sha256": "6b00afd149f28a4d4d6e678c67899f5dfd8867b92b3c70fecd3a0b61278c3bb9"
+    },
+    {
+      "path": "assets/symptoms/brown-spot-close.jpg",
+      "bytes": 71603,
+      "sha256": "2b3861f0cf5c39d9c2bb86bd0f8c554b7bef9382cfed83411921c3a420acc5f9"
+    },
+    {
+      "path": "assets/symptoms/brown-spot-field.jpg",
+      "bytes": 73411,
+      "sha256": "cd3f0542c0e8bc08966ef9309d859e1f1c1dc4bc1be60e12f4af3b9c16690597"
+    },
+    {
+      "path": "assets/symptoms/dead-heart-bore-hole.jpg",
+      "bytes": 41011,
+      "sha256": "1f0638475a3389f17acf22c250e8dd6a8eba546279aefa6d24ed3eacaee7c00c"
+    },
+    {
+      "path": "assets/symptoms/dead-heart-symptom.jpg",
+      "bytes": 64438,
+      "sha256": "0421de767fffe6b0d042d373152e199eb54dc881ffbd906206fb68041e00cf57"
+    },
+    {
+      "path": "assets/symptoms/downy-mildew-leaf.jpg",
+      "bytes": 48990,
+      "sha256": "96deb1f41abdfec9932cb61f50d807ec7e118569f9377b312050221ec4b9eacd"
+    },
+    {
+      "path": "assets/symptoms/downy-mildew-plant.jpg",
+      "bytes": 79388,
+      "sha256": "ef74382343be0137ab3b799d0d429b90140a95e8d899a7bf16228a24b9b73ca3"
+    },
+    {
+      "path": "assets/symptoms/panicle-blight-compare.jpg",
+      "bytes": 61487,
+      "sha256": "17167cbbed36f475ed707a12377bb9459bc2d8b53d720fe60138f908062649df"
+    },
+    {
+      "path": "assets/symptoms/panicle-blight-field.jpg",
+      "bytes": 31366,
+      "sha256": "c497c70a95094c4db935385e9d2c5e5209d5234ac894bec01a98c7b84b042f2e"
+    },
+    {
+      "path": "assets/symptoms/sheath-blight-lesion.jpg",
+      "bytes": 62617,
+      "sha256": "1fafe5c5a33d00d838469fa187a090bd90befd1f5722ac8ee4919f8f5387b39f"
+    },
+    {
+      "path": "assets/symptoms/sheath-blight-waterline.jpg",
+      "bytes": 39429,
+      "sha256": "188e68107b5bec99432071a0583d562b306e46ff0392be3b91c329ea380fc127"
+    },
+    {
+      "path": "assets/symptoms/tungro-field.jpg",
+      "bytes": 55389,
+      "sha256": "f115835045fcb19b305d63039ab3a86a6d0986f98f06f553a25bdf05cf9c5b85"
+    },
+    {
+      "path": "assets/symptoms/tungro-leaf.jpg",
+      "bytes": 52001,
+      "sha256": "a031e7f73151d8f6606bab3290f72b4e8fae52680efd7f2cefce5d32048138e7"
+    },
+    {
+      "path": "pages/index/index.wxml",
+      "bytes": 13937,
+      "sha256": "404eceeedd24aa6385f37ad9a68668a30e5900142f822aea4bd0d2297f8c3ca3"
+    },
+    {
+      "path": "pages/history/history.wxml",
+      "bytes": 10394,
+      "sha256": "aeb75a0e3834cd546cee0d457c8433c219d8220d93a5455afe2e92e08ece17d1"
+    },
+    {
+      "path": "pages/map/map.wxml",
+      "bytes": 6306,
+      "sha256": "c03066302e061de1ddce07efac06d28ad2e52fbd07b15152620e934ee5e4b044"
+    },
+    {
+      "path": "pages/profile/profile.wxml",
+      "bytes": 5058,
+      "sha256": "58389c1a935c9f08f2ec9e06cb2702cfd99f51a3fcadf1c1172ac166f4bd7f32"
+    },
+    {
+      "path": "components/bottom-navigation/bottom-navigation.wxml",
+      "bytes": 1002,
+      "sha256": "64f1df70d46fc6c6cbf286bc7121b1bc019487021ef6b29117a48fc34e77a626"
+    },
+    {
+      "path": "app.wxss",
+      "bytes": 1691,
+      "sha256": "8ff32f4ea7a08dd36e86fcba9bced5a1ad218fff91fe89472b0a267dd7b6f391"
+    },
+    {
+      "path": "components/bottom-navigation/bottom-navigation.wxss",
+      "bytes": 684,
+      "sha256": "b845102b707ad7a7f2ff1c800c1723da9e75eb8544572a19cd0921831730243b"
+    },
+    {
+      "path": "pages/index/index.wxss",
+      "bytes": 15380,
+      "sha256": "5b6a2b82259231ea63c405095db0aef74fd048953e7f8880176bb2b1cee5b9fa"
+    },
+    {
+      "path": "pages/history/history.wxss",
+      "bytes": 9094,
+      "sha256": "b43c70ac64402b571f43e712f350a0d04b5699ecee646ce551694ea28cb33333"
+    },
+    {
+      "path": "pages/map/map.wxss",
+      "bytes": 5067,
+      "sha256": "2814ee537a88b10a86a085e5fdd4f77c5c398eb1c0c0db749e98739c2f2d7369"
+    },
+    {
+      "path": "pages/profile/profile.wxss",
+      "bytes": 4394,
+      "sha256": "d2fa6b490dc2d68a240496ffb50956b311032ddb04cf05f35e0331fd59348b08"
+    },
+    {
+      "path": "utils/coordinates.js",
+      "bytes": 2896,
+      "sha256": "4e63233db9dbda1fe7b3658b2b389bbea9572c008f9682411a7322f6368b9657"
+    },
+    {
+      "path": "utils/gps-extractor.js",
+      "bytes": 5893,
+      "sha256": "b45178dbd22548538e7227481fbb99bc41ecde3416a64d0cd6f3d5d95d7415dc"
+    },
+    {
+      "path": "utils/header-layout.js",
+      "bytes": 1003,
+      "sha256": "fb2776c2539de84f1548efcef588e5afae90bf3705c9f934a543b0a15fc4f9cc"
+    },
+    {
+      "path": "utils/history-store.js",
+      "bytes": 5722,
+      "sha256": "73852e80ee8c4c279587a796682ad31cba7e885559c52b0f3275972243105d67"
+    },
+    {
+      "path": "utils/location-service.js",
+      "bytes": 6377,
+      "sha256": "ea42496f31adc3f43a4b37b904c3d5864d1976ceebd0d889c115c642fc4dad38"
+    },
+    {
+      "path": "utils/location.js",
+      "bytes": 7630,
+      "sha256": "651a76d232069a99fc480a5cd58a2dcd1545fb967a1388b7217283a0736a788b"
+    },
+    {
+      "path": "utils/map-markers.js",
+      "bytes": 2563,
+      "sha256": "345903588567214a8b8a61a4c1c3d49da96d8ac69969e38f40139948d21ac1a6"
+    },
+    {
+      "path": "utils/navigation-state.js",
+      "bytes": 1290,
+      "sha256": "8b7b4f8b9a49f7bef2e253d09e63105e7b38d3837dd147a28aa245b47278cb26"
+    },
+    {
+      "path": "utils/util.js",
+      "bytes": 460,
+      "sha256": "87b2004360bd30330618f52a86a68d5d9f2d7d5456d638d9d337338973d0b06c"
+    },
+    {
+      "path": "pages/history/history.js",
+      "bytes": 15707,
+      "sha256": "0a394d582b3fcd0a1e841a751a5a9c72cbd8e5a7fabd996572fcce8042d023dd"
+    },
+    {
+      "path": "pages/index/disease-photos.js",
+      "bytes": 2553,
+      "sha256": "384d667403a2d14c482b6cabe2a88c9bcb1338bc2bbc68f01d3c06c6c9d73160"
+    },
+    {
+      "path": "pages/index/disease-profiles.js",
+      "bytes": 3349,
+      "sha256": "1ae76e1364e05b04b5de30a1f66cb611f4dc30e83afedd019149b26cab715be5"
+    },
+    {
+      "path": "pages/index/index.js",
+      "bytes": 44643,
+      "sha256": "1d3fa53ec5e4899f2acf68787f0abf83f01dc4067d23cd06403b64181b017088"
+    },
+    {
+      "path": "pages/map/map.js",
+      "bytes": 5539,
+      "sha256": "b67ed069464dd8175a98c4d3653ca535b556b17e65fa28b353d353e6ccf09f9c"
+    },
+    {
+      "path": "pages/profile/profile.js",
+      "bytes": 3731,
+      "sha256": "18547989df25d43e73842318450a130836a08edc9e384e0145d4b2695229d163"
+    },
+    {
+      "path": "THIRD_PARTY_NOTICES.txt",
+      "bytes": 2299,
+      "sha256": "26e55785d6cc0ab897945d868d75736b8239b5357a530238f62dcc719e9d9c45"
+    },
+    {
+      "path": "docs/symptom-photo-sources.json",
+      "bytes": 19668,
+      "sha256": "dbecf22139c36fa4e47bb22d61a65ec745a0a854758a8345ca853c7be3e499b9"
+    }
+  ],
+  "scope": "Build inputs and third-party attribution; local execution records are excluded.",
+  "inputDescription": "Fixed shared UI inputs for the HoloLens experimental application"
+}
