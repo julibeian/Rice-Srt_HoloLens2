@@ -119,8 +119,18 @@ public static class PerceptionControl {
         manager.Human.RightHand.PerformGesture(SimulatedGesture.FingerPressed);
         manager.Human.RightHand.PerformGesture(SimulatedGesture.FingerReleased);
         Thread.Sleep(250);
-        bool ok=sink.Packets>0&&sink.Bytes>0;
-        Reply(new {ok=ok,test="offline_sdk_packet_generation",processBits=IntPtr.Size*8,packets=sink.Packets,bytes=sink.Bytes,deviceContacted=false,inputVerified=false});
+        manager.Human.RightHand.Position=new Vector3{X=0.9f,Y=1.5f,Z=-0.2f};
+        bool outsideFrustum=!manager.Human.RightHand.Visible;
+        long before=sink.Packets;
+        manager.Device.HandTracker.FrustumIgnored=true;
+        bool forcedVisible=manager.Human.RightHand.Visible;
+        manager.Human.RightHand.PerformGesture(SimulatedGesture.FingerPressed);
+        Thread.Sleep(100);
+        manager.Human.RightHand.PerformGesture(SimulatedGesture.FingerReleased);
+        Thread.Sleep(250);
+        bool gesturePackets=sink.Packets>before;
+        bool ok=sink.Packets>0&&sink.Bytes>0&&outsideFrustum&&forcedVisible&&gesturePackets;
+        Reply(new {ok=ok,test="offline_sdk_packet_generation",processBits=IntPtr.Size*8,packets=sink.Packets,bytes=sink.Bytes,outsideFrustumDetected=outsideFrustum,explicitFrustumOverrideVisible=forcedVisible,gesturePacketsGenerated=gesturePackets,deviceContacted=false,inputVerified=false});
         if(Marshal.IsComObject(manager))Marshal.FinalReleaseComObject(manager);
         GC.KeepAlive(sink);return ok?0:2;
     }
@@ -149,16 +159,17 @@ public static class PerceptionControl {
                 if(words[0]=="exit")break;
                 try {
                     if(words.Length==1&&words[0]=="status"){
-                        Reply(new {ok=sink.IsValid,state=sink.IsValid?"connected":"disconnected",packets=sink.Packets,bytes=sink.Bytes,httpStatus=sink.LastHttpStatus,inputVerified=false});continue;
+                        Reply(new {ok=sink.IsValid,state=sink.IsValid?"connected":"disconnected",packets=sink.Packets,bytes=sink.Bytes,httpStatus=sink.LastHttpStatus,handActivated=manager.Human.RightHand.Activated,handVisible=manager.Human.RightHand.Visible,handFrustumIgnored=manager.Device.HandTracker.FrustumIgnored,inputVerified=false});continue;
                     }
                     if(words.Length==1&&words[0]=="pose"){
-                        Reply(new {ok=sink.IsValid,body=manager.Human.WorldPosition,head=manager.Human.Head.WorldPosition,headRotation=manager.Human.Head.Rotation,hand=manager.Human.RightHand.WorldPosition,handPosition=manager.Human.RightHand.Position,handRotation=((ISimulatedHand2)manager.Human.RightHand).Orientation,inputVerified=false});continue;
+                        Reply(new {ok=sink.IsValid,body=manager.Human.WorldPosition,head=manager.Human.Head.WorldPosition,headRotation=manager.Human.Head.Rotation,hand=manager.Human.RightHand.WorldPosition,handPosition=manager.Human.RightHand.Position,handRotation=((ISimulatedHand2)manager.Human.RightHand).Orientation,handActivated=manager.Human.RightHand.Activated,handVisible=manager.Human.RightHand.Visible,handFrustumIgnored=manager.Device.HandTracker.FrustumIgnored,inputVerified=false});continue;
                     }
                     if(!sink.IsValid)throw new InvalidOperationException("Connection lost");
                     if(words.Length==1&&words[0]=="home"){
                         manager.Human.RightHand.Activated=true;manager.Human.RightHand.PerformGesture(SimulatedGesture.Home);
                     } else if(words.Length==1&&words[0]=="tap"){
                         manager.Human.RightHand.Activated=true;
+                        if(!manager.Human.RightHand.Visible)throw new InvalidOperationException("Simulated hand is outside the tracking frustum; inspect pose before sending input");
                         manager.Human.RightHand.PerformGesture(SimulatedGesture.FingerPressed);
                         await Task.Delay(100);
                         manager.Human.RightHand.PerformGesture(SimulatedGesture.FingerReleased);
@@ -172,6 +183,8 @@ public static class PerceptionControl {
                         ((ISimulatedDevice2)manager.Device).IsUserPresent=words[1]=="on";
                     } else if(words.Length==2&&words[0]=="hand"&&(words[1]=="on"||words[1]=="off")){
                         manager.Human.RightHand.Activated=words[1]=="on";
+                    } else if(words.Length==2&&words[0]=="hand-frustum"&&(words[1]=="ignore"||words[1]=="enforce")){
+                        manager.Device.HandTracker.FrustumIgnored=words[1]=="ignore";
                     } else if(words.Length==4&&words[0]=="hand-position"){
                         manager.Human.RightHand.Position=new Vector3{X=Number(words[1],1),Y=Number(words[2],2),Z=Number(words[3],1)};
                     } else if(words.Length==4&&words[0]=="hand-look"){

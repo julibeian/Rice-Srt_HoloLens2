@@ -23,7 +23,7 @@
 | 阶段 | 阶段性结果 | 文档与分支 |
 | --- | --- | --- |
 | 一：电脑通过 USB 管理眼镜 | 已有身份校验、远程程序执行、文件往返、会话重连、桥进程恢复和单次设备重启恢复记录；提供新电脑配置流程 | [通用操作手册](docs/milestones/phase-1-usb-terminal/manual.md) · [资源](docs/milestones/phase-1-usb-terminal/resources.md) · [重要迭代历史](docs/milestones/phase-1-usb-terminal/history.md) · [阶段分支](https://github.com/julibeian/hololens-terminal/tree/codex/pc-hololens-connection) |
-| 二：真机稻视界眼镜控制 | 进行中。实时画面和鼠标控制在本阶段验收，结合微软 3.0.24.0 官方软件包做对照测试 | [第二阶段资料](https://github.com/julibeian/hololens-terminal/tree/codex/ricefield-device-control/docs/milestones/phase-2-ricefield-control) · [阶段分支](https://github.com/julibeian/hololens-terminal/tree/codex/ricefield-device-control) |
+| 二：真机稻视界眼镜控制 | 进行中。实时画面和鼠标控制在本阶段验收，结合微软 3.0.24.0 官方软件包做对照测试 | [通用手册](docs/milestones/phase-2-ricefield-control/manual.md) · [官方对照测试](docs/milestones/phase-2-ricefield-control/official-3.0.24.0-test.md) · [阶段分支](https://github.com/julibeian/hololens-terminal/tree/codex/ricefield-device-control) |
 
 阶段状态、复现边界与后续工作见 [阶段成果总览](docs/milestones/README.md)。
 

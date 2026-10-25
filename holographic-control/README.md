@@ -2,6 +2,10 @@
 
 本模块辅助 HoloLens 实验：获取官方全息显示样本、用官方 SDK 编码输入，并以设备端限时租约保证控制结束后恢复默认模式。应用内正常采集不依赖 PC 控制器。
 
+这些能力属于 [第二阶段：真机稻视界眼镜控制](../docs/milestones/phase-2-ricefield-control/README.md)，在第一阶段 USB 管理连接完成后单独验收。新电脑按 [通用手册](../docs/milestones/phase-2-ricefield-control/manual.md) 准备；微软 **3.0.24.0** 官方软件包按 [对照测试计划](../docs/milestones/phase-2-ricefield-control/official-3.0.24.0-test.md) 验证，不混用本项目 legacy x86 DLL。
+
+Windows 图形入口见 [稻视界眼镜控制](../pc-control/README.md)，支持真实视频、鼠标定位点按、视角调整与停止恢复。脚本控制器的 `pose`、`status` 现在包含模拟手的可见状态；超出追踪范围时 `tap` 拒绝发送。实验中可以显式使用 `hand-frustum ignore`，仅影响当前模拟会话。
+
 ## 入口
 
 配置设备与门户凭据后，在仓库根目录使用 PowerShell 7：

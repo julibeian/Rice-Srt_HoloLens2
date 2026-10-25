@@ -32,6 +32,8 @@ pwsh -NoProfile -File holographic-control/tests/PortalPairing.Tests.ps1
 
 ## Windows 打包与原生工具
 
+电脑端真机控制归入 [第二阶段](milestones/phase-2-ricefield-control/README.md)。其 [资源清单](milestones/phase-2-ricefield-control/resources.md) 区分 legacy x86 编码器、ARM64 恢复保护及微软 3.0.24.0 官方对照包。恢复保护构建器通过本机 `vswhere` 定位 MSVC，并从配置的 SDK 定位 ARM64 库；可显式指定工具路径。
+
 现有构建脚本使用 Windows SDK **10.0.26100.0** 的 MakeAppx、ARM64 库和 WinRT 头文件，以及 .NET Framework C# 编译器。原生辅助工具使用 Zig **0.15.2**：
 
 ```powershell
