@@ -10,10 +10,22 @@
 | --- | --- |
 | 了解产品能力与架构 | [产品说明](docs/product.md) · [系统架构](docs/architecture.md) |
 | 安装开发环境、构建和测试 | [开发指南](docs/development.md) |
+| 连接电脑与眼镜、查看阶段性成果 | [阶段成果总览](docs/milestones/README.md) |
 | 组织采样与验证 | [实验中心](experiments/README.md) · [采集协议](experiments/protocols/leaf-capture.md) |
 | 查找与补充资料 | [资料库](resources/README.md) |
 | 提交问题、方案或实验结果 | [协作说明](CONTRIBUTING.md) · [新建 Issue](https://github.com/julibeian/hololens-terminal/issues/new/choose) |
 | 下载实验预览包 | [版本发布](https://github.com/julibeian/hololens-terminal/releases/tag/v1.0.0.22) · [版本说明](CHANGELOG.md) |
+
+## 阶段性成果：电脑连接与真机控制
+
+按两个阶段维护，各自提供手册、资源和验收范围。第一阶段的管理连接不包含视频和鼠标操作。
+
+| 阶段 | 阶段性结果 | 文档与分支 |
+| --- | --- | --- |
+| 一：电脑通过 USB 管理眼镜 | 已有身份校验、远程程序执行、文件往返、会话重连、桥进程恢复和单次设备重启恢复记录；提供新电脑配置流程 | [通用操作手册](docs/milestones/phase-1-usb-terminal/manual.md) · [资源](docs/milestones/phase-1-usb-terminal/resources.md) · [重要迭代历史](docs/milestones/phase-1-usb-terminal/history.md) · [阶段分支](https://github.com/julibeian/hololens-terminal/tree/codex/pc-hololens-connection) |
+| 二：真机稻视界眼镜控制 | 进行中。实时画面和鼠标控制在本阶段验收，结合微软 3.0.24.0 官方软件包做对照测试 | [第二阶段资料](https://github.com/julibeian/hololens-terminal/tree/codex/ricefield-device-control/docs/milestones/phase-2-ricefield-control) · [阶段分支](https://github.com/julibeian/hololens-terminal/tree/codex/ricefield-device-control) |
+
+阶段状态、复现边界与后续工作见 [阶段成果总览](docs/milestones/README.md)。
 
 ## 产品流程
 

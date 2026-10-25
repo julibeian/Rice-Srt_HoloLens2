@@ -30,6 +30,11 @@ Assert-Hl ($selected -eq '169.254.100.21') 'An old GUID must not prevent reconne
 Assert-Hl ($script:ProbeAddresses.Count -eq 2) 'A rejected preferred address must not prevent trying the authenticated candidate.'
 Assert-Hl ($script:HlDiscoveredGuid -eq '22222222-2222-2222-2222-222222222222') 'Reported discovery identity must describe the current connection.'
 Assert-Hl ($script:Disposed -eq 1) 'Successful identity probe must release its connection.'
+$selectedConnection=Find-HlDevice -KeepConnection
+Assert-Hl ($selectedConnection.Address -eq '169.254.100.21' -and $null -ne $selectedConnection.Client) 'The bridge must reuse the already authenticated connection.'
+Assert-Hl ($script:Disposed -eq 1) 'A retained connection must not be disposed before the bridge can use it.'
+Close-HlDeviceConnection $selectedConnection.Client
+Assert-Hl ($script:Disposed -eq 2) 'The bridge retains responsibility for closing its connection.'
 $script:TestCandidates = @($script:TestCandidates[0])
 $rejected = $false
 try { Find-HlDevice | Out-Null } catch { $rejected = $_.Exception.Message -like '*No discovered candidate authenticated*' }
