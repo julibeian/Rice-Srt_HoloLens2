@@ -21,12 +21,14 @@ python tools/Verify-Product.py
 ```powershell
 if (-not (Test-Path config.json)) { Copy-Item config.example.json config.json }
 pwsh -NoProfile -File tests/HoloLens.Discovery.Tests.ps1
+pwsh -NoProfile -File tests/HoloLens.Connection.Tests.ps1
+pwsh -NoProfile -File tests/HoloLens.StatusFile.Tests.ps1
 pwsh -NoProfile -File tests/Field.Network.Tests.ps1
 pwsh -NoProfile -File holographic-control/tests/TlsPin.Tests.ps1
 pwsh -NoProfile -File holographic-control/tests/PortalPairing.Tests.ps1
 ```
 
-以上检查使用离线替身和临时测试证书，不进行设备操作。连接真实设备前按 [设备调试指南](device-debugging.md) 填入经过核对的配置。
+以上检查使用离线替身、本机文件锁和临时测试证书，不进行设备操作。`tests/HoloLens.DiscoveryProcess.Tests.ps1` 另行检查 SDK 发现子进程的限时清理，会启动一次发现，但不配对或写设备。新电脑先按 [第一阶段通用手册](milestones/phase-1-usb-terminal/manual.md) 配置并运行 `tools/connection/Test-Workstation.ps1`。
 
 ## Windows 打包与原生工具
 

@@ -9,13 +9,13 @@ $pipe = $null
 $stopping = $false
 $nextCheck = [DateTime]::MinValue
 $lastLoggedState = ''
-$status = [ordered]@{ State='starting'; Device=$script:HlConfig.DeviceName; Address=$null; ProcessId=$PID; StartedAt=[DateTimeOffset]::Now.ToString('o'); LastHeartbeat=$null; LastError=$null; Connections=0; Pipe=$script:HlPipeName }
+$status = [ordered]@{ State='starting'; Device=$script:HlConfig.DeviceName; Address=$null; ProcessId=$PID; StartedAt=[DateTimeOffset]::Now.ToString('o'); UpdatedAt=$null; ActiveOperation=$null; LastHeartbeat=$null; LastError=$null; Connections=0; Pipe=$script:HlPipeName; SourceHashes=@{} }
+foreach ($sourceName in @('HoloLens.Common.ps1','HoloLens.Bridge.ps1')) {
+    $status.SourceHashes[$sourceName]=(Get-FileHash -LiteralPath (Join-Path $PSScriptRoot $sourceName) -Algorithm SHA256).Hash
+}
 
 function Save-HlStatus {
-    $temporary = Join-Path $script:HlStateDirectory 'status.tmp'
-    $destination = Join-Path $script:HlStateDirectory 'status.json'
-    [IO.File]::WriteAllText($temporary,($status | ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
-    [IO.File]::Move($temporary,$destination,$true)
+    Write-HlBridgeStatus $status
 }
 
 function Write-HlLog([string]$Message) {
@@ -48,14 +48,16 @@ try {
                         'status' { $data=$status }
                         'stop' { $stopping=$true; $data=@{ Stopping=$true } }
                         'reconnect' {
-                            if ($client) { try { $client.Disconnect() } catch {}; $client=$null }
+                            Close-HlDeviceConnection $client; $client=$null
                             $status.State='reconnecting'; $status.LastError=$null; $nextCheck=[DateTime]::MinValue
                             Save-HlStatus
                             $data=$status
                         }
                         default {
                             if ($null -eq $client -or $status.State -ne 'connected') { throw "HoloLens is $($status.State). The bridge is retrying automatically." }
-                            $data=Invoke-HlOperation $client $request $address
+                            $status.ActiveOperation=[string]$request.action; Save-HlStatus
+                            try { $data=Invoke-HlOperation $client $request $address }
+                            finally { $status.ActiveOperation=$null; Save-HlStatus }
                         }
                     }
                     $response=@{ ok=$true; data=$data }
@@ -68,8 +70,9 @@ try {
             try {
                 if ($null -eq $client) {
                     $status.State='discovering'; Save-HlStatus
-                    $address=Find-HlDevice
-                    $client=Connect-HlDevice $address
+                    $connection=Find-HlDevice -KeepConnection
+                    $address=$connection.Address
+                    $client=$connection.Client
                     $status.Address=$address
                     $status.Connections++
                     Write-HlLog ('Authenticated SSH connected to ' + $address)
@@ -82,7 +85,7 @@ try {
             } catch {
                 $status.State='waiting_for_device'
                 $status.LastError=Get-HlErrorMessage $_.Exception
-                if ($client) { try { $client.Disconnect() } catch {}; $client=$null }
+                Close-HlDeviceConnection $client; $client=$null
                 $nextCheck=[DateTime]::UtcNow.AddSeconds($script:HlConfig.ReconnectSeconds)
             }
             if ($status.State -ne $lastLoggedState) { Write-HlLog ($status.State + $(if($status.LastError){': '+$status.LastError}else{''})); $lastLoggedState=$status.State }
@@ -96,7 +99,7 @@ try {
     exit 1
 } finally {
     if ($pipe) { $pipe.Dispose() }
-    if ($client) { try { $client.Disconnect() } catch {} }
+    Close-HlDeviceConnection $client
     if ($status.State -ne 'failed') { $status.State='stopped'; try { Save-HlStatus; Write-HlLog 'Bridge stopped.' } catch {} }
     if ($ownsMutex) { $mutex.ReleaseMutex() }
     $mutex.Dispose()

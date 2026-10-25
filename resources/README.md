@@ -4,6 +4,8 @@
 
 ## 基础文档
 
+电脑连接相关依赖、官方获取入口和复用脚本见 [第一阶段资源清单](../docs/milestones/phase-1-usb-terminal/resources.md)。实时画面、鼠标控制及微软 3.0.24.0 官方控制软件另见 [第二阶段入口](../docs/milestones/README.md)。
+
 | 编号 | 资料 | 用途 |
 | --- | --- | --- |
 | REF-001 | [Windows Device Portal](https://learn.microsoft.com/en-us/windows/mixed-reality/develop/advanced-concepts/using-the-windows-device-portal) | 开发设备连接与调试；用于实验工具，不作为产品部署中的通用远程服务 |

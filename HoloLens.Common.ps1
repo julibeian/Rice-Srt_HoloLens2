@@ -50,12 +50,61 @@ function ConvertFrom-HlDiscoveryOutput([string[]]$Lines) {
 }
 
 function Get-HlDiscoveredDevices {
-    $lines = & (Join-Path $script:HlConfig.SdkDirectory 'WinAppDeployCmd.exe') devices 3
-    if ($LASTEXITCODE -ne 0) { throw 'Windows SDK USB discovery failed; the paired device will be retried.' }
-    ConvertFrom-HlDiscoveryOutput $lines
+    param([ValidateRange(1,30000)][int]$TimeoutMilliseconds=12000)
+    $start = [Diagnostics.ProcessStartInfo]::new()
+    $start.FileName = Join-Path $script:HlConfig.SdkDirectory 'WinAppDeployCmd.exe'
+    $start.UseShellExecute = $false
+    $start.CreateNoWindow = $true
+    $start.RedirectStandardOutput = $true
+    $start.RedirectStandardError = $true
+    $start.ArgumentList.Add('devices')
+    $start.ArgumentList.Add('3')
+    $process = [Diagnostics.Process]::new()
+    $process.StartInfo = $start
+    try {
+        if (-not $process.Start()) { throw 'Windows SDK discovery process did not start.' }
+        $output = $process.StandardOutput.ReadToEndAsync()
+        $errors = $process.StandardError.ReadToEndAsync()
+        if (-not $process.WaitForExit($TimeoutMilliseconds)) {
+            $ownedPid = $process.Id
+            try { $process.Kill(); $null = $process.WaitForExit(2000) } catch {}
+            $failure = [TimeoutException]::new('Windows SDK discovery timed out; its own child process was stopped. The bridge can retry without replaying a device command.')
+            $failure.Data['DiscoveryProcessId'] = $ownedPid
+            throw $failure
+        }
+        $stdout = $output.GetAwaiter().GetResult()
+        $stderr = $errors.GetAwaiter().GetResult()
+        if ($process.ExitCode -ne 0) { throw ('Windows SDK discovery failed (exit ' + $process.ExitCode + '): ' + $stderr.Trim()) }
+        ConvertFrom-HlDiscoveryOutput ($stdout -split '\r?\n')
+    } finally { $process.Dispose() }
+}
+
+function Close-HlDeviceConnection($Client) {
+    if ($null -eq $Client) { return }
+    # Release the SDK object even if disconnecting a lost device fails.
+    try { $Client.Disconnect() } catch {}
+    try { $Client.Dispose() } catch {}
+}
+
+function Write-HlBridgeStatus($Status, [string]$StateDirectory=$script:HlStateDirectory) {
+    $Status.UpdatedAt=[DateTimeOffset]::Now.ToString('o')
+    $temporary=Join-Path $StateDirectory 'status.tmp'
+    $destination=Join-Path $StateDirectory 'status.json'
+    [IO.File]::WriteAllText($temporary,($Status|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
+    try {
+        for($attempt=0;;$attempt++) {
+            try { [IO.File]::Move($temporary,$destination,$true); return }
+            catch [IO.IOException] { if($attempt -ge 39){throw} }
+            catch [UnauthorizedAccessException] { if($attempt -ge 39){throw} }
+            # Windows readers may briefly omit FILE_SHARE_DELETE. Do not tear
+            # down an authenticated device session for this local file race.
+            Start-Sleep -Milliseconds 25
+        }
+    } finally { if(Test-Path -LiteralPath $temporary){Remove-Item -LiteralPath $temporary -ErrorAction SilentlyContinue} }
 }
 
 function Find-HlDevice {
+    param([switch]$KeepConnection)
     $candidates = @(Get-HlDiscoveredDevices)
     if (-not $candidates.Count) { throw 'Target HoloLens USB network is unavailable; waiting for the same device to reconnect.' }
     $errors = [Collections.Generic.List[string]]::new()
@@ -66,11 +115,25 @@ function Find-HlDevice {
             # Only the existing authenticated SSH host fingerprint establishes identity.
             $probe = Connect-HlDevice $candidate.Address
             $script:HlDiscoveredGuid = $candidate.DiscoveryGuid
+            if ($KeepConnection) {
+                $connection = [pscustomobject]@{ Address=$candidate.Address; Client=$probe }
+                $probe = $null
+                return $connection
+            }
             return $candidate.Address
         } catch { $errors.Add($candidate.Address + ': ' + (Get-HlErrorMessage $_.Exception)) }
-        finally { if ($probe) { try { $probe.Disconnect() } catch {}; $probe.Dispose() } }
+        finally { Close-HlDeviceConnection $probe }
     }
     throw ('No discovered candidate authenticated as the paired HoloLens. ' + ($errors -join '; '))
+}
+
+function Test-HlWorkerStalled($SavedStatus, [int]$WorkerId, [DateTimeOffset]$Now, [int]$LimitSeconds=120) {
+    if ($null -eq $SavedStatus -or $SavedStatus.ProcessId -ne $WorkerId) { return $false }
+    $updated = $SavedStatus.PSObject.Properties['UpdatedAt']
+    if (-not $updated -or -not $updated.Value) { return $false }
+    $at = [DateTimeOffset]::MinValue
+    if (-not [DateTimeOffset]::TryParse([string]$updated.Value, [ref]$at)) { return $false }
+    return ($Now - $at).TotalSeconds -gt $LimitSeconds
 }
 
 function Connect-HlDevice([string]$Address) {
@@ -90,28 +153,45 @@ function Connect-HlDevice([string]$Address) {
         }
         return $client
     } catch {
-        try { $client.Disconnect() } catch {}
-        $client.Dispose()
+        Close-HlDeviceConnection $client
         throw
     }
 }
 
 function Get-HlDeviceInfo($Client, [string]$Address) {
-    $target = [ordered]@{}
-    foreach ($property in $Client.TargetInfo.PSObject.Properties) {
-        $value = $property.Value
-        $target[$property.Name] = if ($null -eq $value) { $null } elseif ($value -is [bool] -or $value -is [string]) { $value } else { $value.ToString() }
+    if ($Client.RemoteDevice.Sha1Fingerprint -cne $script:HlConfig.ExpectedFingerprint) {
+        throw 'SSH host identity differs from the paired HoloLens. Device metadata cannot establish trust.'
     }
+    $target = [ordered]@{}
+    $metadataErrors = [Collections.Generic.List[string]]::new()
+    $targetInfo = $null
+    try { $targetInfo = $Client.TargetInfo } catch { $metadataErrors.Add('TargetInfo: ' + (Get-HlErrorMessage $_.Exception)) }
+    if ($null -eq $targetInfo) {
+        $metadataErrors.Add('SDK target metadata is unavailable; authenticated SSH identity remains independently checked.')
+    } else {
+        foreach ($property in $targetInfo.PSObject.Properties) {
+            try {
+                $value = $property.Value
+                $target[$property.Name] = if ($null -eq $value) { $null } elseif ($value -is [bool] -or $value -is [string]) { $value } else { $value.ToString() }
+            } catch { $metadataErrors.Add($property.Name + ': ' + (Get-HlErrorMessage $_.Exception)) }
+        }
+    }
+    $architecture = $null
+    try {
+        if ($null -ne $Client.EffectiveProcessorArchitecture) { $architecture = $Client.EffectiveProcessorArchitecture.ToString() }
+    } catch { $metadataErrors.Add('Architecture: ' + (Get-HlErrorMessage $_.Exception)) }
     return [ordered]@{
         DeviceName = $script:HlConfig.DeviceName
         DiscoveryGuid = if (Get-Variable HlDiscoveredGuid -Scope Script -ErrorAction SilentlyContinue) { $script:HlDiscoveredGuid } else { $script:HlConfig.DiscoveryGuid }
         Address = $Address
-        Transport = 'USB NCM / authenticated SSH'
+        Transport = if ($Address -match '^169\.254\.') { 'USB NCM / authenticated SSH' } else { 'Network / authenticated SSH' }
         User = $Client.RemoteDevice.UserName
         HostFingerprint = $Client.RemoteDevice.Sha1Fingerprint
-        Architecture = $Client.EffectiveProcessorArchitecture.ToString()
+        Architecture = $architecture
         WorkingDirectory = $script:HlConfig.RemoteWorkingDirectory
         Target = $target
+        MetadataAvailable = $null -ne $targetInfo
+        MetadataErrors = $metadataErrors.ToArray()
     }
 }
 
