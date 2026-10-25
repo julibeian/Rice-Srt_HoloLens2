@@ -4,7 +4,7 @@
 
 ## 基础文档
 
-电脑连接相关依赖、官方获取入口和复用脚本见 [第一阶段资源清单](../docs/milestones/phase-1-usb-terminal/resources.md)。实时画面、鼠标控制及微软 3.0.24.0 官方控制软件另见 [第二阶段入口](../docs/milestones/README.md)。
+电脑连接相关依赖、官方获取入口和复用脚本见 [第一阶段资源清单](../docs/milestones/phase-1-usb-terminal/resources.md)。实时画面、鼠标控制及微软 3.0.24.0 官方控制软件另见 [第二阶段资源](../docs/milestones/phase-2-ricefield-control/resources.md)。
 
 | 编号 | 资料 | 用途 |
 | --- | --- | --- |

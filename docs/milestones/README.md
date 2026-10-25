@@ -20,6 +20,6 @@
 
 状态：**进行中**。在第一阶段的管理连接之上，建立认证门户、真实全息视频、鼠标操作和设备端限时恢复保护，并与微软 **Perception Simulation 3.0.24.0** 官方软件包进行对照测试。
 
-第二阶段有独立的 [资料目录](https://github.com/julibeian/hololens-terminal/tree/codex/ricefield-device-control/docs/milestones/phase-2-ricefield-control) 和 [源码分支](https://github.com/julibeian/hololens-terminal/tree/codex/ricefield-device-control)。自制软件后端的真机记录、桌面窗口检查与官方 GUI 的测试分别记载，不以第一阶段连通代替控制验收。
+第二阶段有独立的 [资料目录](phase-2-ricefield-control/README.md)、[操作手册](phase-2-ricefield-control/manual.md)、[官方 3.0.24.0 对照测试计划](phase-2-ricefield-control/official-3.0.24.0-test.md) 和 [源码分支](https://github.com/julibeian/hololens-terminal/tree/codex/ricefield-device-control)。自制软件后端的真机记录、桌面窗口检查与官方 GUI 的测试分别记载，不以第一阶段连通代替控制验收。
 
 应用采集与识别另按 [v1.0.0.22 实验摘要](../../experiments/results/pipeline-v1.0.0.22.md) 管理。真实叶片、复杂光照与长期稳定性继续保留待验证状态。

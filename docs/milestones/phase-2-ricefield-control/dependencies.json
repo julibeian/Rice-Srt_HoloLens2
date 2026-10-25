@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "stage": 2,
+  "recorded_date": "2026-10-25",
+  "official_control": {
+    "version": "3.0.24.0",
+    "source": "https://go.microsoft.com/fwlink/?linkid=2212643",
+    "bytes": 34230272,
+    "sha256": "E2873EB2633477AE32430D0A566FE5612AA45BF5552B95B83A20C78B518A1B8E",
+    "expected_signer": "Microsoft Corporation",
+    "architecture": "x64",
+    "purpose": "phase_two_official_gui_comparison",
+    "device_gui_acceptance": "pending"
+  },
+  "legacy_control_sdk": {
+    "emulator_release": "10.0.22621.1402",
+    "msi_product_version": "10.1.22621.1402",
+    "bootstrap_source": "https://go.microsoft.com/fwlink/?linkid=2290700",
+    "bootstrap_sha256": "8522252ED0D385C9CD1634F459B10E739CAE0ED4FFB2C26AEA651C85F1292D2E",
+    "msi_name": "Microsoft HoloLens Emulator-x64_en-us.msi",
+    "msi_sha256": "0929E00047AD7FEA65521277AC367CC064B18983C3713A481EC3B0C34043458D",
+    "manager_architecture": "x86",
+    "required_files": [
+      "PerceptionSimulationManager.dll",
+      "PerceptionSimulationManager.Interop.dll",
+      "SimulationStream.Interop.dll",
+      "PerceptionSimulationRest.dll"
+    ],
+    "purpose": "existing_project_input_encoder"
+  },
+  "native_guard": {
+    "architecture": "ARM64",
+    "zig_version": "0.15.2",
+    "lease_seconds": 300,
+    "restore_mode": 0
+  },
+  "verification_scope": "Recorded hashes and cached Microsoft signatures. The official 3.0.24.0 MSI signature, product version and SHA256 were rechecked without installation. Installation and official GUI device testing are separate pending steps. No third-party binary is included."
+}

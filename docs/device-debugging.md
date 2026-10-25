@@ -35,6 +35,6 @@ pwsh -NoProfile -File field-app/ops/Start-App.ps1
 
 ## 第二阶段：全息实验控制
 
-操作入口见 [控制工具说明](../holographic-control/README.md)。门户凭据在执行环境加密保存，认证有效时复用。建立具名的 300 秒设备端恢复租约后才进行 PC 输入，操作结合当前画面，结束时关闭自身流并确认 Default(0)。同一操作编号的超时继续读取原结果，避免重复拍摄或输入。
+新环境从 [第二阶段通用手册](milestones/phase-2-ricefield-control/manual.md) 开始，脚本入口见 [控制工具说明](../holographic-control/README.md)。门户凭据在执行环境加密保存，认证有效时复用。建立具名的 300 秒设备端恢复租约后才进行 PC 输入，操作结合当前画面，结束时关闭自身流并确认 Default(0)。同一操作编号的超时继续读取原结果，避免重复拍摄或输入。微软 3.0.24.0 独立包的真机对照按 [官方测试计划](milestones/phase-2-ricefield-control/official-3.0.24.0-test.md) 单独记录。
 
 原始诊断、照片、全息视频和设备账户材料保存在受控实验资料位置。提交问题时提供脱敏的错误码、版本、现象与必要摘要。
