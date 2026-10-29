@@ -1,6 +1,10 @@
 # 微软 Perception Simulation 3.0.24.0 官方软件对照测试
 
-阶段：二，真机稻视界眼镜控制。状态：**官方软件包静态核查可执行；官方 GUI 真机功能测试待完成**。此项不归入第一阶段 USB 管理连接的完成项。
+阶段：二，真机稻视界眼镜控制。状态：**电脑侧安装与 SDK 检查已有通过记录；本轮官方 GUI 已到原设备认证框，但自动文字输入未取得可见效果，官方视频和点按仍未完成**。此项不归入第一阶段 USB 管理连接的完成项。
+
+2026-10-27 续测：微软原版 GUI 经进程受限的临时本机认证转发，已取得原设备模式查询及控制流创建 HTTP 200；官方输入 WS 格式支持已补齐，后续被电脑高权限壁纸屏保阻挡，尚无官方有效画面或点按证据。具名保护均恢复 Default(0)。直接登录与转发辅助结果分别保留，详见[27 日续测记录](../../../reports/20261027-official-focus/官方续测记录.md)。
+
+2026-10-26 真机续测见[官方真机测试进度](../../../reports/20261026-phase2-live/官方测试进度.md)。原 SSH 身份、保存凭据及固定证书的 Windows 原生 HTTPS 请求通过，原版 GUI 仍弹出独立认证框。Legacy SDK 的系统代理超时与直连 HTTP 403、新客户端的参数错误分别记录，不用其中任一结果代替原版 GUI 的真实画面或点按。最后门户读回 Default(0)，官方测试进程已关闭。
 
 测试目标是比较微软官方 GUI 与本项目桌面工具在同一设备、应用版本和控件上的实际行为，判断哪些能力可以直接复用官方工具，哪些仍需要本项目整合。官方文档的能力说明、自制后端的成功和安装成功分别保留证据。
 
@@ -18,7 +22,9 @@
 & .\pc-control\official\Install-OfficialControl.ps1
 ```
 
-安装脚本默认仅选择 App、ManagedApi、NativeApi、Recordings，未请求驱动或服务。保存安装前基线、MSI 日志、退出码与实际程序哈希；退出码 3010 表示请求重启，不能直接记作安装后运行完成。本次资料更新没有执行安装或重启。
+安装脚本默认仅选择 App、ManagedApi、NativeApi、Recordings。显式添加 `-IncludeDriversAndService` 才选择 Drivers、Service；`-EnableDeveloperMode` 单独控制开发者模式设置。保存安装前基线、MSI 日志、退出码与实际程序哈希；退出码 3010 表示请求重启，不能直接记作安装后运行完成。
+
+2026-10-26 已按用户要求完成上述六项功能安装，MSI 退出码 0、无需重启；三个微软签名驱动包已进入驱动存储。官方 GUI 启动与 Legacy 切换、SDK 录制回放、管理员 COM 服务测试通过。本机 Windows 11 25H2 缺少 Holographic 设备类，WMR 模拟设备创建失败，残留节点已清理；测试脚本现会提前拒绝此不受支持的本机路径。HoloLens 真机远程连接仍需独立验收，完整证据见[安装与测试记录](../../../reports/20261026-official-drivers/安装与测试记录.md)。
 
 官方程序通常位于 `%ProgramFiles%/Microsoft Perception Simulation/Control/PerceptionSimulationControl.exe`。[微软说明](https://learn.microsoft.com/en-us/windows/mixed-reality/develop/advanced-concepts/perception-simulation-standalone) 要求 Windows 10 2004 或更新，并将已有 HoloLens 2 目标选为 `HoloLens 2 (Legacy)`。完整 Hyper-V 模拟器的要求不能直接套到这个独立 GUI。
 
@@ -57,7 +63,7 @@ try {
 
 | 项目 | 微软 3.0.24.0 官方 GUI | 本项目工具已有记录 | 本轮应保存的证据 |
 | --- | --- | --- | --- |
-| 启动与原设备认证 | 待验收 | 后端已有 | 版本、目标身份核对、认证状态；隐去密码 |
+| 启动与原设备认证 | GUI 启动和 Legacy 选择已通过；原设备认证待验收 | 后端已有 | 版本、目标身份核对、认证状态；隐去密码 |
 | 可解码的真实全息画面 | 待验收 | 后端已有 | 新帧与可读稻视界界面；排除 PV 独立流和 PC 离线预览 |
 | “范围”控件单次点按 | 待验收 | 后端已有 | 点按前后文字与取景框变化 |
 | 功能菜单、历史结果、原图切换 | 待验收 | 后端已有 | 各控件的前后对应画面，不重传旧照片 |

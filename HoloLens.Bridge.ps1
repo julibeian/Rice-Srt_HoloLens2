@@ -1,4 +1,5 @@
 . (Join-Path $PSScriptRoot 'HoloLens.Common.ps1')
+. (Join-Path $PSScriptRoot 'HoloLens.UsbPower.ps1')
 $mutex = [Threading.Mutex]::new($false, ('Local\' + $script:HlPipeName))
 $ownsMutex = $false
 try { $ownsMutex = $mutex.WaitOne(0) } catch [Threading.AbandonedMutexException] { $ownsMutex=$true }
@@ -9,8 +10,8 @@ $pipe = $null
 $stopping = $false
 $nextCheck = [DateTime]::MinValue
 $lastLoggedState = ''
-$status = [ordered]@{ State='starting'; Device=$script:HlConfig.DeviceName; Address=$null; ProcessId=$PID; StartedAt=[DateTimeOffset]::Now.ToString('o'); UpdatedAt=$null; ActiveOperation=$null; LastHeartbeat=$null; LastError=$null; Connections=0; Pipe=$script:HlPipeName; SourceHashes=@{} }
-foreach ($sourceName in @('HoloLens.Common.ps1','HoloLens.Bridge.ps1')) {
+$status = [ordered]@{ State='starting'; Device=$script:HlConfig.DeviceName; Address=$null; ProcessId=$PID; StartedAt=[DateTimeOffset]::Now.ToString('o'); UpdatedAt=$null; ActiveOperation=$null; LastHeartbeat=$null; LastError=$null; Connections=0; Pipe=$script:HlPipeName; SourceHashes=@{}; UsbPower=$null }
+foreach ($sourceName in @('HoloLens.Common.ps1','HoloLens.Bridge.ps1','HoloLens.UsbPower.ps1')) {
     $status.SourceHashes[$sourceName]=(Get-FileHash -LiteralPath (Join-Path $PSScriptRoot $sourceName) -Algorithm SHA256).Hash
 }
 
@@ -28,6 +29,15 @@ try {
     Import-HlSdk
     Save-HlStatus
     Write-HlLog 'Bridge started; local current-user named pipe only.'
+    # Keep one availability supervisor alive per session. It runs as a separate
+    # process so that bridge restarts (including its own recovery restarts) do
+    # not stop wake attempts; a local mutex prevents duplicates.
+    try{
+        $supervisor=Join-Path $PSScriptRoot 'holographic-control\ops\Start-WakeSupervisor.ps1'
+        if(Test-Path -LiteralPath $supervisor){
+            Start-Process -FilePath (Join-Path $PSHOME 'pwsh.exe') -ArgumentList @('-NoLogo','-NoProfile','-WindowStyle','Hidden','-File',('"'+$supervisor+'"')) -WindowStyle Hidden | Out-Null
+        }
+    }catch{Write-HlLog ('Supervisor start failed: '+$_.Exception.Message)}
     while (-not $stopping) {
         if ($null -eq $pipe) {
             $options = [IO.Pipes.PipeOptions]::Asynchronous -bor [IO.Pipes.PipeOptions]::CurrentUserOnly
@@ -81,10 +91,13 @@ try {
                 $status.State='connected'
                 $status.LastError=$null
                 $status.LastHeartbeat=[DateTimeOffset]::Now.ToString('o')
+                try{$status.UsbPower=Invoke-HlUsbPowerTick $client $address}
+                catch{$status.UsbPower=@{State='error';Error=(Get-HlErrorMessage $_.Exception)}}
                 $nextCheck=[DateTime]::UtcNow.AddSeconds($script:HlConfig.KeepAliveSeconds)
             } catch {
                 $status.State='waiting_for_device'
                 $status.LastError=Get-HlErrorMessage $_.Exception
+                $status.UsbPower=@{State='not_renewed';Reason='USB identity is not currently connected';LastVerifiedHeartbeat=$status.LastHeartbeat;DeviceLeaseMs=45000;CurrentDeviceStateVerified=$false}
                 Close-HlDeviceConnection $client; $client=$null
                 $nextCheck=[DateTime]::UtcNow.AddSeconds($script:HlConfig.ReconnectSeconds)
             }

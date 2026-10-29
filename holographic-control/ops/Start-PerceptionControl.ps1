@@ -35,8 +35,9 @@ try{
     $process.StandardInput.WriteLine($configuration);$configuration=$null;$credential=$null
     $first=$process.StandardOutput.ReadLine()
     if(-not $first){throw 'Controller exited before reporting connection status.'}
-    $first
     $ready=$first|ConvertFrom-Json
+    $ready | Add-Member -NotePropertyName AdapterProcessId -NotePropertyValue $process.Id -Force
+    $ready | ConvertTo-Json -Compress
     if(-not $ready.ok -or $ready.state -ne 'connected'){return}
     # Caller supplies explicit commands over its existing terminal/PTY. Secrets
     # travelled only over the private child stdin pipe, never process arguments.

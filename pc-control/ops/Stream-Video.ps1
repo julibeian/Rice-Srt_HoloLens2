@@ -1,3 +1,4 @@
+param([ValidateSet('Interactive','Detail')][string]$VideoProfile='Interactive')
 $ErrorActionPreference='Stop'
 $ProgressPreference='SilentlyContinue'
 $workspace=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
@@ -6,7 +7,8 @@ $context=$null;$response=$null;$stream=$null
 try {
     $context=New-HoloAuthenticatedPortalContext
     # Only holograms: no independent PV camera or either audio source.
-    $url=$context.BaseUri+'/api/holographic/stream/live_high.mp4?holo=true&pv=false&mic=false&loopback=false&RenderFromCamera=false'
+    $endpoint=if($VideoProfile -eq 'Detail'){'live_high.mp4'}else{'live_med.mp4'}
+    $url=$context.BaseUri+'/api/holographic/stream/'+$endpoint+'?holo=true&pv=false&mic=false&loopback=false&RenderFromCamera=false'
     $response=$context.Client.GetAsync($url,[Net.Http.HttpCompletionOption]::ResponseHeadersRead).GetAwaiter().GetResult()
     if([int]$response.StatusCode -ne 200){throw ('Holographic stream HTTP '+[int]$response.StatusCode)}
     $stream=$response.Content.ReadAsStreamAsync().GetAwaiter().GetResult()

@@ -150,3 +150,64 @@ function New-HoloAuthenticatedPortalContext {
         return $context
     } catch {$context.Client.Dispose();throw}
 }
+
+function New-HoloDirectPortalContext {
+    # Pinned portal access that does not depend on the SSH bridge. The SSO key
+    # renewal path mirrors New-HoloPortalContext: a leaf may renew only with the
+    # same public key, issuer, subject and valid time; no credential is sent to
+    # a peer that fails that check.
+    param(
+        [Parameter(Mandatory)][ValidatePattern('^169\.254\.\d+\.\d+$')][string]$Address,
+        [ValidateRange(3,60)][int]$TimeoutSeconds=6
+    )
+    $pinPath=Join-Path $script:HolographicRoot '.state\portal-tls-pin.json'
+    $credentialPath=Join-Path $script:HolographicRoot '.state\portal-credential.clixml'
+    if(-not(Test-Path -LiteralPath $pinPath)){throw 'No pinned portal certificate is available.'}
+    if(-not(Test-Path -LiteralPath $credentialPath)){throw 'No saved portal credential is available.'}
+    $config=Get-Content -LiteralPath (Join-Path $script:HolographicWorkspace 'config.json') -Raw -Encoding UTF8|ConvertFrom-Json
+    $pin=Get-Content -LiteralPath $pinPath -Raw -Encoding UTF8|ConvertFrom-Json
+    $saved=Import-Clixml -LiteralPath $credentialPath
+    if($config.DeviceName -cne $pin.DeviceName -or $pin.DeviceName -cne $saved.DeviceName){throw 'Saved device identity records disagree.'}
+    if($config.ExpectedFingerprint -cne $pin.SshFingerprint -or $pin.SshFingerprint -cne $saved.SshFingerprint){throw 'Saved SSH fingerprint records disagree.'}
+    $der=[HoloPortalTls]::ReadCertificate($Address)
+    $current=[Security.Cryptography.X509Certificates.X509Certificate2]::new($der)
+    try{
+        $observed=[Convert]::ToHexString([Security.Cryptography.SHA256]::HashData($der))
+        $renewed=$false
+        if($observed -cne $pin.CertificateSha256){
+            $certificateFile=if($pin.PSObject.Properties['CertificateFile']){[string]$pin.CertificateFile}else{'portal-server.cer'}
+            if($certificateFile -notmatch '^portal-server(-[A-F0-9]{64})?\.cer$'){throw 'Unexpected pinned certificate filename.'}
+            $certificatePath=Join-Path $script:HolographicRoot ('.state\'+$certificateFile)
+            if(-not(Test-Path -LiteralPath $certificatePath)){throw 'The previously pinned certificate file is missing.'}
+            $previous=[Security.Cryptography.X509Certificates.X509Certificate2]::new($certificatePath)
+            try{
+                $check=Test-HoloPortalCertificateRenewal $previous $current ('CN='+$Address)
+                if(-not $check.Allowed){throw 'The Device Portal key, issuer, subject or validity changed. The saved pin remains in effect; no credentials were sent.'}
+                $history=Join-Path $script:HolographicRoot ('.state\tls-renewals\'+(Get-Date -Format 'yyyyMMdd-HHmmss')+'-'+[Guid]::NewGuid().ToString('N').Substring(0,6))
+                [IO.Directory]::CreateDirectory($history)|Out-Null
+                Copy-Item -LiteralPath $pinPath -Destination (Join-Path $history 'previous-pin.json')
+                Copy-Item -LiteralPath $certificatePath -Destination (Join-Path $history 'previous-server.cer')
+                $evidence=[ordered]@{At=[DateTimeOffset]::Now.ToString('o');DeviceName=$config.DeviceName;SshFingerprint=$config.ExpectedFingerprint;PreviousCertificateSha256=$pin.CertificateSha256;CurrentCertificateSha256=$observed;Renewal=$check;CredentialsSent=$false;Source='direct'}
+                [IO.File]::WriteAllText((Join-Path $history 'verification.json'),($evidence|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
+                $pin.CertificateSha256=$observed
+                $pin|Add-Member -NotePropertyName RenewedAt -NotePropertyValue ([DateTimeOffset]::Now.ToString('o')) -Force
+                $versioned=Join-Path $script:HolographicRoot ('.state\portal-server-'+$observed+'.cer')
+                if(-not(Test-Path -LiteralPath $versioned)){[IO.File]::WriteAllBytes($versioned,$der)}
+                $pin|Add-Member -NotePropertyName CertificateFile -NotePropertyValue ('portal-server-'+$observed+'.cer') -Force
+                $pin|Add-Member -NotePropertyName PublicKeySha256 -NotePropertyValue $check.PublicKeySha256 -Force
+                [IO.File]::WriteAllText($pinPath,($pin|ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
+                [IO.File]::WriteAllBytes((Join-Path $script:HolographicRoot '.state\portal-server.cer'),$der)
+                $renewed=$true
+            }finally{$previous.Dispose()}
+        }
+        $keyPin=Get-HoloPortalPublicKeyPin $current
+        if($pin.PSObject.Properties['PublicKeySha256'] -and $pin.PublicKeySha256 -cne $keyPin){throw 'The public key does not match its stored pin.'}
+        $handler=[HoloPortalTls]::CreateHandler($Address,$observed)
+        $client=[Net.Http.HttpClient]::new($handler)
+        $client.Timeout=[TimeSpan]::FromSeconds($TimeoutSeconds)
+        $network=$saved.Credential.GetNetworkCredential()
+        $client.DefaultRequestHeaders.Authorization=[Net.Http.Headers.AuthenticationHeaderValue]::new('Basic',[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($network.UserName+':'+$network.Password)))
+        $network=$null
+        return @{Client=$client;Address=$Address;CertificateSha256=$observed;PublicKeySha256=$keyPin;Renewed=$renewed;DeviceName=$config.DeviceName}
+    }finally{$current.Dispose()}
+}

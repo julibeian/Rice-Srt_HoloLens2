@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><title>HoloLens 输入验证</title><link rel="stylesheet" href="probe.css"></head>
+<body>
+  <header><h1>HoloLens 输入验证 <small>1.0.0.0</small></h1><div id="session">正在初始化</div></header>
+  <main>
+    <section><h2>目标选择</h2><div class="targets"><button id="target-a">A · 蓝色</button><button id="target-b">B · 橙色</button><button id="target-c">C · 绿色</button></div><output id="selection">尚未选择</output></section>
+    <section><h2>按住、移动、释放</h2><div id="drag-surface" tabindex="0">拖动区域 <span id="drag-marker"></span></div><label>滑块 <input id="slider" type="range" min="0" max="100" value="50"></label><output id="slider-value">50</output></section>
+    <section><h2>文字与焦点</h2><label for="text">普通测试文本</label><textarea id="text" rows="3" placeholder="先选择这里，再输入中英文与符号"></textarea><output id="focus">焦点：无</output></section>
+    <section class="trace"><h2>实际事件</h2><div id="summary"></div><pre id="events"></pre><div id="storage">仅保存在本机应用数据，不发往网络</div></section>
+  </main><script src="probe-model.js"></script><script src="probe.js"></script>
+</body></html>

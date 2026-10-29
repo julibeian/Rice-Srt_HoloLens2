@@ -1,6 +1,8 @@
 param(
     [ValidatePattern('^[A-Za-z0-9_-]{1,64}$')][string]$RunId=('live-'+(Get-Date -Format 'yyyyMMdd-HHmmss')+'-'+[Guid]::NewGuid().ToString('N').Substring(0,6)),
-    [ValidateRange(1,15)][int]$Seconds=6
+    [ValidateRange(1,15)][int]$Seconds=6,
+    [ValidateSet('Interactive','Detail','Low')][string]$VideoProfile='Detail',
+    [switch]$DisableStabilizationBuffer
 )
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'Holographic.Common.ps1')
@@ -10,19 +12,22 @@ if(Test-Path -LiteralPath $checkpoint){Get-Content -LiteralPath $checkpoint -Raw
 $context=New-HoloAuthenticatedPortalContext
 [IO.Directory]::CreateDirectory($folder)|Out-Null
 $path=Join-Path $folder 'live.mp4'
-$proof=[ordered]@{RunId=$RunId;At=[DateTimeOffset]::Now.ToString('o');State='request_started';Seconds=$Seconds;StreamHttpStatus=$null;Bytes=0;Holograms=$true;PhotoVideoCamera=$false;Microphone=$false;LoopbackAudio=$false;RenderFromCamera=$false;StreamClosed=$false;VisibleUiVerified=$false;Video=$path;Evidence=$folder}
+$endpoint=switch($VideoProfile){'Interactive'{'live_med.mp4'}'Low'{'live_low.mp4'}default{'live_high.mp4'}}
+$proof=[ordered]@{RunId=$RunId;At=[DateTimeOffset]::Now.ToString('o');State='request_started';Seconds=$Seconds;Endpoint=$endpoint;DisableStabilizationBuffer=[bool]$DisableStabilizationBuffer;ReadSeconds=$null;StreamHttpStatus=$null;Bytes=0;Holograms=$true;PhotoVideoCamera=$false;Microphone=$false;LoopbackAudio=$false;RenderFromCamera=$false;StreamClosed=$false;VisibleUiVerified=$false;Video=$path;Evidence=$folder}
 [IO.File]::WriteAllText($checkpoint,($proof|ConvertTo-Json -Depth 4),[Text.UTF8Encoding]::new($false))
 $response=$null;$stream=$null;$file=$null;$deadline=$null
 try {
     # Explicitly exclude PV and both audio sources. This does not reserve the
     # application's camera or upload a view of the room to an external service.
-    $url=$context.BaseUri+'/api/holographic/stream/live_high.mp4?holo=true&pv=false&mic=false&loopback=false&RenderFromCamera=false'
+    $url=$context.BaseUri+'/api/holographic/stream/'+$endpoint+'?holo=true&pv=false&mic=false&loopback=false&RenderFromCamera=false'
+    if($DisableStabilizationBuffer){$url+='&vstab=false&vstabbuffer=0'}
     $response=$context.Client.GetAsync($url,[Net.Http.HttpCompletionOption]::ResponseHeadersRead).GetAwaiter().GetResult()
     $proof.StreamHttpStatus=[int]$response.StatusCode
     if($proof.StreamHttpStatus -eq 200){
         $stream=$response.Content.ReadAsStreamAsync().GetAwaiter().GetResult()
         $file=[IO.File]::Open($path,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::Read)
         $deadline=[Threading.CancellationTokenSource]::new($Seconds*1000)
+        $clock=[Diagnostics.Stopwatch]::StartNew()
         $buffer=[byte[]]::new(65536)
         try {
             while($proof.Bytes -lt 20971520){
@@ -33,6 +38,7 @@ try {
             $proof.State='sample_received'
         } catch [OperationCanceledException] {$proof.State='bounded_sample_received'}
         if($proof.Bytes -eq 0){$proof.State='empty_stream'}
+        $proof.ReadSeconds=$clock.Elapsed.TotalSeconds
     } else {$proof.State='stream_rejected'}
 } catch {$proof.State='stream_error';$proof.ErrorType=$_.Exception.GetType().Name}
 finally {

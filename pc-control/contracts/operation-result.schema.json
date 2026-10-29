@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HoloLens whole-device operation result, version 1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "operation_id", "session_id", "device_identity_ref", "source_manifest_ref", "kind", "target", "parameters_sha256", "started_at", "ended_at", "status", "layers", "readback_evidence", "error", "cleanup"],
+  "properties": {
+    "schema_version": {"const": 1},
+    "operation_id": {"type": "string", "pattern": "^[A-Za-z0-9_-]{1,64}$"},
+    "session_id": {"type": "string", "minLength": 1},
+    "device_identity_ref": {"type": "string", "minLength": 1},
+    "source_manifest_ref": {"type": "string", "minLength": 1},
+    "kind": {"enum": ["read", "input", "management"]},
+    "target": {
+      "type": "object", "additionalProperties": false,
+      "required": ["type", "identity"],
+      "properties": {"type": {"enum": ["device", "application", "file", "control", "text"]}, "identity": {"type": "string", "minLength": 1}}
+    },
+    "parameters_sha256": {"type": "string", "pattern": "^[A-Fa-f0-9]{64}$"},
+    "started_at": {"type": "string", "format": "date-time"},
+    "ended_at": {"type": ["string", "null"], "format": "date-time"},
+    "status": {"enum": ["accepted", "in_progress", "completed", "failed", "unknown", "cancelled", "rejected"]},
+    "layers": {
+      "type": "object", "additionalProperties": false,
+      "required": ["request", "transport", "device_state", "visible_effect"],
+      "properties": {
+        "request": {"$ref": "#/$defs/layer"}, "transport": {"$ref": "#/$defs/layer"},
+        "device_state": {"$ref": "#/$defs/layer"}, "visible_effect": {"$ref": "#/$defs/layer"}
+      }
+    },
+    "readback_evidence": {"$ref": "#/$defs/evidence"},
+    "error": {
+      "oneOf": [{"type": "null"}, {"type": "object", "additionalProperties": false, "required": ["code", "message"], "properties": {"code": {"type": "string", "minLength": 1}, "message": {"type": "string", "minLength": 1}}}]
+    },
+    "cleanup": {
+      "type": "object", "additionalProperties": false, "required": ["status", "evidence"],
+      "properties": {"status": {"enum": ["not_required", "pending", "verified", "failed", "unknown"]}, "evidence": {"$ref": "#/$defs/evidence"}}
+    }
+  },
+  "$defs": {
+    "evidence": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "layer": {
+      "type": "object", "additionalProperties": false, "required": ["status", "evidence"],
+      "properties": {"status": {"enum": ["not_observed", "passed", "failed", "unknown", "not_applicable"]}, "evidence": {"$ref": "#/$defs/evidence"}},
+      "allOf": [{"if": {"properties": {"status": {"const": "passed"}}}, "then": {"properties": {"evidence": {"minItems": 1}}}}]
+    }
+  },
+  "allOf": [
+    {"if": {"properties": {"status": {"const": "completed"}}}, "then": {"properties": {"ended_at": {"type": "string"}, "error": {"type": "null"}, "layers": {"properties": {"request": {"properties": {"status": {"const": "passed"}}}, "transport": {"properties": {"status": {"const": "passed"}}}, "device_state": {"properties": {"status": {"const": "passed"}}}}}, "cleanup": {"properties": {"status": {"enum": ["not_required", "verified"]}}}}}},
+    {"if": {"properties": {"status": {"const": "completed"}, "kind": {"const": "input"}}}, "then": {"properties": {"layers": {"properties": {"visible_effect": {"properties": {"status": {"const": "passed"}, "evidence": {"minItems": 2}}}}}, "cleanup": {"properties": {"status": {"const": "verified"}, "evidence": {"minItems": 1}}}}}},
+    {"if": {"properties": {"status": {"const": "completed"}, "kind": {"enum": ["read", "management"]}}}, "then": {"properties": {"readback_evidence": {"minItems": 1}}}},
+    {"if": {"properties": {"cleanup": {"properties": {"status": {"const": "verified"}}}}}, "then": {"properties": {"cleanup": {"properties": {"evidence": {"minItems": 1}}}}}},
+    {"if": {"properties": {"status": {"enum": ["failed", "unknown", "rejected"]}}}, "then": {"properties": {"error": {"type": "object"}}}}
+  ]
+}

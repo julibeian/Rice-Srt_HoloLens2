@@ -1,0 +1,471 @@
+{
+  "schema_version": 1,
+  "scope": "HoloLens whole-device visual operation and management",
+  "plan_ref": "../../plans/20261027-phase2-hololens-control/任务状态.json",
+  "mandatory_priorities": [
+    "P0",
+    "P1"
+  ],
+  "historical_results_are_new_acceptance": false,
+  "result_schema": "../../../pc-control/contracts/operation-result.schema.json",
+  "verification_layers": [
+    "request",
+    "transport",
+    "device_state",
+    "visible_effect"
+  ],
+  "routes": [
+    {
+      "role": "candidate",
+      "id": "direct-sdk",
+      "status": "cross_application_not_verified"
+    },
+    {
+      "role": "candidate",
+      "id": "custom-legacy-adapter",
+      "status": "historical_application_success_only"
+    },
+    {
+      "role": "comparison",
+      "id": "official-gui",
+      "status": "historical_video_success_input_unverified"
+    },
+    {
+      "role": "candidate_text",
+      "id": "portal-virtual-input",
+      "status": "not_probed"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "F01",
+      "description": "自动发现原设备，核对身份，复用认证；区分离线、认证失败和未知状态",
+      "priority": "P0",
+      "mandatory": true,
+      "acceptance": [
+        "A01",
+        "A02"
+      ],
+      "tasks": [
+        "T02",
+        "T03"
+      ],
+      "implementation": "not_verified",
+      "acceptance_status": "not_run",
+      "observations": [
+        {
+          "type": "live_read_only",
+          "evidence": "reports/phase2-full-control/m0-environment-20261027-1955/environment.json",
+          "acceptance": "A01",
+          "complete_requirement": false
+        }
+      ],
+      "scenarios": [
+        "shell-and-settings",
+        "browser-2d",
+        "independent-business-2d",
+        "holographic-3d"
+      ],
+      "boundaries": []
+    },
+    {
+      "id": "F02",
+      "description": "显示真实全息画面，标明视频来源与新鲜度，支持窗口缩放和本机截图",
+      "priority": "P0",
+      "mandatory": true,
+      "acceptance": [
+        "A03",
+        "A04"
+      ],
+      "tasks": [
+        "T03",
+        "T07"
+      ],
+      "implementation": "not_verified",
+      "acceptance_status": "not_run",
+      "observations": [],
+      "scenarios": [
+        "shell-and-settings",
+        "browser-2d",
+        "independent-business-2d",
+        "holographic-3d"
+      ],
+      "boundaries": []
+    },
+    {
+      "id": "F03",
+      "description": "鼠标指向不同应用目标；支持校准和失效检测，错误定位时阻止输入",
+      "priority": "P0",
+      "mandatory": true,
+      "acceptance": [
+        "A05",
+        "A06"
+      ],
+      "tasks": [
+        "T03",
+        "T04",
+        "T05",
+        "T08"
+      ],
+      "implementation": "in_progress",
+      "acceptance_status": "not_run",
+      "observations": [
+        {
+          "complete_requirement": false,
+          "evidence": "docs/milestones/phase-2-hololens-control/input-route.md",
+          "type": "native_trusted_click_and_visible_system_navigation"
+        }
+      ],
+      "scenarios": [
+        "shell-and-settings",
+        "browser-2d",
+        "independent-business-2d",
+        "holographic-3d"
+      ],
+      "boundaries": []
+    },
+    {
+      "id": "F04",
+      "description": "点按、按住、释放、长按、拖动与滚动；异常时释放全部按键和手势",
+      "priority": "P1",
+      "mandatory": true,
+      "acceptance": [
+        "A07",
+        "A08"
+      ],
+      "tasks": [
+        "T03",
+        "T09",
+        "T10"
+      ],
+      "implementation": "not_verified",
+      "acceptance_status": "not_run",
+      "observations": [],
+      "scenarios": [
+        "shell-and-settings",
+        "browser-2d",
+        "independent-business-2d",
+        "holographic-3d"
+      ],
+      "boundaries": []
+    },
+    {
+      "id": "F05",
+      "description": "调整观看视角和距离；移动缩放二维窗口，操作三维对象的位置旋转与尺寸",
+      "priority": "P1",
+      "mandatory": true,
+      "acceptance": [
+        "A09",
+        "A10"
+      ],
+      "tasks": [
+        "T03",
+        "T12"
+      ],
+      "implementation": "not_verified",
+      "acceptance_status": "not_run",
+      "observations": [],
+      "scenarios": [
+        "shell-and-settings",
+        "browser-2d",
+        "independent-business-2d",
+        "holographic-3d"
+      ],
+      "boundaries": []
+    },
+    {
+      "id": "F06",
+      "description": "打开开始菜单，枚举可启动应用，按真实包身份启动和切换，返回前一应用",
+      "priority": "P0",
+      "mandatory": true,
+      "acceptance": [
+        "A11",
+        "A12"
+      ],
+      "tasks": [
+        "T03",
+        "T04",
+        "T06",
+        "T13"
+      ],
+      "implementation": "in_progress",
+      "acceptance_status": "not_run",
+      "observations": [
+        {
+          "complete_requirement": false,
+          "evidence": "reports/phase2-full-control/t06-desktop-20261027/检查与交付.md",
+          "type": "version_bound_inventory_and_generic_launch"
+        }
+      ],
+      "scenarios": [
+        "shell-and-settings",
+        "browser-2d",
+        "independent-business-2d",
+        "holographic-3d"
+      ],
+      "boundaries": []
+    },
+    {
+      "id": "F07",
+      "description": "在目标输入框输入英文、数字、中文、符号和换行；支持删除与常见编辑键",
+      "priority": "P1",
+      "mandatory": true,
+      "acceptance": [
+        "A13",
+        "A14"
+      ],
+      "tasks": [
+        "T03",
+        "T11"
+      ],
+      "implementation": "not_verified",
+      "acceptance_status": "not_run",
+      "observations": [],
+      "scenarios": [
+        "shell-and-settings",
+        "browser-2d",
+        "independent-business-2d",
+        "holographic-3d"
+      ],
+      "boundaries": []
+    },
+    {
+      "id": "F08",
+      "description": "在普通系统设置和对话框中完成查看、选择和允许的设置操作",
+      "priority": "P1",
+      "mandatory": true,
+      "acceptance": [
+        "A15",
+        "A16"
+      ],
+      "tasks": [
+        "T03",
+        "T13"
+      ],
+      "implementation": "not_verified",
+      "acceptance_status": "not_run",
+      "observations": [],
+      "scenarios": [
+        "shell-and-settings",
+        "browser-2d",
+        "independent-business-2d",
+        "holographic-3d"
+      ],
+      "boundaries": []
+    },
+    {
+      "id": "F09",
+      "description": "列出应用，安装更新指定测试包，按精确身份停止和卸载目标",
+      "priority": "P1",
+      "mandatory": true,
+      "acceptance": [
+        "A17",
+        "A18"
+      ],
+      "tasks": [
+        "T03",
+        "T06",
+        "T14"
+      ],
+      "implementation": "in_progress",
+      "acceptance_status": "not_run",
+      "observations": [],
+      "scenarios": [
+        "shell-and-settings",
+        "browser-2d",
+        "independent-business-2d",
+        "holographic-3d"
+      ],
+      "boundaries": []
+    },
+    {
+      "id": "F10",
+      "description": "浏览实际可访问目录，上传下载文件，校验完整性并保留失败信息",
+      "priority": "P1",
+      "mandatory": true,
+      "acceptance": [
+        "A19",
+        "A20"
+      ],
+      "tasks": [
+        "T03",
+        "T15"
+      ],
+      "implementation": "not_verified",
+      "acceptance_status": "not_run",
+      "observations": [],
+      "scenarios": [
+        "shell-and-settings",
+        "browser-2d",
+        "independent-business-2d",
+        "holographic-3d"
+      ],
+      "boundaries": []
+    },
+    {
+      "id": "F11",
+      "description": "查询网络、电源、电量和存储；支持已验证设置的修改、读回及恢复",
+      "priority": "P1",
+      "mandatory": true,
+      "acceptance": [
+        "A21",
+        "A22"
+      ],
+      "tasks": [
+        "T03",
+        "T16"
+      ],
+      "implementation": "not_verified",
+      "acceptance_status": "not_run",
+      "observations": [],
+      "scenarios": [
+        "shell-and-settings",
+        "browser-2d",
+        "independent-business-2d",
+        "holographic-3d"
+      ],
+      "boundaries": []
+    },
+    {
+      "id": "F12",
+      "description": "查看进程与设备诊断，导出日志和崩溃材料，保留权限拒绝和不完整结果",
+      "priority": "P1",
+      "mandatory": true,
+      "acceptance": [
+        "A23"
+      ],
+      "tasks": [
+        "T03",
+        "T17"
+      ],
+      "implementation": "not_verified",
+      "acceptance_status": "not_run",
+      "observations": [],
+      "scenarios": [
+        "shell-and-settings",
+        "browser-2d",
+        "independent-business-2d",
+        "holographic-3d"
+      ],
+      "boundaries": []
+    },
+    {
+      "id": "F13",
+      "description": "截图录屏；明确画面、相机和声音来源，控制保存位置与采集状态",
+      "priority": "P1",
+      "mandatory": true,
+      "acceptance": [
+        "A24"
+      ],
+      "tasks": [
+        "T03",
+        "T18"
+      ],
+      "implementation": "not_verified",
+      "acceptance_status": "not_run",
+      "observations": [],
+      "scenarios": [
+        "shell-and-settings",
+        "browser-2d",
+        "independent-business-2d",
+        "holographic-3d"
+      ],
+      "boundaries": []
+    },
+    {
+      "id": "F14",
+      "description": "统一只读观看与输入控制会话，处理竞争、失焦、中断、退出和设备恢复",
+      "priority": "P0",
+      "mandatory": true,
+      "acceptance": [
+        "A25",
+        "A26",
+        "A27"
+      ],
+      "tasks": [
+        "T03",
+        "T05",
+        "T19",
+        "T20",
+        "T23"
+      ],
+      "implementation": "in_progress",
+      "acceptance_status": "not_run",
+      "observations": [
+        {
+          "complete_requirement": false,
+          "evidence": "reports/phase2-full-control/t06-desktop-20261027/cleanup.json",
+          "type": "bounded_own_stream_cleanup"
+        }
+      ],
+      "scenarios": [
+        "shell-and-settings",
+        "browser-2d",
+        "independent-business-2d",
+        "holographic-3d"
+      ],
+      "boundaries": []
+    },
+    {
+      "id": "F15",
+      "description": "提供统一 Windows 桌面入口、状态反馈和依赖诊断，完成第二台电脑复现",
+      "priority": "P1",
+      "mandatory": true,
+      "acceptance": [
+        "A28",
+        "A29"
+      ],
+      "tasks": [
+        "T02",
+        "T03",
+        "T21",
+        "T22",
+        "T24"
+      ],
+      "implementation": "not_verified",
+      "acceptance_status": "not_run",
+      "observations": [],
+      "scenarios": [
+        "shell-and-settings",
+        "browser-2d",
+        "independent-business-2d",
+        "holographic-3d"
+      ],
+      "boundaries": []
+    },
+    {
+      "id": "F16",
+      "description": "提供会话记录、版本与哈希关联、性能统计及持续运行验证",
+      "priority": "P1",
+      "mandatory": true,
+      "acceptance": [
+        "A30",
+        "A31",
+        "A32"
+      ],
+      "tasks": [
+        "T01",
+        "T03",
+        "T20",
+        "T23",
+        "T24"
+      ],
+      "implementation": "not_verified",
+      "acceptance_status": "not_run",
+      "observations": [
+        {
+          "type": "source_baseline",
+          "evidence": "reports/phase2-full-control/m0-baseline-20261027-1950/source-manifest.json",
+          "complete_requirement": false
+        }
+      ],
+      "scenarios": [
+        "shell-and-settings",
+        "browser-2d",
+        "independent-business-2d",
+        "holographic-3d"
+      ],
+      "boundaries": []
+    }
+  ]
+}

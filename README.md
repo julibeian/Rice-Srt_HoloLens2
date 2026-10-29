@@ -16,14 +16,17 @@
 | 提交问题、方案或实验结果 | [协作说明](CONTRIBUTING.md) · [新建 Issue](https://github.com/julibeian/hololens-terminal/issues/new/choose) |
 | 下载实验预览包 | [版本发布](https://github.com/julibeian/hololens-terminal/releases/tag/v1.0.0.22) · [版本说明](CHANGELOG.md) |
 
-## 阶段性成果：电脑连接与真机控制
+## 五阶段路线
 
-按两个阶段维护，各自提供手册、资源和验收范围。第一阶段的管理连接不包含视频和鼠标操作。
-
-| 阶段 | 阶段性结果 | 文档与分支 |
+| 阶段 | 目标 | 当前状态 |
 | --- | --- | --- |
-| 一：电脑通过 USB 管理眼镜 | 已有身份校验、远程程序执行、文件往返、会话重连、桥进程恢复和单次设备重启恢复记录；提供新电脑配置流程 | [通用操作手册](docs/milestones/phase-1-usb-terminal/manual.md) · [资源](docs/milestones/phase-1-usb-terminal/resources.md) · [重要迭代历史](docs/milestones/phase-1-usb-terminal/history.md) · [阶段分支](https://github.com/julibeian/hololens-terminal/tree/codex/pc-hololens-connection) |
-| 二：真机稻视界眼镜控制 | 进行中。实时画面和鼠标控制在本阶段验收，结合微软 3.0.24.0 官方软件包做对照测试 | [通用手册](docs/milestones/phase-2-ricefield-control/manual.md) · [官方对照测试](docs/milestones/phase-2-ricefield-control/official-3.0.24.0-test.md) · [阶段分支](https://github.com/julibeian/hololens-terminal/tree/codex/ricefield-device-control) |
+| 一 | 电脑通过 USB 稳定连接眼镜 | 已完成：身份校验、远程程序执行、文件往返、断线重连、桥进程自恢复、受控重启 |
+| 二 | 在电脑上稳定操作眼镜内画面 | 基本可用、验收进行中：实时画面、点按、跨应用启动、延迟优化与可用性看护；25 fps、完整 DPI、三维交互与长时稳定性仍在推进 |
+| 三 | 静态识别模型嵌入眼镜 | 未开始 |
+| 四 | 动态识别模型嵌入眼镜 | 未开始 |
+| 五 | 前后端挂载 | 未开始 |
+
+阶段一、二的已有成果与验收范围分别记录在 [阶段成果总览](docs/milestones/README.md)、[第一阶段手册](docs/milestones/phase-1-usb-terminal/manual.md) 和 [第二阶段能力登记](docs/milestones/phase-2-hololens-control/README.md)。稻视界是第二阶段的验证应用之一，其应用专用手册见 [稻视界控制](docs/milestones/phase-2-ricefield-control/manual.md)。
 
 阶段状态、复现边界与后续工作见 [阶段成果总览](docs/milestones/README.md)。
 

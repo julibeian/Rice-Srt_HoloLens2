@@ -13,6 +13,9 @@
 *.cer
 session.json
 
+# Internal phase-two execution state, task JSON and working plans stay local.
+/docs/plans/
+
 # Installed tools, runtimes and dependencies.
 /.tools/
 /runtime/powershell/

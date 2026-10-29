@@ -1,6 +1,6 @@
 param(
     [ValidateSet('arm64','x64')][string]$Architecture='arm64',
-    [ValidateSet('perception','portal','uia','injector','local-simulation','lifecycle','desktop-state','certificate','settings')][string]$Probe='perception'
+    [ValidateSet('perception','portal','uia','injector','local-simulation','lifecycle','desktop-state','certificate','settings','audio','power','power-state')][string]$Probe='perception'
 )
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot
@@ -25,6 +25,7 @@ $lib='C:\Program Files (x86)\Windows Kits\10\Lib\10.0.26100.0\um\'+$Architecture
 $extraLibs=@()
 if($Probe -eq 'uia'){$extraLibs=@((Join-Path (Split-Path -Parent $lib) 'uuid.lib'),(Join-Path (Split-Path -Parent $lib) 'oleaut32.lib'))}
 if($Probe -eq 'certificate'){$extraLibs=@((Join-Path (Split-Path -Parent $lib) 'crypt32.lib'))}
+if($Probe -eq 'power-state'){$extraLibs=@((Join-Path (Split-Path -Parent $lib) 'PowrProf.lib'))}
 & 'C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207\bin\Hostx64\x64\link.exe' /nologo /NODEFAULTLIB ('/ENTRY:'+$Probe.Replace('-','_')+'_probe_entry') /SUBSYSTEM:CONSOLE ('/MACHINE:'+$Architecture.ToUpperInvariant()) /DYNAMICBASE /NXCOMPAT /OPT:REF $object $lib @extraLibs ('/OUT:'+$exe)
 if($LASTEXITCODE -ne 0){throw 'Perception probe link failed.'}
 [ordered]@{Architecture=$Architecture;Path=$exe;Sha256=(Get-FileHash -LiteralPath $exe).Hash}|ConvertTo-Json -Compress

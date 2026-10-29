@@ -16,9 +16,9 @@
 
 本阶段不包含实时画面、鼠标输入或识别效果结论。已有结果来自一个开发环境与一台 HoloLens 2；通用文档和离线检查不等于已经完成第二台电脑的真机复现。
 
-## 第二阶段：真机稻视界眼镜控制
+## 第二阶段：HoloLens 整机操作与管理
 
-状态：**进行中**。在第一阶段的管理连接之上，建立认证门户、真实全息视频、鼠标操作和设备端限时恢复保护，并与微软 **Perception Simulation 3.0.24.0** 官方软件包进行对照测试。
+状态：**进行中**。范围扩展为系统与多应用可视化操作、键盘文字、持续手势、三维交互、设备维护及异常恢复。见 [整机实施与能力登记](phase-2-hololens-control/README.md) 和 [执行入口](../plans/20261027-phase2-hololens-control/执行入口.md)。M0 基线已建立，通用输入仍待跨应用验证。
 
 第二阶段有独立的 [资料目录](phase-2-ricefield-control/README.md)、[操作手册](phase-2-ricefield-control/manual.md)、[官方 3.0.24.0 对照测试计划](phase-2-ricefield-control/official-3.0.24.0-test.md) 和 [源码分支](https://github.com/julibeian/hololens-terminal/tree/codex/ricefield-device-control)。自制软件后端的真机记录、桌面窗口检查与官方 GUI 的测试分别记载，不以第一阶段连通代替控制验收。
 
