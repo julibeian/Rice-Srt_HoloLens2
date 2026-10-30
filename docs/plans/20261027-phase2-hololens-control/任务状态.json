@@ -5,9 +5,9 @@
   "project_scope": "HoloLens 整机可视化操作与管理",
   "plan_file": "二阶段整机控制规划书.md",
   "entry_file": "执行入口.md",
-  "status": "in_progress",
+  "status": "blocked",
   "next_task": "T07",
-  "current_device_state": "2026-10-29 20:09:15+08:00: bridge connected and power worker active; device awake LowPowerState=false with39 decoded frames. Supervisor launcher runs from the bridge and now uses a three-step ladder: ensure bridge when healthy, SDK enumeration for deep sleep, bridge restart as fallback, portal restart (7min budget,900s restart cooldown) only when the portal is reachable and the device stays low power. Restart invocation/parse self-test returned already_awake with39frames. A95s bridge-stop did not put the just-rebooted device to sleep, so the discovery-first branch was not re-run end to end this round; 19:46 enumeration wake (about16s),19:40 bridge-restart recovery (42.3s) and19:59-20:04 StateA restart wake (about5min) remain version-bound evidence.",
+  "current_device_state": "2026-10-30T20:37:47.0568739+08:00: original device not accessible. SDK discovery and NCM adapters including hidden remain empty, bridge PID10088 verified alive waiting_for_device and ActiveOperation=null. Current PnP query20:29 empty without errors; existing configured address169.254.112.215 SDK attempt20:33 failed network-unreachable0x80072743. No current authenticated SSH/portal, power/input-mode/video state. Native probe1.0.0.2 package/source verified unchanged, not deployed or device-tested. Three-goal-turn blocker audit satisfied. Await original-device access, then reverify existing identity and resume live acceptance.25fps and full targets unchanged; README user-maintained and Windows DPI deferred.",
   "implementation_started": true,
   "task_status_values": [
     "not_started",
@@ -660,7 +660,37 @@
         "docs/milestones/phase-2-hololens-control/operation-deadline-20261029.md",
         "reports/phase2-full-control/t07-operation-deadline-20261029/source-manifest.json",
         "reports/phase2-full-control/t07-operation-deadline-20261029/build-manifest.json",
-        "docs/plans/20261027-phase2-hololens-control/验收剩余项与当前阻断.md"
+        "docs/plans/20261027-phase2-hololens-control/验收剩余项与当前阻断.md",
+        "pc-control/ops/Video.SourceReader.ps1",
+        "pc-control/ops/Video.RawTransport.ps1",
+        "pc-control/tests/Video.SourceReader.Tests.ps1",
+        "holographic-control/device/hl-capture-support-probe.c",
+        "holographic-control/ops/Get-CaptureSupport.ps1",
+        "holographic-control/device/hl-timing-probe.c",
+        "holographic-control/ops/Get-DeviceTiming.ps1",
+        "docs/milestones/phase-2-hololens-control/video-source-20261029-evening.md",
+        "docs/milestones/phase-2-hololens-control/native-capture-20261030.md",
+        "holographic-control/device/hl-capture-item-probe.c",
+        "holographic-control/ops/Get-CaptureItem.ps1",
+        "pc-control/ops/Measure-SimulationViews.ps1",
+        "pc-control/ops/Build-ScreenNative.ps1",
+        "pc-control/ops/Build-ScreenProbe.ps1",
+        "pc-control/ops/Invoke-ScreenProbe.ps1",
+        "pc-control/ops/Test-ScreenNative.ps1",
+        "pc-control/screen-probe/ScreenNative.c",
+        "pc-control/screen-probe/ScreenNative.idl",
+        "pc-control/screen-probe/ScreenNative.def",
+        "pc-control/screen-probe/AppxManifest.xml",
+        "pc-control/screen-probe/index.html",
+        "pc-control/screen-probe/probe.css",
+        "pc-control/screen-probe/probe.js",
+        "pc-control/screen-probe/stats.js",
+        "pc-control/tests/ScreenNative.Abi.c",
+        "pc-control/tests/ScreenCaptureStats.test.cjs",
+        "pc-control/tests/ScreenCaptureBridge.test.cjs",
+        "docs/milestones/phase-2-hololens-control/native-capture-stop-20261030.md",
+        "pc-control/tests/ScreenNative.Cancellation.c",
+        "docs/milestones/phase-2-hololens-control/latency-block-20261030.md"
       ],
       "evidence": [
         "pc-control/.state/sessions/20261028-133045-446656/events.jsonl",
@@ -715,11 +745,59 @@
         "reports/phase2-full-control/t07-block-audit-20261029/current-state.json",
         "reports/phase2-full-control/t07-block-audit-20261029/video-result.json",
         "reports/phase2-full-control/t07-block-audit-20261029/video-verification.json",
-        "reports/phase2-full-control/t07-block-audit-20261029/evidence-manifest.json"
+        "reports/phase2-full-control/t07-block-audit-20261029/evidence-manifest.json",
+        "reports/phase2-full-control/t07-continue-live-20261029/source-comparison.json",
+        "reports/phase2-full-control/t07-continue-live-20261029/fragmented-reader-tests.json",
+        "reports/phase2-full-control/t07-continue-live-20261029/raw-pin-negative.json",
+        "reports/phase2-full-control/t07-continue-live-20261029/capture-support.json",
+        "reports/phase2-full-control/t07-continue-live-20261029/capture-support-repeat.json",
+        "reports/phase2-full-control/t07-continue-live-20261029/system-framerate-audit.json",
+        "reports/phase2-full-control/t07-continue-live-20261029/source-manifest.json",
+        "reports/phase2-full-control/t07-continue-live-20261029/device-timing-audit.json",
+        "reports/phase2-full-control/t07-continue-live-20261029/timing-period-final.json",
+        "reports/phase2-full-control/t07-current-backend-20261029/click-audit.json",
+        "reports/phase2-full-control/t07-current-backend-20261029/build-manifest.json",
+        "reports/phase2-full-control/t07-current-backend-20261029/readonly-30min/audit.json",
+        "reports/phase2-full-control/t07-current-backend-20261029/frame-coverage-audit.json",
+        "reports\\phase2-full-control\\t07-continue-live-20261029\\timing-comparison.json",
+        "reports\\phase2-full-control\\t07-continue-live-20261029\\timing-idempotency-tests.json",
+        "reports\\phase2-full-control\\t07-continue-live-20261029\\mode-final.json",
+        "reports\\phase2-full-control\\t07-continue-live-20261029\\power-final.json",
+        "reports\\phase2-full-control\\t07-continue-live-20261029\\audio-final.json",
+        "reports\\phase2-full-control\\t07-continue-live-20261029\\evidence-manifest-final.json",
+        "reports\\phase2-full-control\\t07-current-backend-20261029\\evidence-manifest-final.json",
+        "reports/phase2-full-control/t07-capture-route-20261029/monitor-item.json",
+        "reports/phase2-full-control/t07-capture-route-20261029/screen-probe-preflight.json",
+        "reports/phase2-full-control/t07-capture-route-20261029/t07-sim-views-additional-20261029-b-control.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/device-final.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/bridge-final.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/prior-simulation-analysis.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/simulation-idempotency.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/package-build-final.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/abi-test-final.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/metadata-check.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/js-tests.txt",
+        "reports/phase2-full-control/t07-native-capture-20261030/powershell-parse-final.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/before-result.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/native-tests-verified.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/frontend-tests-final.txt",
+        "reports/phase2-full-control/t07-native-stop-20261030/x64-build-verified.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/package-verified.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/device-check-latest.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/parse-tests.json",
+        "reports/phase2-full-control/t07-device-recheck-20261030-202717/bridge-status.json",
+        "reports/phase2-full-control/t07-device-recheck-20261030-202717/device-state.json",
+        "reports/phase2-full-control/t07-device-recheck-20261030-202717/pnp-state.json",
+        "reports/phase2-full-control/t07-device-recheck-20261030-202717/route-state.json",
+        "reports/phase2-full-control/t07-device-recheck-20261030-202717/known-address-check.json",
+        "reports/phase2-full-control/t07-device-recheck-20261030-202717/prepared-package-check.json",
+        "reports/phase2-full-control/t07-device-recheck-20261030-202717/goal-block-audit.json",
+        "reports/phase2-full-control/t07-device-recheck-20261030-202717/final-guard.json"
       ],
-      "blocked_reason": "Original device remains in low_power with only40byte non-decodable medium stream. Same condition confirmed in three consecutive goal turns (16:10 power diagnosis,16:52 operation deadline delivery,17:09 current audit). Existing guarded presence and bounded power requests accepted but did not restore frames; no validated remote wake remains. Current25fps/1-2Mbps/current-version DPI/input/long-run/replug acceptance requires external device wake and fresh decoded video. Existing0.3.3 code and tests retained; do not loop reboot or replace true-device evidence with local fixtures.",
-      "updated_at": "2026-10-29T17:15:23.7522778+08:00",
-      "notes": "Desktop0.3.3 adds a shared deadline for both output pipes and owned script-process exit. Frozen0.3.2 fault reproduced beyond45000ms: still waiting at47025ms with child alive; test stopped only that owned child. Actual new RunScript times out45039ms and confirms own process exit, records script_timeout and no replay. Nine local pipe/process cases including inherited writers and a real Windows message loop pass; existing pointer/frame-pool320/journal/power13/layout7 checks and46field/discovery checks pass. Three actual0.3.3 readonly device operations verify bridge/portal/power, no input or video. Desktop0.3.2 DPI fix remains; its six actual OS100/125/150 local mappings and older trusted clicks are version-bound; full0.3.3 device regression pending. CPU23.35 versus45.05 core percent belongs0.3.1 only. USB outage12:34:41-13:56:07 prevents inferring continuous-USB keepawake failure from later low_power; reconnect wake is still unsuccessful. Final16:52 original identity/pinned portal,LowPowerState=true,mode0,advancing USB power ack/enabled policy. No new presence,reboot,MRC or audio changes.25fps,1-2Mbps,full device DPI,four-interface,long-run,unworn keepawake and physical replug remain incomplete. Completion audit17:09: previous goal turn was progress (0.3.3 actual deadline fix), but the same valid-video blocker persisted across3turns. Goal scope and all original targets retained. Current medium40bytes/ffprobe1,identity/pinning verified,mode0,USB lease enabled and ack advanced. No active measurement job to wait on; meaningful next live work requires restored device frames. Stable pointer tracking uses ROI, initial unknown-position calibration may still search whole frame; retain this qualification. Old zero-stabilization source comparison20.67fps already exists; do not call it wholly untried."
+      "blocked_reason": "2026-10-30 connection blocker confirmed across three consecutive goal turns: original paired HoloLens absent from SDK/NCM; current PnP and hidden adapters empty, existing address169.254.112.215 returns network unreachable0x80072743. Bridge PID10088 is live waiting with no active operation. Offline native1.0.0.2 work is prepared and verified; live deployment, capture/performance, GUI and long-run acceptance require restored access to the original device. Current power/mode/portal/video are unknown; do not label this as proven sleep or replay input/restart.",
+      "updated_at": "2026-10-30T20:37:47.0568739+08:00",
+      "notes": "Desktop0.3.3 adds a shared deadline for both output pipes and owned script-process exit. Frozen0.3.2 fault reproduced beyond45000ms: still waiting at47025ms with child alive; test stopped only that owned child. Actual new RunScript times out45039ms and confirms own process exit, records script_timeout and no replay. Nine local pipe/process cases including inherited writers and a real Windows message loop pass; existing pointer/frame-pool320/journal/power13/layout7 checks and46field/discovery checks pass. Three actual0.3.3 readonly device operations verify bridge/portal/power, no input or video. Desktop0.3.2 DPI fix remains; its six actual OS100/125/150 local mappings and older trusted clicks are version-bound; full0.3.3 device regression pending. CPU23.35 versus45.05 core percent belongs0.3.1 only. USB outage12:34:41-13:56:07 prevents inferring continuous-USB keepawake failure from later low_power; reconnect wake is still unsuccessful. Final16:52 original identity/pinned portal,LowPowerState=true,mode0,advancing USB power ack/enabled policy. No new presence,reboot,MRC or audio changes.25fps,1-2Mbps,full device DPI,four-interface,long-run,unworn keepawake and physical replug remain incomplete. Completion audit17:09: previous goal turn was progress (0.3.3 actual deadline fix), but the same valid-video blocker persisted across3turns. Goal scope and all original targets retained. Current medium40bytes/ffprobe1,identity/pinning verified,mode0,USB lease enabled and ack advanced. No active measurement job to wait on; meaningful next live work requires restored device frames. Stable pointer tracking uses ROI, initial unknown-position calibration may still search whole frame; retain this qualification. Old zero-stabilization source comparison20.67fps already exists; do not call it wholly untried. Resumed after user-repaired sleep/start; current frames and awake verified. Current0.3.3 backend100/100 ordered trusted selections:P50692.63ms,P95819.99ms,max869.65ms, own stream closed200/named lease restoredmode0 at20:36.1800.97s no-input observation passed its scope:31samples,39042decodedframes,mean20.984fps,zero sleep/restart/health errors,five processes stable. Four actual UI frames and med/high source parameters reviewed, no current full GUI/DPI acceptance. PowerShell/native/raw-TLS source remainsabout21fps. Timer inspect33ms waits47.49ms;45s worker-only1ms multimedia request balanced and15.625ms restored, actual stream21.54fps stillbelow25. Do not add persistent/global timing tweaks or treat IsSupported=true as capture implementation.25fps/1-2Mbps/all GUI/four-interface selections/2h interaction/physical replug remain open. User defers Windows desktop DPI and owns all README updates. Final readonly21:39 original awake/mode0;21:41all playback roles silent. Timing source before/during/after21.036/21.536/21.102fps; own request balanced, fresh Inspect15.625ms and33ms waits47.79ms. No timer request remains active. README files unchanged by this agent after human ownership instruction. 2026-10-30 continuation: original-device SDK discovery and NCM adapters are empty; bridge PID10088 is live waiting_for_device. Current device power/mode/video are unverified, no restart/input/desktop DPI changes. Historical isolated simulation-view0 is423 clean decoded frames1440x936,21.357fps; separate view1 decoding fails and has no FPS, additionalView fresh protected requestHTTP500 retained. JS prototype1.0.0.0 actual preflight failed before capture; replaced by native WinRT bridge in independent ScreenProbe1.0.0.1, not the desktop product. ARM64 package schema/PE/metadata pass; same-source x64 actual DLL ABI28 assertions and frontend/statistics12 checks pass without picker/UI/capture. New package is not installed or runtime-verified on the device. Keep25fps and all original end-to-end requirements open; next verify identity/awake frames, install/launch new probe and obtain real source selection, frames and cleanup before considering product integration. Native cancellation continuation20:16: actual worker with a fake completed picker reproduced GetResults called after Stop. ScreenProbe1.0.0.2 now checks Stop before result/setup stages, requests cancel once, observes terminal status for up to2s, never closes a pending async operation, preserves cancellation/close HRESULTs and blocks new picker requests when cleanup is unknown. Inspect preserves unknown outcomes. Component protocol2 prevents stale DLL use; empty frames and unverified cleanup cannot pass measurement. Same-source actual x64 DLL ABI28 assertions, native worker9 asynchronous cases and frontend/statistics16 checks pass without real picker/capture/input. ARM64 Appx built, not installed or tested on HoloLens. At20:16 bridge PID10088 alive but SDK/NCM empty, device power/mode/portal/video unverified. Original25fps/bitrate/DPI/four-interface/2h targets and README ownership unchanged. Connection block audit20:37: three consecutive goal turns19:52/20:16/20:27 have the same absent-device condition; PnP20:29, known-address network-unreachable20:33 and fresh SDK/hidden-adapter guard20:37 confirm it. Prior turn made concrete native cancellation progress; no own live measurement/deployment job remains to wait on. Existing README/config entries checked, prepared1.0.0.2 sources/layout/package unchanged. All remaining critical evidence needs real device access; no surrogate FPS/CPU/DPI acceptance. Full goal retained, task now blocked pending restored original-device connectivity.",
+      "previous_blocked_reason": "Original device remains in low_power with only40byte non-decodable medium stream. Same condition confirmed in three consecutive goal turns (16:10 power diagnosis,16:52 operation deadline delivery,17:09 current audit). Existing guarded presence and bounded power requests accepted but did not restore frames; no validated remote wake remains. Current25fps/1-2Mbps/current-version DPI/input/long-run/replug acceptance requires external device wake and fresh decoded video. Existing0.3.3 code and tests retained; do not loop reboot or replace true-device evidence with local fixtures."
     },
     {
       "id": "T08",
@@ -1128,13 +1206,38 @@
       "required_evidence": "新帧、源参数与应用信息",
       "status": "not_run",
       "runs": [
-        "t07-latency-20261028"
+        "t07-latency-20261028",
+        "t07-current-backend-20261029",
+        "t07-native-capture-20261030",
+        "t07-native-stop-20261030"
       ],
       "evidence": [
         "docs/milestones/phase-2-hololens-control/latency-20261028.md",
-        "reports/phase2-full-control/t07-latency-20261028/修复与验证.md"
+        "reports/phase2-full-control/t07-latency-20261028/修复与验证.md",
+        "reports/phase2-full-control/t07-current-backend-20261029/frame-coverage-audit.json",
+        "reports/phase2-full-control/t07-current-backend-20261029/click-audit.json",
+        "reports/phase2-full-control/t07-current-backend-20261029/readonly-30min/audit.json",
+        "reports/phase2-full-control/t07-capture-route-20261029/monitor-item.json",
+        "reports/phase2-full-control/t07-capture-route-20261029/screen-probe-preflight.json",
+        "reports/phase2-full-control/t07-capture-route-20261029/t07-sim-views-additional-20261029-b-control.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/device-final.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/bridge-final.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/prior-simulation-analysis.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/simulation-idempotency.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/package-build-final.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/abi-test-final.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/metadata-check.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/js-tests.txt",
+        "reports/phase2-full-control/t07-native-capture-20261030/powershell-parse-final.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/before-result.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/native-tests-verified.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/frontend-tests-final.txt",
+        "reports/phase2-full-control/t07-native-stop-20261030/x64-build-verified.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/package-verified.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/device-check-latest.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/parse-tests.json"
       ],
-      "notes": "Medium/high source and source labels tested; formal four-interface current-frame coverage is incomplete."
+      "notes": "Medium/high source and source labels tested; formal four-interface current-frame coverage is incomplete. Current0.3.3 backend fresh Start/Settings/Rice/InputProbe frames and med854x480/high1280x720 reviewed. Profile/source events and notices recorded; full current GUI label transitions still deferred, so formal acceptance not marked passed. Native ScreenProbe1.0.0.1 is locally built/ABI-checked only; device capture and PC painted FPS remain unverified. Historical isolated simulation view0 remains21.357fps; view1 decode errors exclude its message count from FPS. No new acceptance pass. Cancellation-fixed ScreenProbe1.0.0.2 passes local ABI28/native-worker9/frontend16 checks only. No new device capture or PC painted-FPS proof; formal acceptance stays open."
     },
     {
       "id": "A04",
@@ -1146,7 +1249,8 @@
         "t07-dpi-100-normal-20261029-a",
         "t07-dpi-100-full-20261029-a",
         "t07-dpi-100-full-20261029-b",
-        "t07-dpi-20261029-local"
+        "t07-dpi-20261029-local",
+        "t07-current-backend-20261029"
       ],
       "evidence": [
         "docs/milestones/phase-2-hololens-control/latency-20261028.md",
@@ -1154,9 +1258,12 @@
         "docs/milestones/phase-2-hololens-control/latency-20261029-dpi.md",
         "reports/phase2-full-control/t07-dpi-20261029/local-mapping-audit.json",
         "reports/phase2-full-control/t07-dpi-20261029/device-input-audit.json",
-        "reports/phase2-full-control/t07-dpi-20261029/build-tests-after.txt"
+        "reports/phase2-full-control/t07-dpi-20261029/build-tests-after.txt",
+        "reports/phase2-full-control/t07-current-backend-20261029/frame-coverage-audit.json",
+        "reports/phase2-full-control/t07-current-backend-20261029/click-audit.json",
+        "reports/phase2-full-control/t07-current-backend-20261029/readonly-30min/audit.json"
       ],
-      "notes": "Partial/version-bound:0.3.0 actual150 normal/fullscreen trusted selections;0.3.1 actual100 normal B/fullscreen C trusted (first C refused without tap).0.3.2 fixed125 crop; actual100/125/150 normal/fullscreen local BGRA mappings6/6 passed but sent no device input. Current0.3.3 adds script deadline/pipe cleanup and preserves layout code; only local layout checks run on current sources, complete current-version trusted device DPI regression remains unrun. No blanket acceptance from mixed versions."
+      "notes": "Partial/version-bound:0.3.0 actual150 normal/fullscreen trusted selections;0.3.1 actual100 normal B/fullscreen C trusted (first C refused without tap).0.3.2 fixed125 crop; actual100/125/150 normal/fullscreen local BGRA mappings6/6 passed but sent no device input. Current0.3.3 adds script deadline/pipe cleanup and preserves layout code; only local layout checks run on current sources, complete current-version trusted device DPI regression remains unrun. No blanket acceptance from mixed versions. Current Windows GUI/DPI100/125/150 deferred by direct human request; no new scale changes. Earlier version-bound results retained."
     },
     {
       "id": "A05",
@@ -1165,14 +1272,18 @@
       "status": "not_run",
       "runs": [
         "t05-sdk-probe-20261027-c",
-        "t07-latency-20261028"
+        "t07-latency-20261028",
+        "t07-current-backend-20261029"
       ],
       "evidence": [
         "reports/phase2-full-control/t04-delivery-20261027/operation-independent-b.json",
         "docs/milestones/phase-2-hololens-control/latency-20261028.md",
-        "reports/phase2-full-control/t07-latency-20261028/修复与验证.md"
+        "reports/phase2-full-control/t07-latency-20261028/修复与验证.md",
+        "reports/phase2-full-control/t07-current-backend-20261029/frame-coverage-audit.json",
+        "reports/phase2-full-control/t07-current-backend-20261029/click-audit.json",
+        "reports/phase2-full-control/t07-current-backend-20261029/readonly-30min/audit.json"
       ],
-      "notes": "Final package 100/100 single-app A/B/C selections match ordered trusted events. Four classes each 30 selections remain incomplete."
+      "notes": "Final package 100/100 single-app A/B/C selections match ordered trusted events. Four classes each 30 selections remain incomplete. Current0.3.3 backend100/100 A/B/C batch matches ordered trusted events, visibleP50692.63ms/P95819.99ms. Three warmups excluded. Four classes each30 selections remain unrun."
     },
     {
       "id": "A06",
@@ -1377,8 +1488,15 @@
       "procedure_and_pass_condition": "30 分钟无输入观察，2 小时观看与交互循环无未恢复会话",
       "required_evidence": "心跳、资源、故障与恢复记录",
       "status": "not_run",
-      "runs": [],
-      "evidence": []
+      "runs": [
+        "t07-current-backend-20261029"
+      ],
+      "evidence": [
+        "reports/phase2-full-control/t07-current-backend-20261029/frame-coverage-audit.json",
+        "reports/phase2-full-control/t07-current-backend-20261029/click-audit.json",
+        "reports/phase2-full-control/t07-current-backend-20261029/readonly-30min/audit.json"
+      ],
+      "notes": "Current0.3.3 backend1800.97s no-input video observation passed scoped checks:31resource samples,31minute decode windows39042frames,mean20.984fps,mode0/awake31of31,zero input/restarts/health errors. Resource ranges observed;2h interaction remains unrun, formalA30 not passed."
     },
     {
       "id": "A31",
@@ -1386,13 +1504,38 @@
       "required_evidence": "单调时钟样本、P50 P95",
       "status": "not_run",
       "runs": [
-        "t07-latency-20261028"
+        "t07-latency-20261028",
+        "t07-current-backend-20261029",
+        "t07-native-capture-20261030",
+        "t07-native-stop-20261030"
       ],
       "evidence": [
         "docs/milestones/phase-2-hololens-control/latency-20261028.md",
-        "reports/phase2-full-control/t07-latency-20261028/修复与验证.md"
+        "reports/phase2-full-control/t07-latency-20261028/修复与验证.md",
+        "reports/phase2-full-control/t07-current-backend-20261029/frame-coverage-audit.json",
+        "reports/phase2-full-control/t07-current-backend-20261029/click-audit.json",
+        "reports/phase2-full-control/t07-current-backend-20261029/readonly-30min/audit.json",
+        "reports/phase2-full-control/t07-capture-route-20261029/monitor-item.json",
+        "reports/phase2-full-control/t07-capture-route-20261029/screen-probe-preflight.json",
+        "reports/phase2-full-control/t07-capture-route-20261029/t07-sim-views-additional-20261029-b-control.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/device-final.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/bridge-final.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/prior-simulation-analysis.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/simulation-idempotency.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/package-build-final.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/abi-test-final.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/metadata-check.json",
+        "reports/phase2-full-control/t07-native-capture-20261030/js-tests.txt",
+        "reports/phase2-full-control/t07-native-capture-20261030/powershell-parse-final.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/before-result.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/native-tests-verified.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/frontend-tests-final.txt",
+        "reports/phase2-full-control/t07-native-stop-20261030/x64-build-verified.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/package-verified.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/device-check-latest.json",
+        "reports/phase2-full-control/t07-native-stop-20261030/parse-tests.json"
       ],
-      "notes": "Source, first-frame, painted FPS, receipt age, CPU, recovery and click distributions recorded for exact versions. 25fps and 1-2Mbps remain unmet; recovery transients and unequal-scene CPU limits retained."
+      "notes": "Source, first-frame, painted FPS, receipt age, CPU, recovery and click distributions recorded for exact versions. 25fps and 1-2Mbps remain unmet; recovery transients and unequal-scene CPU limits retained. Current backend100-click and31minute decode distributions recorded; no GUI CPU relabeling. Native/raw TLSabout21fps and bounded multimedia timer request21.54fps;25fps remains unmet.1-2Mbps achieved only in some scenes. All original targets retained. Native ScreenProbe1.0.0.1 is locally built/ABI-checked only; device capture and PC painted FPS remain unverified. Historical isolated simulation view0 remains21.357fps; view1 decode errors exclude its message count from FPS. No new acceptance pass. Cancellation-fixed ScreenProbe1.0.0.2 passes local ABI28/native-worker9/frontend16 checks only. No new device capture or PC painted-FPS proof; formal acceptance stays open."
     },
     {
       "id": "A32",
@@ -1487,9 +1630,29 @@
     {
       "at": "2026-10-29T20:10:00+08:00",
       "change": "Supervisor ladder integrated: healthy ensures the bridge is running; deep sleep uses SDK enumeration then bridge restart; State A uses portal restart with a7min budget and900s restart cooldown. Attempt state is written before acting and success always requires a decodable frame. Fixed healthy-but-bridge-stopped returning without resuming the bridge. Restart invocation/parse self-test returned already_awake with39 frames. A95s bridge-stop after the reboot did not induce sleep, so the discovery-first branch was not re-run end to end this round; earlier enumeration (about16s), bridge-restart (42.3s) and StateA restart (about5min) evidence stays version-bound."
+    },
+    {
+      "change": "Resumed T07 after user sleep/start fix. Current0.3.3 backend100/100 ordered trusted,30min no-input video and four-interface frames completed within stated scopes;25fps/full GUI-DPI/2h remain open. Native/raw source and bounded timing comparisons retained.21:16 external tracked-file restore detected; current task restored after human clarified README is user-maintained. README not edited thereafter.",
+      "at": "2026-10-29T21:36:03.1667297+08:00"
+    },
+    {
+      "at": "2026-10-30T19:52:11.7446562+08:00",
+      "change": "ScreenProbe1.0.0.1 native bridge built; local ABI28 and frontend12 checks pass, no picker or device capture. Historical isolated simulation view0 remains21.357fps; view1 invalid and fresh additionalViewHTTP500 retained. Original device currently undiscovered, bridge alive; full25fps/bitrate/DPI/2h targets remain open. README ownership and DPI deferral preserved.",
+      "previous_device_state": "2026-10-29 20:09:15+08:00: bridge connected and power worker active; device awake LowPowerState=false with39 decoded frames. Supervisor launcher runs from the bridge and now uses a three-step ladder: ensure bridge when healthy, SDK enumeration for deep sleep, bridge restart as fallback, portal restart (7min budget,900s restart cooldown) only when the portal is reachable and the device stays low power. Restart invocation/parse self-test returned already_awake with39frames. A95s bridge-stop did not put the just-rebooted device to sleep, so the discovery-first branch was not re-run end to end this round; 19:46 enumeration wake (about16s),19:40 bridge-restart recovery (42.3s) and19:59-20:04 StateA restart wake (about5min) remain version-bound evidence. Continued after human sleep/start fix:20:15 fresh39frames;20:36 own input restoredmode0.20:40-21:10 no-input observation1800.97s remainedawake/mode0,zero video restarts.21:12-21:16 current Start/Settings/Rice/InputProbe frames and med/high profiles reviewed.21:30 bounded timing request ended and restored15.625ms. README is maintained directly by the user; desktop DPI deferred."
+    },
+    {
+      "at": "2026-10-30T20:16:20.3472724+08:00",
+      "change": "ScreenProbe1.0.0.2 cancellation fix: completed-picker Stop race reproduced and fixed, pending Close avoided, unknown cleanup retained, protocol2/empty-frame gates added. Local ABI28/native9/frontend16 pass; no device capture. Original device remains undiscovered; all original targets retained.",
+      "previous_device_state": "2026-10-30T19:52:11.7446562+08:00: original paired-device discovery empty, NCM adapters absent; bridge PID10088 verified live in waiting_for_device. Current SSH/portal/power/input mode/video cannot be verified. No device restart, control or desktop scaling was performed; existing USB power policy was not changed. ScreenProbe1.0.0.1 built locally with native bridge; not installed or runtime-verified on HoloLens. Desktop remains0.3.3.0 SHA17B563087304FC1556AF4D194E3026E0185C8EE17EFFE56DE676DF41F39A2CD8. Prior awake/mode0/100-click/30min results remain historical and version-bound. README user-maintained; Windows DPI deferred."
+    },
+    {
+      "at": "2026-10-30T20:37:47.0568739+08:00",
+      "change": "T07 marked blocked after three consecutive goal turns with original-device connectivity absent. Current PnP/hidden adapters and known-address SDK check confirm no accessible route; bridge service alone is not an active measurement. Prepared native1.0.0.2 unchanged; all original targets remain incomplete. No device restart/input or desktop scaling change.",
+      "previous_device_state": "2026-10-30T20:16:20.3472724+08:00: bridge PID10088 verified alive waiting_for_device; SDK discovery and NCM adapters empty. Current original-device SSH/portal/power/mode/video remain unverified. Independent ScreenProbe1.0.0.2 with cancellation fix and component protocol2 is built locally; ABI28/native-worker9/frontend16 checks pass without real picker/capture. It is not deployed or runtime-verified on HoloLens. Desktop stays0.3.3.0; no restart, input, audio, USB policy or desktop scaling changes in this continuation.25fps and all original acceptance targets stay open; README remains user-maintained and Windows DPI deferred."
     }
   ],
   "active_user_constraints": [
-    "Device playback audio must remain muted at 0 percent, per user request on 2026-10-27. Do not unmute during tests."
+    "Device playback audio must remain muted at 0 percent, per user request on 2026-10-27. Do not unmute during tests.",
+    " User on2026-10-29 requests background work first and Windows DPI later. README files are henceforth maintained personally by the user; agent maintains code, task state and separate acceptance records."
   ]
 }

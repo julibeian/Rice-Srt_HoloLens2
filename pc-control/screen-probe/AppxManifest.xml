@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10" xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10" xmlns:uap6="http://schemas.microsoft.com/appx/manifest/uap/windows10/6" IgnorableNamespaces="uap uap6">
+  <Identity Name="Rice.HoloLens.ScreenProbe" Publisher="CN=RiceHoloLensCapture" Version="1.0.0.2" ProcessorArchitecture="arm64" />
+  <Properties><DisplayName>HoloLens 视频源验证</DisplayName><PublisherDisplayName>Rice Project</PublisherDisplayName><Logo>AppAssets\Logo50.png</Logo></Properties>
+  <Dependencies><TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.19041.0" MaxVersionTested="10.0.22621.0" /></Dependencies>
+  <Resources><Resource Language="zh-CN" /></Resources>
+  <Applications><Application Id="Probe" StartPage="index.html"><uap:VisualElements DisplayName="HoloLens 视频源验证" Description="独立屏幕采集验证，手动选择范围后进行限时测试" Square150x150Logo="AppAssets\Logo150.png" Square44x44Logo="AppAssets\Logo44.png" BackgroundColor="#142C49" /></Application></Applications>
+  <Extensions><Extension Category="windows.activatableClass.inProcessServer"><InProcessServer><Path>Rice.HoloLens.ScreenNative.dll</Path><ActivatableClass ActivatableClassId="Rice.HoloLens.ScreenNative.Probe" ThreadingModel="both" /></InProcessServer></Extension></Extensions>
+  <Capabilities><uap6:Capability Name="graphicsCapture" /></Capabilities>
+</Package>

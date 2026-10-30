@@ -28,6 +28,7 @@ if($LASTEXITCODE -ne 0){throw 'Operation deadline checks did not compile.'}
 & (Join-Path $output 'OperationProcessTests.exe') (Join-Path $output 'OperationProcessFixture.exe') (Join-Path $output ('operation-cases-'+[Guid]::NewGuid().ToString('N')))
 if($LASTEXITCODE -ne 0){throw 'Operation process deadline or pipe cleanup failed.'}
 & (Join-Path $root 'tests\Video.Health.Model.Tests.ps1')
+& (Join-Path $root 'tests\Video.SourceReader.Tests.ps1')
 $layoutAssembly=Join-Path $output 'RiceHoloLensControl.Layout.dll'
 $layoutSources=@('AssemblyInfo.cs','ApplicationIdentity.cs','VideoFrames.cs','SessionJournal.cs','OperationProcess.cs','PointerGeometry.cs','DeviceSession.cs','MainForm.cs')|ForEach-Object {Join-Path $root ('desktop\'+$_)}
 & $compiler /nologo /codepage:65001 /target:library /platform:x86 /optimize+ /r:System.Drawing.dll /r:System.Windows.Forms.dll /r:System.Web.Extensions.dll ('/out:'+$layoutAssembly) @layoutSources

@@ -4,7 +4,8 @@ param(
     [ValidateSet('Interactive','Detail','Low')][string]$VideoProfile='Interactive',
     [switch]$RenderFromCamera,
     [switch]$DisableStabilizationBuffer,
-    [ValidateSet('Default','ImmediateAck')][string]$Transport='Default'
+    [ValidateSet('Default','ImmediateAck','RawTls')][string]$Transport='Default',
+    [ValidateSet('PowerShell','Native')][string]$Reader='PowerShell'
 )
 $ErrorActionPreference='Stop';$ProgressPreference='SilentlyContinue'
 $workspace=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
@@ -17,13 +18,15 @@ if(Test-Path -LiteralPath (Join-Path $folder 'request.json')){throw 'Source meas
 $utf8=[Text.UTF8Encoding]::new($false)
 function Save-Json($Name,$Value){[IO.File]::WriteAllText((Join-Path $folder $Name),($Value|ConvertTo-Json -Depth 9),$utf8)}
 $endpoint=switch($VideoProfile){'Detail'{'live_high.mp4'}'Low'{'live_low.mp4'}default{'live_med.mp4'}}
-Save-Json 'request.json' @{at=[DateTimeOffset]::Now.ToString('o');endpoint=$endpoint;seconds=$Seconds;render_from_camera=[bool]$RenderFromCamera;disable_stabilization=[bool]$DisableStabilizationBuffer;transport=$Transport;pv=$false;microphone=$false;loopback=$false;input_sent=$false}
+$effectiveReader=if($Transport -eq 'RawTls'){'NativeRawTls'}else{$Reader}
+Save-Json 'request.json' @{at=[DateTimeOffset]::Now.ToString('o');endpoint=$endpoint;seconds=$Seconds;render_from_camera=[bool]$RenderFromCamera;disable_stabilization=[bool]$DisableStabilizationBuffer;transport=$Transport;reader=$effectiveReader;pv=$false;microphone=$false;loopback=$false;input_sent=$false}
 $context=$null;$response=$null;$stream=$null;$file=$null;$deadline=$null;$socketTransport=$null
 $chunks=[Collections.Generic.List[object]]::new();$bytes=[long]0
 $proof=[ordered]@{at=[DateTimeOffset]::Now.ToString('o');run_id=$RunId;state='request_started';endpoint=$endpoint;bytes=0;read_seconds=$null;http_status=$null;stream_closed=$false;frames=$null;first_packet_ms=$null;whole_read_fps=$null;steady_start_ms=$null;steady_end_ms=$null;steady_frames=$null;steady_wall_fps=$null;mbps=$null;input_sent=$false;error=$null}
 try{
+    if($Reader -eq 'Native'){. (Join-Path $PSScriptRoot 'Video.SourceReader.ps1')}
     $context=New-HoloAuthenticatedPortalContext
-    if($Transport -ne 'Default'){
+    if($Transport -eq 'ImmediateAck'){
         . (Join-Path $PSScriptRoot 'Video.SocketTransport.ps1')
         $socketTransport=[HoloVideoSocketTransport]::new($context.Device.Address,$context.CertificateSha256,[byte]1)
         $socketTransport.Client.DefaultRequestHeaders.Authorization=$context.Client.DefaultRequestHeaders.Authorization
@@ -32,6 +35,14 @@ try{
     }
     $url=$context.BaseUri+'/api/holographic/stream/'+$endpoint+'?holo=true&pv=false&mic=false&loopback=false&RenderFromCamera='+([bool]$RenderFromCamera).ToString().ToLowerInvariant()
     if($DisableStabilizationBuffer){$url+='&vstab=false&vstabbuffer=0'}
+    if($Transport -eq 'RawTls'){
+        . (Join-Path $PSScriptRoot 'Video.RawTransport.ps1')
+        $file=[IO.File]::Open((Join-Path $folder 'source.mp4'),[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::Read)
+        $capture=[HoloVideoRawTransport]::CaptureAsync($context.Device.Address,$context.CertificateSha256,$context.Client.DefaultRequestHeaders.Authorization.ToString(),([uri]$url).PathAndQuery,$file,$Seconds).GetAwaiter().GetResult()
+        $bytes=$capture.Bytes;$chunks=$capture.Chunks
+        $proof.http_status=$capture.HttpStatus;$proof.raw_framing=$capture.Framing;$proof.raw_certificate_verified=$capture.CertificateVerified
+        $proof.read_seconds=$capture.Seconds;$proof.bytes=$bytes;$proof.state='bounded_copy_received'
+    }else{
     $response=$context.Client.GetAsync($url,[Net.Http.HttpCompletionOption]::ResponseHeadersRead).GetAwaiter().GetResult()
     $proof.http_status=[int]$response.StatusCode
     if($proof.http_status -ne 200){throw ('Stream HTTP '+$proof.http_status)}
@@ -39,20 +50,25 @@ try{
     $file=[IO.File]::Open((Join-Path $folder 'source.mp4'),[IO.FileMode]::CreateNew,[IO.FileAccess]::Write,[IO.FileShare]::Read)
     $deadline=[Threading.CancellationTokenSource]::new($Seconds*1000);$clock=[Diagnostics.Stopwatch]::StartNew();$buffer=[byte[]]::new(65536)
     try{
-        while($bytes -lt 67108864){
+        if($Reader -eq 'Native'){
+            $capture=[HoloVideoSourceReader]::CopyAsync($stream,$file,$clock,$deadline.Token).GetAwaiter().GetResult()
+            $bytes=$capture.Bytes;$chunks=$capture.Chunks
+        }else{while($bytes -lt 67108864){
             $count=$stream.ReadAsync($buffer,0,$buffer.Length,$deadline.Token).GetAwaiter().GetResult()
             $received=$clock.Elapsed.TotalMilliseconds
             if($count -eq 0){break}
             $bytes+=$count;$chunks.Add(@{byte_end=$bytes;received_ms=$received;bytes=$count})
             $file.Write($buffer,0,$count)
-        }
+        }}
     }catch [OperationCanceledException]{}
     $proof.read_seconds=$clock.Elapsed.TotalSeconds;$proof.bytes=$bytes;$proof.state='bounded_copy_received'
+    }
 }catch{$proof.state='source_error';$proof.error=$_.Exception.GetType().Name+': '+$_.Exception.Message}
 finally{
     if($file){$file.Dispose()};if($stream){$stream.Dispose()};if($response){$response.Dispose()};if($deadline){$deadline.Dispose()};if($context){$context.Client.Dispose()}
     $proof.stream_closed=$true;Save-Json 'chunks.json' @($chunks)
     $proof.transport=$Transport
+    $proof.reader=$effectiveReader
     if($socketTransport){$proof.socket_count=$socketTransport.ConnectedSockets;$proof.socket_ack_frequency=$socketTransport.AckFrequencyApplied}
 }
 if($proof.state -eq 'bounded_copy_received'){

@@ -1,6 +1,6 @@
 param(
     [ValidateSet('arm64','x64')][string]$Architecture='arm64',
-    [ValidateSet('perception','portal','uia','injector','local-simulation','lifecycle','desktop-state','certificate','settings','audio','power','power-state')][string]$Probe='perception'
+    [ValidateSet('perception','portal','uia','injector','local-simulation','lifecycle','desktop-state','certificate','settings','audio','power','power-state','capture-support','timing','capture-item')][string]$Probe='perception'
 )
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot

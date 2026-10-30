@@ -1,0 +1,18 @@
+import "inspectable.idl";
+import "Windows.Foundation.idl";
+namespace Rice.HoloLens.ScreenNative
+{
+    [uuid(ee34c01b-9e1a-4148-b833-873d42538c94), version(1.0), exclusiveto(Probe)]
+    interface IProbe : IInspectable
+    {
+        HRESULT Inspect([out, retval] HSTRING* value);
+        HRESULT OpenPicker([in] HSTRING localFolder);
+        HRESULT GetState([out, retval] HSTRING* value);
+        HRESULT Stop();
+    }
+    [version(1.0), activatable(1.0), threading(both), marshaling_behavior(agile)]
+    runtimeclass Probe
+    {
+        [default] interface IProbe;
+    }
+}
