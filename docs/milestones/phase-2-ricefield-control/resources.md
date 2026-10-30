@@ -14,10 +14,10 @@
 ## 1. 获取官方 3.0.24.0 包
 
 ```powershell
-& .\pc-control\official\Get-OfficialControl.ps1
+& .\apps/pc-control\official\Get-OfficialControl.ps1
 ```
 
-[下载与检查脚本](../../../pc-control/official/Get-OfficialControl.ps1) 从微软 [下载入口](https://go.microsoft.com/fwlink/?linkid=2212643) 获取 MSI，检查最终 HTTPS 域名、微软签名和固定 SHA256，随后只读分析 MSI。结果在本机忽略目录 `tools/perception-simulation/official-3.0.24/`，不安装软件。
+[下载与检查脚本](../../../apps/pc-control/official/Get-OfficialControl.ps1) 从微软 [下载入口](https://go.microsoft.com/fwlink/?linkid=2212643) 获取 MSI，检查最终 HTTPS 域名、微软签名和固定 SHA256，随后只读分析 MSI。结果在本机忽略目录 `tools/perception-simulation/official-3.0.24/`，不安装软件。
 
 | 已核查项目 | 参考值 |
 | --- | --- |
@@ -28,7 +28,7 @@
 
 链接未来可能返回不同文件。脚本遇到哈希变化会停止，不能为了继续测试而直接删去核验。在线入口可访问与缓存完整哈希通过分别记录。
 
-如需安装，先读 [官方测试计划](official-3.0.24.0-test.md)。[安装脚本](../../../pc-control/official/Install-OfficialControl.ps1) 要求管理员权限，仅显式选择 App、ManagedApi、NativeApi、Recordings 功能，保存安装前设置与 MSI 日志。默认不请求驱动、服务或切换 PC 开发者模式；`-EnableDeveloperMode` 是另外的显式选项，本阶段资料发布不执行它。
+如需安装，先读 [官方测试计划](official-3.0.24.0-test.md)。[安装脚本](../../../apps/pc-control/official/Install-OfficialControl.ps1) 要求管理员权限，仅显式选择 App、ManagedApi、NativeApi、Recordings 功能，保存安装前设置与 MSI 日志。默认不请求驱动、服务或切换 PC 开发者模式；`-EnableDeveloperMode` 是另外的显式选项，本阶段资料发布不执行它。
 
 ## 2. 获取 legacy x86 SDK
 
@@ -77,7 +77,7 @@ $extractProcess = Start-Process -FilePath msiexec.exe -ArgumentList @(
     ('TARGETDIR="' + $portableDirectory + '"'), '/L*v', ('"' + $extractLog + '"')
 ) -WindowStyle Hidden -PassThru -Wait
 if ($extractProcess.ExitCode -notin @(0, 3010)) { throw '管理镜像提取失败，请检查日志。' }
-& .\holographic-control\ops\Build-Control.ps1
+& .\apps/holographic-control\ops\Build-Control.ps1
 ```
 
 预期文件位于 `tools/perception-simulation/portable-hololens/Windows Kits/10/Microsoft XDE/10.0.22621.0/`：
@@ -109,12 +109,12 @@ FFmpeg 下载页面本次网页抓取超时，作为稳定官方入口保留；�
 
 | 入口 | 用途 |
 | --- | --- |
-| [pc-control/README.md](../../../pc-control/README.md) | 自制 Windows 工具的操作说明 |
-| [Build-Control.ps1](../../../holographic-control/ops/Build-Control.ps1) | legacy x86 编码器与离线自检 |
-| [Build-SimulationLease.ps1](../../../holographic-control/ops/Build-SimulationLease.ps1) | 设备端 ARM64 恢复保护；自动发现本机工具 |
-| [Control-Lease.ps1](../../../holographic-control/ops/Control-Lease.ps1) | 显式具名 Start/Stop/Status |
-| [Test-Connection.ps1](../../../holographic-control/ops/Test-Connection.ps1) | 设备身份、证书连续性与门户认证 |
-| [pc-control/ops/Build-Tests.ps1](../../../pc-control/ops/Build-Tests.ps1) | 离线指针测试，编译但不自动运行真机测试入口 |
-| [TLS 测试](../../../holographic-control/tests/TlsPin.Tests.ps1) / [配对测试](../../../holographic-control/tests/PortalPairing.Tests.ps1) | 临时证书和请求替身验证，不改门户账号 |
+| [apps/pc-control/README.md](../../../apps/pc-control/README.md) | 自制 Windows 工具的操作说明 |
+| [Build-Control.ps1](../../../apps/holographic-control/ops/Build-Control.ps1) | legacy x86 编码器与离线自检 |
+| [Build-SimulationLease.ps1](../../../apps/holographic-control/ops/Build-SimulationLease.ps1) | 设备端 ARM64 恢复保护；自动发现本机工具 |
+| [Control-Lease.ps1](../../../apps/holographic-control/ops/Control-Lease.ps1) | 显式具名 Start/Stop/Status |
+| [Test-Connection.ps1](../../../apps/holographic-control/ops/Test-Connection.ps1) | 设备身份、证书连续性与门户认证 |
+| [apps/pc-control/ops/Build-Tests.ps1](../../../apps/pc-control/ops/Build-Tests.ps1) | 离线指针测试，编译但不自动运行真机测试入口 |
+| [TLS 测试](../../../apps/holographic-control/tests/TlsPin.Tests.ps1) / [配对测试](../../../apps/holographic-control/tests/PortalPairing.Tests.ps1) | 临时证书和请求替身验证，不改门户账号 |
 
 输入、认证和恢复的使用顺序见 [通用手册](manual.md)。

@@ -1,14 +1,14 @@
 $ErrorActionPreference='Stop'
 $workspace=Split-Path -Parent $PSScriptRoot
-. (Join-Path $workspace 'HoloLens.UsbPower.ps1')
+. (Join-Path $workspace 'usb-terminal/HoloLens.UsbPower.ps1')
 # Replace route/file/SDK boundaries. No device operation or network mutation.
 Add-Type -TypeDefinition 'public static class HlUsbPowerRoute{public static uint GetBestInterface(uint d,out uint i){i=12;return 0;}}'
 function Get-NetAdapter {param($InterfaceIndex,$ErrorAction);[pscustomobject]@{Status='Up';PnPDeviceID=$script:adapterId}}
-$fixture=Join-Path $workspace ('pc-control/.state/tests/usb-power-'+[guid]::NewGuid().ToString('N'))
+$fixture=Join-Path $workspace ('apps/pc-control/.state/tests/usb-power-'+[guid]::NewGuid().ToString('N'))
 $script:HlStateDirectory=$fixture;$script:HlRoot=$fixture;$script:HlConfig=[pscustomobject]@{DeviceName='fixture';ExpectedFingerprint='fingerprint'}
 $script:adapterId='USB\fixture';$script:puts=0;$script:launches=0
-[IO.Directory]::CreateDirectory((Join-Path $fixture 'holographic-control/.state/usb-power/arm64'))|Out-Null
-$worker=Join-Path $fixture 'holographic-control/.state/usb-power/arm64/hl-usb-power.exe'
+[IO.Directory]::CreateDirectory((Join-Path $fixture 'apps/holographic-control/.state/usb-power/arm64'))|Out-Null
+$worker=Join-Path $fixture 'apps/holographic-control/.state/usb-power/arm64/hl-usb-power.exe'
 [IO.File]::WriteAllText($worker,'not executable; SDK boundaries are mocked')
 $policy=[pscustomobject]@{Enabled=$true;DeviceName='fixture';ExpectedFingerprint='fingerprint';Owner=('1'*32);WorkerSha256=(Get-FileHash -LiteralPath $worker).Hash}
 $path=Join-Path $fixture 'usb-power-policy.json'
@@ -52,7 +52,7 @@ try{
     if($result.State -cne 'disabled' -or $script:puts -ne $before){throw 'Disabled policy still wrote the device'}
     @{passed=8;device_operations=0;persisted_report_is_not_liveness=$true}|ConvertTo-Json
 }finally{
-    $resolved=[IO.Path]::GetFullPath($fixture);$allowed=[IO.Path]::GetFullPath((Join-Path $workspace 'pc-control/.state/tests'))+[IO.Path]::DirectorySeparatorChar
+    $resolved=[IO.Path]::GetFullPath($fixture);$allowed=[IO.Path]::GetFullPath((Join-Path $workspace 'apps/pc-control/.state/tests'))+[IO.Path]::DirectorySeparatorChar
     if(-not $resolved.StartsWith($allowed,[StringComparison]::OrdinalIgnoreCase) -or (Split-Path -Leaf $resolved) -notlike 'usb-power-*'){throw 'Unsafe fixture cleanup'}
     Remove-Item -LiteralPath $resolved -Recurse -Force
 }

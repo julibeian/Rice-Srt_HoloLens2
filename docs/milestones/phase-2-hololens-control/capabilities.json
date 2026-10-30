@@ -7,7 +7,7 @@
     "P1"
   ],
   "historical_results_are_new_acceptance": false,
-  "result_schema": "../../../pc-control/contracts/operation-result.schema.json",
+  "result_schema": "../../../apps/pc-control/contracts/operation-result.schema.json",
   "verification_layers": [
     "request",
     "transport",

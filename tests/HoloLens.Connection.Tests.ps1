@@ -1,5 +1,5 @@
 $ErrorActionPreference='Stop'
-. (Join-Path (Split-Path -Parent $PSScriptRoot) 'HoloLens.Common.ps1')
+. (Join-Path (Split-Path -Parent $PSScriptRoot) 'usb-terminal/HoloLens.Common.ps1')
 function Assert-Connection($Condition,[string]$Message){if(-not $Condition){throw $Message}}
 $remote=[pscustomobject]@{Sha1Fingerprint=$script:HlConfig.ExpectedFingerprint;UserName='DevToolsUser'}
 $client=[pscustomobject]@{RemoteDevice=$remote;TargetInfo=$null;EffectiveProcessorArchitecture=$null}

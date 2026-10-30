@@ -1,5 +1,5 @@
 $ErrorActionPreference='Stop'
-. (Join-Path (Split-Path -Parent $PSScriptRoot) 'HoloLens.Common.ps1')
+. (Join-Path (Split-Path -Parent $PSScriptRoot) 'usb-terminal/HoloLens.Common.ps1')
 $clock=[Diagnostics.Stopwatch]::StartNew()
 $timedOut=$false;$ownedPid=0
 try { Get-HlDiscoveredDevices -TimeoutMilliseconds 1 | Out-Null }

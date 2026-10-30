@@ -26,9 +26,9 @@
 
 ## 新增工具与视频对照
 
-`holographic-control/ops/Get-DevicePowerState.ps1 -RunId <唯一编号>` 在原身份上运行受限只读探针。同一 RunId 只回读原始报告，已实测 PID 和设备运行时计数保持原值，不会重新启动诊断。事件接口不可用或拒绝时记录原因，不自动提权或修改权限。
+`apps/holographic-control/ops/Get-DevicePowerState.ps1 -RunId <唯一编号>` 在原身份上运行受限只读探针。同一 RunId 只回读原始报告，已实测 PID 和设备运行时计数保持原值，不会重新启动诊断。事件接口不可用或拒绝时记录原因，不自动提权或修改权限。
 
-`pc-control/ops/Measure-VideoSource.ps1` 和 `holographic-control/ops/Get-PortalLiveSample.ps1` 新增 **Low** 诊断档，日常桌面默认仍为中清。低清本轮同样只收到 40 字节，解析失败后测量结果明确为 `measurement_incomplete`，帧率和码率均为空，未计为有效对照。
+`apps/pc-control/ops/Measure-VideoSource.ps1` 和 `apps/holographic-control/ops/Get-PortalLiveSample.ps1` 新增 **Low** 诊断档，日常桌面默认仍为中清。低清本轮同样只收到 40 字节，解析失败后测量结果明确为 `measurement_incomplete`，帧率和码率均为空，未计为有效对照。
 
 只读取得的全局 MRC 设置为 Profile 0、视频 30 fps、稳定缓冲 15 帧，并返回可用采集尺寸。这些是录制／采集默认设置，不能直接当作实时流实际参数。官方 [流接口说明](https://learn.microsoft.com/en-us/windows/mixed-reality/develop/advanced-concepts/device-portal-api-reference#mixed-reality-streaming) 将实时预览参数单独列出；没有据此改动全局 MRC、相机或音频设置，也未宣称找到约 21 fps 的根因。
 

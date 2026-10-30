@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
-. (Join-Path (Split-Path -Parent $PSScriptRoot) 'field-app/ops/Field.NetworkPolicy.ps1')
+. (Join-Path (Split-Path -Parent $PSScriptRoot) 'apps/field-app/ops/Field.NetworkPolicy.ps1')
 $checks = 0
 function Assert-Recovery($Inspection, [bool]$Expected, [string]$Reason) {
     $actual = Get-FieldWifiRecoveryDecision $Inspection

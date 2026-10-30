@@ -1,5 +1,5 @@
 $ErrorActionPreference='Stop'
-. (Join-Path (Split-Path -Parent $PSScriptRoot) 'HoloLens.Common.ps1')
+. (Join-Path (Split-Path -Parent $PSScriptRoot) 'usb-terminal/HoloLens.Common.ps1')
 $directory=Join-Path $script:HlStateDirectory ('status-test-'+[guid]::NewGuid().ToString('N'))
 [IO.Directory]::CreateDirectory($directory)|Out-Null
 $statusPath=Join-Path $directory 'status.json'

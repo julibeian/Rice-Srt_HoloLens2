@@ -11,8 +11,8 @@
 ```powershell
 git fetch origin
 git switch codex/ricefield-device-control
-& .\runtime\powershell\pwsh.exe -NoProfile -File Start-HoloLensBridge.ps1 -InstallAutostart
-& .\runtime\powershell\pwsh.exe -NoProfile -File Connect-HoloLens.ps1 -Command status
+& .\runtime\powershell\pwsh.exe -NoProfile -File usb-terminal/Start-HoloLensBridge.ps1 -InstallAutostart
+& .\runtime\powershell\pwsh.exe -NoProfile -File usb-terminal/Connect-HoloLens.ps1 -Command status
 ```
 
 不要把其他电脑的 `config.json`、`.state/` 或 DPAPI 凭据覆盖到本机。如果使用新的克隆，按第一阶段为此目录配置运行时、任务和配对。下文从仓库根目录打开 PowerShell 7 会话：
@@ -43,11 +43,11 @@ git switch codex/ricefield-device-control
 新设备或缺少本机安装记录时，按 [开发指南](../../development.md) 准备 Node.js、SDK 和应用构建输入，再构建及部署：
 
 ```powershell
-npm --prefix field-app ci
-& .\field-app\ops\Build-App.ps1 -Version 1.0.0.22
-& .\field-app\ops\Install-App.ps1
-& .\field-app\ops\Start-App.ps1
-& .\field-app\ops\Get-AppState.ps1
+npm --prefix apps/field-app ci
+& .\apps/field-app\ops\Build-App.ps1 -Version 1.0.0.22
+& .\apps/field-app\ops\Install-App.ps1
+& .\apps/field-app\ops\Start-App.ps1
+& .\apps/field-app\ops\Get-AppState.ps1
 ```
 
 安装和启动请求被接受后仍须读回实际运行版本与会话，不能只用退出码判断新版运行。此部署使用项目开发目录和固定应用身份 `Rice.HoloLens.Field_r5420n6798s24!Field`。新电脑缺少 `.state/installed.json` 时，不随意手写或复制另一台设备的安装回执。
@@ -59,7 +59,7 @@ npm --prefix field-app ci
 在眼镜开发者设置中启用 Device Portal。先运行：
 
 ```powershell
-& .\holographic-control\ops\Test-Connection.ps1
+& .\apps/holographic-control\ops\Test-Connection.ps1
 ```
 
 脚本先核对第一阶段的原 SSH 身份，再建立同一 USB 目标的门户证书记录。后续仅允许已经核查的同公钥证书连续更新，不通过关闭 TLS 检查解决证书变化。
@@ -68,9 +68,9 @@ npm --prefix field-app ci
 
 ```powershell
 $portalCredential = Get-Credential -Message '输入该眼镜已有的 Device Portal 账号'
-& .\holographic-control\ops\Save-PortalCredential.ps1 -Credential $portalCredential
+& .\apps/holographic-control\ops\Save-PortalCredential.ps1 -Credential $portalCredential
 $portalCredential = $null
-& .\holographic-control\ops\Test-Connection.ps1
+& .\apps/holographic-control\ops\Test-Connection.ps1
 ```
 
 预期 `SshIdentityVerified`、`PortalCertificatePinned`、`PortalAuthenticated` 均为 `true`。`InputVerified=false` 和 `LiveViewVerified=false` 表示这个连接检查自身不做输入或视觉判定，不等于已验证功能失效，也不能据它们宣布所有功能成功。
@@ -81,11 +81,11 @@ DPAPI 凭据绑定当前 Windows 用户和设备。换电脑或换用户后重�
 
 ```powershell
 $portalRun = 'portal-' + [guid]::NewGuid().ToString('N')
-& .\holographic-control\ops\Set-Up-PortalAccess.ps1 -Mode Start -RunId $portalRun
+& .\apps/holographic-control\ops\Set-Up-PortalAccess.ps1 -Mode Start -RunId $portalRun
 $portalPin = Read-Host '眼镜当前显示的门户一次性码' -AsSecureString
-& .\holographic-control\ops\Set-Up-PortalAccess.ps1 -Mode Complete -RunId $portalRun -Pin $portalPin
+& .\apps/holographic-control\ops\Set-Up-PortalAccess.ps1 -Mode Complete -RunId $portalRun -Pin $portalPin
 $portalPin = $null
-& .\holographic-control\ops\Set-Up-PortalAccess.ps1 -Mode Status -RunId $portalRun
+& .\apps/holographic-control\ops\Set-Up-PortalAccess.ps1 -Mode Status -RunId $portalRun
 ```
 
 同一 RunId 只取回原结果。网络超时后先查 Status，不重发账号变更。未取得实际门户临时码时不提交，不使用开机 PIN 代替。官方 GUI 的认证也必须复用这个目标的有效门户账户，见 [官方测试的认证要求](official-3.0.24.0-test.md)。
@@ -93,34 +93,34 @@ $portalPin = $null
 ## 5. 离线构建和检查
 
 ```powershell
-& .\holographic-control\ops\Build-Control.ps1
-& .\holographic-control\ops\Build-SimulationLease.ps1
-& .\pc-control\Build.ps1 -DesktopShortcut
-& .\pc-control\ops\Build-Tests.ps1
-& .\holographic-control\ops\Start-PerceptionControl.ps1 -SelfTest
+& .\apps/holographic-control\ops\Build-Control.ps1
+& .\apps/holographic-control\ops\Build-SimulationLease.ps1
+& .\apps/pc-control\Build.ps1 -DesktopShortcut
+& .\apps/pc-control\ops\Build-Tests.ps1
+& .\apps/holographic-control\ops\Start-PerceptionControl.ps1 -SelfTest
 ```
 
 这些命令构建并检查本机程序，不开始设备控制。`Build-SimulationLease` 仅产生 ARM64 程序；设备保护在后续显式 Start 时才部署并启动。`Build-Tests` 编译显式真机入口但只自动运行离线指针测试，不自动执行真机点按。
 
-`pc-control/dist/runtime.json` 由本机生成，内含 FFmpeg 实际路径。移动或更换解码器后重新构建，不把别人的绝对路径当作可移植配置。专用 PowerShell 的完整运行时仍须保留。
+`apps/pc-control/dist/runtime.json` 由本机生成，内含 FFmpeg 实际路径。移动或更换解码器后重新构建，不把别人的绝对路径当作可移植配置。专用 PowerShell 的完整运行时仍须保留。
 
 ## 6. 先取得可解码的真实画面
 
 ```powershell
 $previewRun = 'preview-' + [guid]::NewGuid().ToString('N')
-& .\holographic-control\ops\Get-PortalLiveSample.ps1 -RunId $previewRun -Seconds 2
+& .\apps/holographic-control\ops\Get-PortalLiveSample.ps1 -RunId $previewRun -Seconds 2
 ```
 
 按输出的本机视频文件路径使用 FFmpeg 解码并实际查看。HTTP 200、少量字节或未解码的流均不证明看到了全息界面。区分真实全息显示、独立 PV 相机和 PC 上离线渲染的界面预览。样本、视频与画面只保存在本机。
 
 ## 7. 使用自制 Windows 图形工具
 
-打开 `pc-control/dist/RiceHoloLensControl.exe`，或构建时创建的桌面快捷方式。
+打开 `apps/pc-control/dist/RiceHoloLensControl.exe`，或构建时创建的桌面快捷方式。
 
 1. 等待新的真实画面，点击“开始控制”。工具建立独立的具名 300 秒设备保护，打开稻视界并校准鼠标。
 2. 校准完成后单击画面中的目标。后端用新画面确认准星后才发送一次点按；操作后继续看新画面，确认具体控件变化。
 3. 使用右键拖动或方向按钮调整视角，“靠近／退后”调整虚拟观看距离。调整后首次点按重新校准。
-4. “开始菜单”发送 Home，“打开稻视界”回到本应用。截图和事件位于本机 `pc-control/.state/sessions/`。
+4. “开始菜单”发送 Home，“打开稻视界”回到本应用。截图和事件位于本机 `apps/pc-control/.state/sessions/`。
 5. 点击“停止控制 · 恢复眼镜”或关闭窗口。读取本次恢复结果，确认自己的控制流关闭、同名保护恢复 `Default(0)`。
 
 每次控制最多 5 分钟。显示画面超过 2.5 秒没有更新时拒绝点按；未知结果先核对，不重复点击。自制工具与微软官方 GUI 不同时连接控制，也不同时运行另一个显式真机测试入口。
@@ -131,12 +131,12 @@ $previewRun = 'preview-' + [guid]::NewGuid().ToString('N')
 
 ```powershell
 $controlRun = 'control-' + [guid]::NewGuid().ToString('N')
-& .\holographic-control\ops\Control-Lease.ps1 -Mode Start -RunId $controlRun
+& .\apps/holographic-control\ops\Control-Lease.ps1 -Mode Start -RunId $controlRun
 try {
-    & .\holographic-control\ops\Start-PerceptionControl.ps1
+    & .\apps/holographic-control\ops\Start-PerceptionControl.ps1
 } finally {
-    & .\holographic-control\ops\Control-Lease.ps1 -Mode Stop -RunId $controlRun
-    & .\holographic-control\ops\Control-Lease.ps1 -Mode Status -RunId $controlRun
+    & .\apps/holographic-control\ops\Control-Lease.ps1 -Mode Stop -RunId $controlRun
+    & .\apps/holographic-control\ops\Control-Lease.ps1 -Mode Status -RunId $controlRun
 }
 ```
 

@@ -56,19 +56,19 @@ obj/
 /tools/Verify-Archive.py
 
 # Prototype build/runtime output and one-environment deployment receipts.
-/pc-control/dist/
-/capture-app/device/
-/capture-app/device-research/package/
-/capture-app/device-research/*.json
-/capture-app/ops/deployment*.json
-/capture-app/ops/release-review*.json
-/capture-app/ops/prepare_release.py
-/capture-app/ops/Deploy-ReviewedRelease.ps1
-/capture-app/ops/Measure-UsbInferencePath.ps1
-/capture-app/uwp/qa/
-/capture-app/web/tests/qa/
-/capture-app/server/runtime-ssh-audit.txt
-/capture-app/server/deployment-source-manifest.json
+/apps/pc-control/dist/
+/apps/capture-app/device/
+/apps/capture-app/device-research/package/
+/apps/capture-app/device-research/*.json
+/apps/capture-app/ops/deployment*.json
+/apps/capture-app/ops/release-review*.json
+/apps/capture-app/ops/prepare_release.py
+/apps/capture-app/ops/Deploy-ReviewedRelease.ps1
+/apps/capture-app/ops/Measure-UsbInferencePath.ps1
+/apps/capture-app/uwp/qa/
+/apps/capture-app/web/tests/qa/
+/apps/capture-app/server/runtime-ssh-audit.txt
+/apps/capture-app/server/deployment-source-manifest.json
 
 # Large samples and rendered document output.
 /data/raw/

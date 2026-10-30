@@ -11,7 +11,7 @@
 ## 1. 先检查软件包，暂不操作设备
 
 ```powershell
-& .\pc-control\official\Get-OfficialControl.ps1
+& .\apps/pc-control\official\Get-OfficialControl.ps1
 ```
 
 记录产品版本、微软签名、MSI SHA256、组件表与依赖。参考包为 **3.0.24.0**，SHA256 见 [资源清单](resources.md)。检查脚本不会安装软件、启用驱动或连接眼镜。已有缓存会重新核对签名和哈希；`-Refresh` 才重新下载。缓存通过不写成已经重新验证在线文件哈希。
@@ -19,7 +19,7 @@
 确认包内容和测试机条件后，由设备维护者在本机管理员 PowerShell 7 中选择安装：
 
 ```powershell
-& .\pc-control\official\Install-OfficialControl.ps1
+& .\apps/pc-control\official\Install-OfficialControl.ps1
 ```
 
 安装脚本默认仅选择 App、ManagedApi、NativeApi、Recordings。显式添加 `-IncludeDriversAndService` 才选择 Drivers、Service；`-EnableDeveloperMode` 单独控制开发者模式设置。保存安装前基线、MSI 日志、退出码与实际程序哈希；退出码 3010 表示请求重启，不能直接记作安装后运行完成。
@@ -43,13 +43,13 @@
 ```powershell
 $officialRun = 'official-' + [guid]::NewGuid().ToString('N')
 $officialControl = Join-Path $env:ProgramFiles 'Microsoft Perception Simulation/Control/PerceptionSimulationControl.exe'
-& .\holographic-control\ops\Control-Lease.ps1 -Mode Start -RunId $officialRun
+& .\apps/holographic-control\ops\Control-Lease.ps1 -Mode Start -RunId $officialRun
 try {
     if (-not (Test-Path -LiteralPath $officialControl)) { throw '官方程序未安装。' }
     Start-Process -FilePath $officialControl -PassThru -Wait | Out-Null
 } finally {
-    & .\holographic-control\ops\Control-Lease.ps1 -Mode Stop -RunId $officialRun
-    & .\holographic-control\ops\Control-Lease.ps1 -Mode Status -RunId $officialRun
+    & .\apps/holographic-control\ops\Control-Lease.ps1 -Mode Stop -RunId $officialRun
+    & .\apps/holographic-control\ops\Control-Lease.ps1 -Mode Status -RunId $officialRun
 }
 ```
 

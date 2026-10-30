@@ -5,14 +5,14 @@
 准备 Node.js、Python 和 PowerShell 7。在仓库根目录执行：
 
 ```powershell
-npm --prefix field-app ci
-node field-app/build.mjs
-node --test field-app/tests/*.test.cjs
-python -B -m unittest discover -s field-app/tests -p test_server.py
+npm --prefix apps/field-app ci
+node apps/field-app/build.mjs
+node --test apps/field-app/tests/*.test.cjs
+python -B -m unittest discover -s apps/field-app/tests -p test_server.py
 python tools/Verify-Product.py
 ```
 
-构建默认读取仓库内 `field-app/upstream-miniprogram/`，不需要相邻工程。若需显式使用其他共用界面源码，设置 `RICE_MINIPROGRAM_ROOT`，并在 PR 中说明来源和输入差异。
+构建默认读取仓库内 `apps/field-app/upstream-miniprogram/`，不需要相邻工程。若需显式使用其他共用界面源码，设置 `RICE_MINIPROGRAM_ROOT`，并在 PR 中说明来源和输入差异。
 
 ## 设备管理工具的离线检查
 
@@ -24,8 +24,8 @@ pwsh -NoProfile -File tests/HoloLens.Discovery.Tests.ps1
 pwsh -NoProfile -File tests/HoloLens.Connection.Tests.ps1
 pwsh -NoProfile -File tests/HoloLens.StatusFile.Tests.ps1
 pwsh -NoProfile -File tests/Field.Network.Tests.ps1
-pwsh -NoProfile -File holographic-control/tests/TlsPin.Tests.ps1
-pwsh -NoProfile -File holographic-control/tests/PortalPairing.Tests.ps1
+pwsh -NoProfile -File apps/holographic-control/tests/TlsPin.Tests.ps1
+pwsh -NoProfile -File apps/holographic-control/tests/PortalPairing.Tests.ps1
 ```
 
 以上检查使用离线替身、本机文件锁和临时测试证书，不进行设备操作。`tests/HoloLens.DiscoveryProcess.Tests.ps1` 另行检查 SDK 发现子进程的限时清理，会启动一次发现，但不配对或写设备。新电脑先按 [第一阶段通用手册](milestones/phase-1-usb-terminal/manual.md) 配置并运行 `tools/connection/Test-Workstation.ps1`。
@@ -38,7 +38,7 @@ pwsh -NoProfile -File holographic-control/tests/PortalPairing.Tests.ps1
 
 ```powershell
 python -m pip install --target .tools/zig-pypi ziglang==0.15.2
-pwsh -NoProfile -File field-app/ops/Build-App.ps1 -Version 1.0.0.22
+pwsh -NoProfile -File apps/field-app/ops/Build-App.ps1 -Version 1.0.0.22
 ```
 
 打包后单独核对新包的版本、文件摘要与 SHA256。部署、启动与真机运行结果分别验收，重新构建的包不能直接套用已发布附件的哈希。
@@ -46,16 +46,16 @@ pwsh -NoProfile -File field-app/ops/Build-App.ps1 -Version 1.0.0.22
 ## 原型测试
 
 ```powershell
-node --test capture-app/web/tests/core.test.mjs capture-app/uwp/core.test.cjs
-python -B -m unittest discover -s capture-app/server -p 'test_*.py'
+node --test apps/capture-app/web/tests/core.test.mjs apps/capture-app/uwp/core.test.cjs
+python -B -m unittest discover -s apps/capture-app/server -p 'test_*.py'
 ```
 
 可选浏览器检查从原型目录安装依赖，使用标准 Playwright 包：
 
 ```powershell
-npm --prefix capture-app ci
-npm --prefix capture-app exec -- playwright install chromium
-npm --prefix capture-app run test:browser
+npm --prefix apps/capture-app ci
+npm --prefix apps/capture-app exec -- playwright install chromium
+npm --prefix apps/capture-app run test:browser
 ```
 
 默认使用 Playwright 安装的 Chromium；需要使用已有浏览器时，可通过 `PLAYWRIGHT_BROWSER_EXECUTABLE` 指定可执行文件。

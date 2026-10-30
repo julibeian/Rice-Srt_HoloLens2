@@ -1,5 +1,5 @@
 $ErrorActionPreference='Stop'
-. (Join-Path $PSScriptRoot '../HoloLens.UsbPower.ps1')
+. (Join-Path $PSScriptRoot '../usb-terminal/HoloLens.UsbPower.ps1')
 $owner='00112233445566778899aabbccddeeff'
 $packet=New-HlUsbPowerHeartbeat -Owner $owner -Sequence 1234567890123
 if($packet.Length -ne 32 -or [BitConverter]::ToUInt32($packet,0) -ne 0x48555048 -or [BitConverter]::ToUInt32($packet,4) -ne 1){throw 'USB heartbeat framing changed'}

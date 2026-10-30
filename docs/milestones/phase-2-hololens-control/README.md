@@ -9,9 +9,9 @@
 | 材料 | 用途 |
 | --- | --- |
 | [能力登记表](capabilities.json) | 冻结 16 项必备需求，按四类场景记录实现和验收，历史成功不计作新验收 |
-| [操作结果格式](../../../pc-control/contracts/operation-result.schema.json) | 分别记录请求、传输、设备状态和可见效果；完成输入必须有前后证据与恢复回执 |
-| [结果校验](../../../pc-control/ops/Phase2.Results.ps1) | 校验和创建不可覆盖的观察记录，不提交或重放设备操作 |
-| [Windows 设备控制工具](../../../pc-control/README.md) | 通用应用选择、真实画面及限时输入，整体验收仍在推进 |
+| [操作结果格式](../../../apps/pc-control/contracts/operation-result.schema.json) | 分别记录请求、传输、设备状态和可见效果；完成输入必须有前后证据与恢复回执 |
+| [结果校验](../../../apps/pc-control/ops/Phase2.Results.ps1) | 校验和创建不可覆盖的观察记录，不提交或重放设备操作 |
+| [Windows 设备控制工具](../../../apps/pc-control/README.md) | 通用应用选择、真实画面及限时输入，整体验收仍在推进 |
 | [0.3.0 延迟修复](latency-20261028.md) | A–F 实现、100 次点按、实际窗口绘制、DPI 与剩余性能目标 |
 | [0.3.1 续做](latency-20261029.md) | USB 正常功耗策略、当前设备恢复、旧回执恢复修正及同素材 CPU 对照 |
 | [0.3.2 显示缩放修复](latency-20261029-dpi.md) | 实际三种 DPI 本机绘制／映射、整套工具 CPU 对照与再次低功耗的限制 |

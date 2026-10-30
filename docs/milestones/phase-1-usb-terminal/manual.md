@@ -133,10 +133,10 @@ JSON 内反斜杠写为 `\\`，例如配置模板里的 SDK 路径。配置和 `
 前置检查通过后：
 
 ```powershell
-& $ps7 -NoProfile -File Start-HoloLensBridge.ps1 -InstallAutostart
-& $ps7 -NoProfile -File Connect-HoloLens.ps1 -Command status
-& $ps7 -NoProfile -File Connect-HoloLens.ps1 -Command info
-& $ps7 -NoProfile -File Connect-HoloLens.ps1 -Command 'tzutil /g'
+& $ps7 -NoProfile -File usb-terminal/Start-HoloLensBridge.ps1 -InstallAutostart
+& $ps7 -NoProfile -File usb-terminal/Connect-HoloLens.ps1 -Command status
+& $ps7 -NoProfile -File usb-terminal/Connect-HoloLens.ps1 -Command info
+& $ps7 -NoProfile -File usb-terminal/Connect-HoloLens.ps1 -Command 'tzutil /g'
 ```
 
 任务以当前 Windows 用户运行，不需要保存 Windows 密码，也不提升为管理员。`State=connected`、新的心跳和实际只读命令成功一起构成本轮管理通道可用证据。`status` 返回成功只说明本机后台可响应；`waiting_for_device` 则是等待设备，不是已连通。
@@ -146,7 +146,7 @@ JSON 内反斜杠写为 `\\`，例如配置模板里的 SDK 路径。配置和 `
 ## 7. 使用受限管理终端
 
 ```powershell
-& $ps7 -NoProfile -File Connect-HoloLens.ps1
+& $ps7 -NoProfile -File usb-terminal/Connect-HoloLens.ps1
 ```
 
 交互终端中使用：
@@ -170,8 +170,8 @@ $localSource = Join-Path $PWD ('.state\transfer-' + $transferId + '.txt')
 $localReturn = Join-Path $PWD ('.state\return-' + $transferId + '.txt')
 [IO.File]::WriteAllText($localSource, 'USB round-trip', [Text.UTF8Encoding]::new($false))
 $remoteFile = 'transfer-' + $transferId + '.txt'
-& $ps7 -NoProfile -File Connect-HoloLens.ps1 -Command ('put "{0}" "{1}"' -f $localSource, $remoteFile)
-& $ps7 -NoProfile -File Connect-HoloLens.ps1 -Command ('get "{0}" "{1}"' -f $remoteFile, $localReturn)
+& $ps7 -NoProfile -File usb-terminal/Connect-HoloLens.ps1 -Command ('put "{0}" "{1}"' -f $localSource, $remoteFile)
+& $ps7 -NoProfile -File usb-terminal/Connect-HoloLens.ps1 -Command ('get "{0}" "{1}"' -f $remoteFile, $localReturn)
 (Get-FileHash -LiteralPath $localSource).Hash -eq (Get-FileHash -LiteralPath $localReturn).Hash
 ```
 
@@ -180,8 +180,8 @@ $remoteFile = 'transfer-' + $transferId + '.txt'
 ## 8. 重连、更新与停止
 
 ```powershell
-& $ps7 -NoProfile -File Connect-HoloLens.ps1 -Command reconnect
-& $ps7 -NoProfile -File Connect-HoloLens.ps1 -Command status
+& $ps7 -NoProfile -File usb-terminal/Connect-HoloLens.ps1 -Command reconnect
+& $ps7 -NoProfile -File usb-terminal/Connect-HoloLens.ps1 -Command status
 ```
 
 等待 `connected` 后重新执行只读命令。`reconnect` 只接受重连请求，不能直接当作恢复成功。命令超时可能已经在设备执行，应先查询原结果；不能自动重放安装、启动或其他有副作用的操作。
@@ -189,12 +189,12 @@ $remoteFile = 'transfer-' + $transferId + '.txt'
 更新代码前先停止当前桥，更新后重新启动；移动目录时也要检查任务实际指向的位置。同一 Windows 用户一次只运行一个本项目桥，多个克隆共用该用户的管道名。
 
 ```powershell
-& $ps7 -NoProfile -File Stop-HoloLensBridge.ps1 -DisableAutostart
+& $ps7 -NoProfile -File usb-terminal/Stop-HoloLensBridge.ps1 -DisableAutostart
 git pull --ff-only
-& $ps7 -NoProfile -File Start-HoloLensBridge.ps1 -InstallAutostart
+& $ps7 -NoProfile -File usb-terminal/Start-HoloLensBridge.ps1 -InstallAutostart
 ```
 
-如果新目录遇到任务归属冲突，保留旧任务并查明来源，不强行覆盖。先在旧目录停用它，再为新目录填写独立任务名；不得同时运行两个桥。只想停止时执行 `Stop-HoloLensBridge.ps1 -DisableAutostart`，本项目的配置与配对记录会保留。
+如果新目录遇到任务归属冲突，保留旧任务并查明来源，不强行覆盖。先在旧目录停用它，再为新目录填写独立任务名；不得同时运行两个桥。只想停止时执行 `usb-terminal/Stop-HoloLensBridge.ps1 -DisableAutostart`，本项目的配置与配对记录会保留。
 
 ## 9. 常见问题与判断顺序
 

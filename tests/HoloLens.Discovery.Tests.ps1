@@ -1,5 +1,5 @@
 $ErrorActionPreference = 'Stop'
-. (Join-Path (Split-Path -Parent $PSScriptRoot) 'HoloLens.Common.ps1')
+. (Join-Path (Split-Path -Parent $PSScriptRoot) 'usb-terminal/HoloLens.Common.ps1')
 function Assert-Hl($Condition, [string]$Message) { if (-not $Condition) { throw $Message } }
 
 $script:HlConfig.DeviceName = 'HL-TEST-DEVICE'

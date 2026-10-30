@@ -26,8 +26,8 @@
 ## 提交前检查
 
 ```powershell
-node field-app/build.mjs
-node --test field-app/tests/*.test.cjs
+node apps/field-app/build.mjs
+node --test apps/field-app/tests/*.test.cjs
 python tools/Verify-Product.py
 git add <本次改动的路径>
 python tools/Check-Repository.py

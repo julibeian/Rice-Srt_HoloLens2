@@ -21,11 +21,11 @@ SDK 的版本号、安装器版本和安装目录版本未必相同。第一阶�
 | [config.example.json](../../../config.example.json) | 不含真实设备身份的配置模板 |
 | [Get-DeviceIdentity.ps1](../../../tools/connection/Get-DeviceIdentity.ps1) | 首次建档或迁移时，观察已配对设备的 SSH 指纹，支持与管理员提供的可信基准比较；不修改配置 |
 | [Test-Workstation.ps1](../../../tools/connection/Test-Workstation.ps1) | 只读检查本机运行时、SDK、配置占位符和关键后台脚本，不联系设备 |
-| [Connect-HoloLens.ps1](../../../Connect-HoloLens.ps1) | 终端与单次命令入口 |
-| [Start-HoloLensBridge.ps1](../../../Start-HoloLensBridge.ps1) / [Stop-HoloLensBridge.ps1](../../../Stop-HoloLensBridge.ps1) | 后台启动、停止及当前用户自启管理 |
-| [Register-HoloLensTask.ps1](../../../Register-HoloLensTask.ps1) | 注册当前用户后台任务，检查已有任务归属 |
-| [HoloLens.Common.ps1](../../../HoloLens.Common.ps1) | SDK 发现、原 SSH 身份核对、受限文件和程序操作 |
-| [HoloLens.Bridge.ps1](../../../HoloLens.Bridge.ps1) / [HoloLens.Watchdog.ps1](../../../HoloLens.Watchdog.ps1) | 用户范围的管道服务、保活、会话复用与卡住恢复 |
+| [usb-terminal/Connect-HoloLens.ps1](../../../usb-terminal/Connect-HoloLens.ps1) | 终端与单次命令入口 |
+| [usb-terminal/Start-HoloLensBridge.ps1](../../../usb-terminal/Start-HoloLensBridge.ps1) / [usb-terminal/Stop-HoloLensBridge.ps1](../../../usb-terminal/Stop-HoloLensBridge.ps1) | 后台启动、停止及当前用户自启管理 |
+| [usb-terminal/Register-HoloLensTask.ps1](../../../usb-terminal/Register-HoloLensTask.ps1) | 注册当前用户后台任务，检查已有任务归属 |
+| [usb-terminal/HoloLens.Common.ps1](../../../usb-terminal/HoloLens.Common.ps1) | SDK 发现、原 SSH 身份核对、受限文件和程序操作 |
+| [usb-terminal/HoloLens.Bridge.ps1](../../../usb-terminal/HoloLens.Bridge.ps1) / [usb-terminal/HoloLens.Watchdog.ps1](../../../usb-terminal/HoloLens.Watchdog.ps1) | 用户范围的管道服务、保活、会话复用与卡住恢复 |
 
 源码随本仓库版本维护。微软与其他第三方运行时从各自官方来源获取，并遵守其许可证；本分支不重新打包或上传厂商二进制。
 

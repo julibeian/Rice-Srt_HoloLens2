@@ -29,7 +29,7 @@ if($null -ne $config){
         Add-Check ('SDK '+$name) ([bool]$exists) 'Use a complete matching x64 Windows SDK tool directory.'
     }
 }
-foreach($name in @('Connect-HoloLens.ps1','Start-HoloLensBridge.ps1','Register-HoloLensTask.ps1','HoloLens.Common.ps1','HoloLens.Bridge.ps1','HoloLens.Watchdog.ps1')){
+foreach($name in @('usb-terminal/Connect-HoloLens.ps1','usb-terminal/Start-HoloLensBridge.ps1','usb-terminal/Register-HoloLensTask.ps1','usb-terminal/HoloLens.Common.ps1','usb-terminal/HoloLens.Bridge.ps1','usb-terminal/HoloLens.Watchdog.ps1')){
     Add-Check $name (Test-Path -LiteralPath (Join-Path $Workspace $name) -PathType Leaf) 'Keep the repository directory structure.'
 }
 $ok=@($checks|Where-Object {-not $_.Passed}).Count -eq 0

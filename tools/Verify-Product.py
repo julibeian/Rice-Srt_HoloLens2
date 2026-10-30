@@ -20,7 +20,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--package', type=Path, help='Optionally verify a downloaded AppX.')
     args = parser.parse_args()
-    inputs = ROOT / 'field-app/upstream-miniprogram'
+    inputs = ROOT / 'apps/field-app/upstream-miniprogram'
     source = read(inputs / 'SOURCE.json')
     for item in source['files']:
         path = (inputs / item['path']).resolve()
