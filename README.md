@@ -20,9 +20,7 @@
 | 四 | 动态识别模型嵌入眼镜 | x |
 | 五 | 前后端挂载 | x |
 
-阶段一、二的已有成果与验收范围分别记录在 [阶段成果总览](docs/milestones/README.md)、[第一阶段手册](docs/milestones/phase-1-usb-terminal/manual.md) 和 [第二阶段能力登记](docs/milestones/phase-2-hololens-control/README.md)。
-
-技术节点的迭代过程已保留仓库；最终解决方式为**最新方案**。
+每项技术节点的迭代过程已保留仓库；最终解决方式为**最新方案**。
 
 ## 流程
 静态
