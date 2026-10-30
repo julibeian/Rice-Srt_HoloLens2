@@ -4,11 +4,9 @@
 
 ### 菜单
 
-|指南|跳转|
-|---|---|
-| 架构 | [参考](docs/architecture.md) |
-| 阶段产出 | [总览](docs/milestones/README.md) |
-| 下载版本 | [下载](https://github.com/julibeian/hololens-terminal/releases)
+架构 *[参考](docs/architecture.md)* ；
+阶段产出 *[总览](docs/milestones/README.md)* ；
+版本  *[下载](https://github.com/julibeian/hololens-terminal/releases)*
 
 ### 阶段
 
@@ -22,7 +20,7 @@
 
 每项技术节点的迭代过程已保留仓库；最终解决方式为**最新方案**。
 
-### 流程
+### 技术流程
 静态
 >拍照上传 → 云端处理 → 返回结果。
 
