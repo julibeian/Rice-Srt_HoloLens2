@@ -28,7 +28,7 @@
 >在线摄影 ⇌ 双端动态交互 → 返回显示标注。
 ### 产品
 
-<img src="docs/images/hololens.jpg" width="480" alt="Microsoft HoloLens">
+<img src="docs/images/hololens.jpg" width="240" alt="Microsoft HoloLens">
 
 Microsoft HoloLens官网跳转[点击此处](https://learn.microsoft.com/zh-cn/hololens/)
 
