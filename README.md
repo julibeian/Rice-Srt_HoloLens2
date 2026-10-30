@@ -8,7 +8,7 @@
 阶段产出 *[总览](docs/milestones/README.md)* ；
 版本  *[下载](https://github.com/julibeian/hololens-terminal/releases)*
 
-### 阶段
+### 阶段任务
 
 | 阶段 | 目标 | 状态 |
 | --- | --- | --- |
