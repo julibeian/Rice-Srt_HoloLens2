@@ -8,9 +8,10 @@ $client = $null
 $address = $null
 $pipe = $null
 $stopping = $false
+$newConnection = $false
 $nextCheck = [DateTime]::MinValue
 $lastLoggedState = ''
-$status = [ordered]@{ State='starting'; Device=$script:HlConfig.DeviceName; Address=$null; ProcessId=$PID; StartedAt=[DateTimeOffset]::Now.ToString('o'); UpdatedAt=$null; ActiveOperation=$null; LastHeartbeat=$null; LastError=$null; Connections=0; Pipe=$script:HlPipeName; SourceHashes=@{}; UsbPower=$null }
+$status = [ordered]@{ State='starting'; Device=$script:HlConfig.DeviceName; Address=$null; ConnectionMethod=$null; LastConnectMs=$null; ProcessId=$PID; StartedAt=[DateTimeOffset]::Now.ToString('o'); UpdatedAt=$null; ActiveOperation=$null; LastHeartbeat=$null; LastError=$null; Connections=0; Pipe=$script:HlPipeName; SourceHashes=@{}; UsbPower=$null }
 foreach ($sourceName in @('HoloLens.Common.ps1','HoloLens.Bridge.ps1','HoloLens.UsbPower.ps1')) {
     $status.SourceHashes[$sourceName]=(Get-FileHash -LiteralPath (Join-Path $PSScriptRoot $sourceName) -Algorithm SHA256).Hash
 }
@@ -80,26 +81,44 @@ try {
             try {
                 if ($null -eq $client) {
                     $status.State='discovering'; Save-HlStatus
+                    $connectClock=[Diagnostics.Stopwatch]::StartNew()
                     $connection=Find-HlDevice -KeepConnection
+                    $connectClock.Stop()
                     $address=$connection.Address
                     $client=$connection.Client
                     $status.Address=$address
+                    $status.ConnectionMethod=[string]$connection.Method
+                    $status.LastConnectMs=[int]$connectClock.ElapsedMilliseconds
                     $status.Connections++
-                    Write-HlLog ('Authenticated SSH connected to ' + $address)
+                    $newConnection=$true
+                    Write-HlLog ('Authenticated SSH connected to ' + $address + ' via ' + $status.ConnectionMethod + ' in ' + $status.LastConnectMs + ' ms')
                 }
                 if (-not $client.RemoteDevice.Ping()) { throw 'SSH keepalive failed.' }
                 $status.State='connected'
                 $status.LastError=$null
                 $status.LastHeartbeat=[DateTimeOffset]::Now.ToString('o')
-                try{$status.UsbPower=Invoke-HlUsbPowerTick $client $address}
-                catch{$status.UsbPower=@{State='error';Error=(Get-HlErrorMessage $_.Exception)}}
+                # Publish the authenticated session before optional power I/O.
+                # The device keeps its last 45-second lease, so renewing it on
+                # the next keepalive tick is safe and keeps status responsive.
+                if ($newConnection) {
+                    $status.UsbPower=@{State='pending_next_tick';Reason='USB power lease renews on the next keepalive tick';LastVerifiedHeartbeat=$status.LastHeartbeat;DeviceLeaseMs=45000}
+                }
+                Save-HlStatus
+                if (-not $newConnection) {
+                    try{$status.UsbPower=Invoke-HlUsbPowerTick $client $address}
+                    catch{$status.UsbPower=@{State='error';Error=(Get-HlErrorMessage $_.Exception)}}
+                }
+                $newConnection=$false
                 $nextCheck=[DateTime]::UtcNow.AddSeconds($script:HlConfig.KeepAliveSeconds)
             } catch {
                 $status.State='waiting_for_device'
                 $status.LastError=Get-HlErrorMessage $_.Exception
                 $status.UsbPower=@{State='not_renewed';Reason='USB identity is not currently connected';LastVerifiedHeartbeat=$status.LastHeartbeat;DeviceLeaseMs=45000;CurrentDeviceStateVerified=$false}
                 Close-HlDeviceConnection $client; $client=$null
-                $nextCheck=[DateTime]::UtcNow.AddSeconds($script:HlConfig.ReconnectSeconds)
+                # With a verified cached endpoint the retry is one cheap TCP probe,
+                # so poll quickly; without one the SDK discovery interval applies.
+                $retrySeconds=if(Get-HlEndpoint){$script:HlFastReconnectSeconds}else{$script:HlConfig.ReconnectSeconds}
+                $nextCheck=[DateTime]::UtcNow.AddSeconds($retrySeconds)
             }
             if ($status.State -ne $lastLoggedState) { Write-HlLog ($status.State + $(if($status.LastError){': '+$status.LastError}else{''})); $lastLoggedState=$status.State }
             Save-HlStatus

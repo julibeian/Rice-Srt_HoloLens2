@@ -4,6 +4,8 @@ function Assert-Hl($Condition, [string]$Message) { if (-not $Condition) { throw 
 
 $script:HlConfig.DeviceName = 'HL-TEST-DEVICE'
 $script:HlConfig.DiscoveryGuid = '11111111-1111-1111-1111-111111111111'
+# This suite mocks the device; it must never read or probe the real cache.
+$script:HlEndpointPath = Join-Path $script:HlStateDirectory ('discovery-endpoint-' + [guid]::NewGuid().ToString('N') + '.json')
 $lines = @(
     '169.254.100.20 11111111-1111-1111-1111-111111111111 HL-TEST-DEVICE'
     '169.254.100.21 22222222-2222-2222-2222-222222222222 HL-TEST-DEVICE'
@@ -43,4 +45,5 @@ $script:TestCandidates = @()
 $missing = $false
 try { Find-HlDevice | Out-Null } catch { $missing = $_.Exception.Message -like '*USB network is unavailable*' }
 Assert-Hl $missing 'A missing USB device must remain a retry state.'
+if (Test-Path -LiteralPath $script:HlEndpointPath) { Remove-Item -LiteralPath $script:HlEndpointPath -ErrorAction SilentlyContinue }
 'Discovery regression checks passed: filtering, GUID changes, rejected candidates, connection disposal and missing device.'

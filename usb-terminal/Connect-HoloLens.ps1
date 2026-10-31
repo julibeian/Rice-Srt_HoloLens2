@@ -1,6 +1,6 @@
 param([string[]]$Command)
 . (Join-Path $PSScriptRoot 'HoloLens.Common.ps1')
-try { $null=Invoke-HlBridge @{action='status'} 1000 } catch { & (Join-Path $PSScriptRoot 'Start-HoloLensBridge.ps1') | Out-Host }
+try { $null=Invoke-HlBridge @{action='status'} 500 } catch { & (Join-Path $PSScriptRoot 'Start-HoloLensBridge.ps1') | Out-Host }
 $channel=Invoke-HlBridge @{action='status'}
 $script:HlWorkingDirectory=$script:HlConfig.RemoteWorkingDirectory
 $script:HlExitCode=0
@@ -9,6 +9,16 @@ function Split-HlArguments([string]$Text) {
     foreach ($match in [regex]::Matches($Text,'"([^"]*)"|''([^'']*)''|(\S+)')) {
         foreach ($index in 1..3) { if ($match.Groups[$index].Success) { $match.Groups[$index].Value; break } }
     }
+}
+
+function Get-HlStatusValue($State, [string]$Name) {
+    # The bridge returns JSON converted to a hashtable; scripts also inspect
+    # the same shape as objects, so accept both without failing on missing keys.
+    if ($null -eq $State) { return $null }
+    if ($State -is [System.Collections.IDictionary]) { return $State[$Name] }
+    $property = $State.PSObject.Properties[$Name]
+    if ($property) { return $property.Value }
+    return $null
 }
 
 function Invoke-HlLine([string]$Line) {
@@ -23,6 +33,7 @@ function Invoke-HlLine([string]$Line) {
             @'
 info                         Device identity and SSH capabilities
 status                       Background channel and heartbeat status
+connect                      Wait for the cached USB session and report the route
 pwd                          Remote working directory
 ls [path] / dir [path]        List a remote directory
 cd path                      Change remote working directory
@@ -57,6 +68,31 @@ File operations run through the SDK's SSH connection; programs execute remotely.
             else { $request.local=[IO.Path]::GetFullPath($parts[0],$PWD.Path);$request.path=$parts[1] }
         }
         {$_ -in @('info','status','reconnect')} {}
+        'connect' {
+            $deadline=[DateTime]::UtcNow.AddSeconds(20)
+            $clock=[Diagnostics.Stopwatch]::StartNew()
+            $state=$null
+            while ([DateTime]::UtcNow -lt $deadline) {
+                $state=Invoke-HlBridge @{action='status'}
+                if ($state.State -eq 'connected' -or $state.State -eq 'failed') { break }
+                Start-Sleep -Milliseconds 150
+            }
+            $clock.Stop()
+            $result=[ordered]@{
+                State=$state.State
+                Device=$state.Device
+                Address=$state.Address
+                ConnectionMethod=Get-HlStatusValue $state 'ConnectionMethod'
+                ConnectMs=Get-HlStatusValue $state 'LastConnectMs'
+                WaitMs=[int]$clock.ElapsedMilliseconds
+                LastHeartbeat=$state.LastHeartbeat
+                ExpectedFingerprint=$script:HlConfig.ExpectedFingerprint
+                SshIdentityVerified=($state.State -eq 'connected')
+            }
+            if ($state.State -ne 'connected') { throw ('HoloLens is ' + $state.State + ': ' + [string]$state.LastError) }
+            $result | ConvertTo-Json -Depth 5
+            return
+        }
         'stop-bridge' { & (Join-Path $PSScriptRoot 'Stop-HoloLensBridge.ps1'); return }
         default {
             $execution=if($verb -eq 'exec'){$rest}else{$Line}

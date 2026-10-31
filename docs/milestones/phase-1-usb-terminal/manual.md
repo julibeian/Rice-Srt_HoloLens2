@@ -114,6 +114,9 @@ $trustedFingerprint = Read-Host '管理员核实的原设备 SSH 指纹'
 | `RemoteWorkingDirectory` | 该开发用户可写的远端工作目录；连接脚本会在不存在时创建 |
 | `ScheduledTaskName` | 本工具的任务名；默认 `HoloLensUsbSshBridge`，不能覆盖别的应用的任务 |
 | `KeepAliveSeconds` / `ReconnectSeconds` | 默认均为 5 秒 |
+| `FastReconnectSeconds` | 已有已验证缓存端点后的重试间隔，默认 1 秒 |
+| `FullDiscoverySeconds` | 缓存端点不可达时执行完整 SDK 发现的最小间隔，默认 10 秒 |
+| `EndpointProbeMilliseconds` | 缓存端点的 TCP 22 探测超时，默认 800 毫秒 |
 | `CommandTimeoutSeconds` | 默认 30 秒；超时后的未知结果不自动重发 |
 | `InitialAddress` | 保留兼容字段；当前 USB 自动发现不依赖它，不是已经配置好的 Wi-Fi 备用链路 |
 
@@ -126,6 +129,7 @@ JSON 内反斜杠写为 `\\`，例如配置模板里的 SDK 路径。配置和 `
 & $ps7 -NoProfile -File tests/HoloLens.Discovery.Tests.ps1
 & $ps7 -NoProfile -File tests/HoloLens.Connection.Tests.ps1
 & $ps7 -NoProfile -File tests/HoloLens.StatusFile.Tests.ps1
+& $ps7 -NoProfile -File tests/HoloLens.FastConnect.Tests.ps1
 ```
 
 以上检查不执行设备命令。可另运行 `tests/HoloLens.DiscoveryProcess.Tests.ps1` 验证 SDK 发现子进程的超时清理；它会启动一次真实 SDK 发现，但不配对、不写设备。
@@ -141,7 +145,7 @@ JSON 内反斜杠写为 `\\`，例如配置模板里的 SDK 路径。配置和 `
 
 任务以当前 Windows 用户运行，不需要保存 Windows 密码，也不提升为管理员。`State=connected`、新的心跳和实际只读命令成功一起构成本轮管理通道可用证据。`status` 返回成功只说明本机后台可响应；`waiting_for_device` 则是等待设备，不是已连通。
 
-常用状态字段：`State`、`UpdatedAt`、`LastHeartbeat`、`ActiveOperation`、`LastError`、`Connections`、`SourceHashes`。`SourceHashes` 是当前桥进程加载的源码摘要，便于排除“磁盘源码已更新但后台还运行旧代码”。
+常用状态字段：`State`、`UpdatedAt`、`LastHeartbeat`、`ActiveOperation`、`LastError`、`Connections`、`ConnectionMethod`、`LastConnectMs`、`SourceHashes`。`ConnectionMethod` 记录本次会话走的是 `cached`（复用已验证端点）还是 `discovered`（完整 SDK 发现），`LastConnectMs` 是建立该会话的耗时。`SourceHashes` 是当前桥进程加载的源码摘要，便于排除“磁盘源码已更新但后台还运行旧代码”。
 
 ## 7. 使用受限管理终端
 
@@ -179,6 +183,14 @@ $remoteFile = 'transfer-' + $transferId + '.txt'
 
 ## 8. 重连、更新与停止
 
+第一次成功会话会经过 SSH 主机指纹核对，随后桥把该 USB 端点缓存到 `usb-terminal/.state/endpoint.json`（仅当前 Windows 用户、被 Git 忽略）。之后的连接先探测这个端点：命中时跳过 SDK 发现，直接完成 SSH 认证，实测约 0.9 秒；只有缓存端点不可达时才按 `FullDiscoverySeconds` 的间隔做完整发现，所以拔插导致地址变化仍能被发现。缓存只在该端点仍匹配 `config.json` 的设备名和指纹、且 SSH 主机指纹再次通过时才使用，不会自动信任新指纹。
+
+```powershell
+& $ps7 -NoProfile -File usb-terminal/Connect-HoloLens.ps1 -Command connect
+```
+
+`connect` 在通道已连通时立即返回，输出 `ConnectionMethod` 和 `ConnectMs`；桥未运行时先启动后台桥再等待，实测本机唤醒缓存端点约 3.5 秒返回。需要主动重建会话时：
+
 ```powershell
 & $ps7 -NoProfile -File usb-terminal/Connect-HoloLens.ps1 -Command reconnect
 & $ps7 -NoProfile -File usb-terminal/Connect-HoloLens.ps1 -Command status
@@ -202,7 +214,7 @@ git pull --ff-only
 | --- | --- |
 | 缺少专用运行时 | 将完整官方 x64 PowerShell ZIP 解压到约定目录，不能只安装系统别名 |
 | SDK DLL 加载失败 | 核对完整 SDK、x64 目录及依赖；不要从 DLL 下载站拼装 |
-| 发现超时或没有目标 | 检查 USB NCM、设备发现和电源状态；单次 SDK 发现最多等待 12 秒，之后由后台重试 |
+| 发现超时或没有目标 | 检查 USB NCM、设备发现和电源状态；单次 SDK 发现最多等待 12 秒，之后由后台重试。已有缓存端点时后台先做 TCP 探测，只在缓存失败且到达 `FullDiscoverySeconds` 间隔时才完整发现 |
 | GUID 或地址改变 | 重新发现；仍使用原 SSH 指纹核对，不重配对 |
 | 主机指纹不一致 | 停止连接并核实是否更换或重刷了设备；不自动信任新指纹 |
 | 元数据为空或读取异常 | 保留 `MetadataErrors`；已验证 SSH 身份与实际命令结果独立判断，不能编造型号或认定退出 |

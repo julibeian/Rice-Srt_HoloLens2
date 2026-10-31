@@ -6,6 +6,15 @@ $script:HlStateDirectory = Join-Path $PSScriptRoot '.state'
 [IO.Directory]::CreateDirectory($script:HlStateDirectory) | Out-Null
 $script:HlUserSid = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
 $script:HlPipeName = 'HoloLensUsbBridge-' + $script:HlUserSid.Replace('-', '_')
+# Fast reconnect: after one authenticated USB session, the verified link-local
+# endpoint is cached. Later sessions probe that route first and only fall back
+# to SDK discovery when the cached endpoint stops answering.
+$script:HlEndpointPath = Join-Path $script:HlStateDirectory 'endpoint.json'
+$script:HlEndpointProbeMilliseconds = if ($script:HlConfig.PSObject.Properties['EndpointProbeMilliseconds']) { [int]$script:HlConfig.EndpointProbeMilliseconds } else { 800 }
+$script:HlFastReconnectSeconds = if ($script:HlConfig.PSObject.Properties['FastReconnectSeconds']) { [int]$script:HlConfig.FastReconnectSeconds } else { 1 }
+$script:HlFullDiscoverySeconds = if ($script:HlConfig.PSObject.Properties['FullDiscoverySeconds']) { [int]$script:HlConfig.FullDiscoverySeconds } else { 10 }
+$script:HlConnectionMethod = $null
+$script:HlLastDiscoveryAttempt = [DateTime]::MinValue
 
 function Get-HlErrorMessage($Exception) {
     $message = $Exception.Message
@@ -103,10 +112,86 @@ function Write-HlBridgeStatus($Status, [string]$StateDirectory=$script:HlStateDi
     } finally { if(Test-Path -LiteralPath $temporary){Remove-Item -LiteralPath $temporary -ErrorAction SilentlyContinue} }
 }
 
+function Get-HlEndpoint {
+    # Only a cache that still matches the configured device and pinned SSH
+    # fingerprint may shortcut discovery. Anything else is ignored, never trusted.
+    if (-not (Test-Path -LiteralPath $script:HlEndpointPath)) { return $null }
+    try {
+        $saved = Get-Content -LiteralPath $script:HlEndpointPath -Raw | ConvertFrom-Json
+        if ($saved.DeviceName -cne $script:HlConfig.DeviceName) { return $null }
+        if ($saved.SshFingerprint -cne $script:HlConfig.ExpectedFingerprint) { return $null }
+        if ([string]$saved.Address -notmatch '^169\.254\.\d{1,3}\.\d{1,3}$') { return $null }
+        return $saved
+    } catch { return $null }
+}
+
+function Save-HlEndpoint([string]$Address, [string]$Fingerprint) {
+    # Persist only the already authenticated USB endpoint. A cache write failure
+    # must never break a working device session.
+    if ([string]$Address -notmatch '^169\.254\.\d{1,3}\.\d{1,3}$') { return }
+    if ($Fingerprint -cne $script:HlConfig.ExpectedFingerprint) { return }
+    $data = [ordered]@{
+        DeviceName = $script:HlConfig.DeviceName
+        SshFingerprint = $Fingerprint
+        Address = $Address
+        VerifiedAt = [DateTimeOffset]::Now.ToString('o')
+    }
+    $temporary = $script:HlEndpointPath + '.tmp'
+    try {
+        [IO.File]::WriteAllText($temporary, ($data | ConvertTo-Json), [Text.UTF8Encoding]::new($false))
+        [IO.File]::Move($temporary, $script:HlEndpointPath, $true)
+    } finally {
+        if (Test-Path -LiteralPath $temporary) { Remove-Item -LiteralPath $temporary -ErrorAction SilentlyContinue }
+    }
+}
+
+function Test-HlEndpointReachable([string]$Address, [int]$TimeoutMilliseconds) {
+    if ($TimeoutMilliseconds -le 0) { $TimeoutMilliseconds = $script:HlEndpointProbeMilliseconds }
+    $client = [Net.Sockets.TcpClient]::new()
+    try {
+        $task = $client.ConnectAsync($Address, 22)
+        if (-not $task.Wait($TimeoutMilliseconds)) { return $false }
+        return $client.Connected
+    } catch { return $false } finally { $client.Dispose() }
+}
+
 function Find-HlDevice {
-    param([switch]$KeepConnection)
+    param([switch]$KeepConnection, [switch]$ForceDiscovery)
+    $cachedFailure = $null
+    $cached = if ($ForceDiscovery) { $null } else { Get-HlEndpoint }
+    if ($cached) {
+        $address = [string]$cached.Address
+        if (-not (Test-HlEndpointReachable $address)) {
+            $cachedFailure = 'cached USB endpoint ' + $address + ' did not answer on TCP 22'
+        } else {
+            $probe = $null
+            try {
+                # The cached route is only a shortcut; SSH host identity is still
+                # compared with the pinned fingerprint before the session is used.
+                $probe = Connect-HlDevice $address
+                $script:HlDiscoveredGuid = $script:HlConfig.DiscoveryGuid
+                $script:HlConnectionMethod = 'cached'
+                if ($KeepConnection) {
+                    $connection = [pscustomobject]@{ Address=$address; Client=$probe; Method='cached' }
+                    $probe = $null
+                    return $connection
+                }
+                return $address
+            } catch {
+                $cachedFailure = 'cached USB endpoint ' + $address + ': ' + (Get-HlErrorMessage $_.Exception)
+            } finally { Close-HlDeviceConnection $probe }
+        }
+        # Full discovery stays rate-limited: while the device is unplugged only
+        # the cheap TCP probe runs, and a changed address is still found later.
+        if (([DateTime]::UtcNow - $script:HlLastDiscoveryAttempt).TotalSeconds -lt $script:HlFullDiscoverySeconds) {
+            throw ('Target HoloLens USB network is unavailable; waiting for the same device to reconnect. ' + $cachedFailure)
+        }
+    }
+    $script:HlLastDiscoveryAttempt = [DateTime]::UtcNow
     $candidates = @(Get-HlDiscoveredDevices)
-    if (-not $candidates.Count) { throw 'Target HoloLens USB network is unavailable; waiting for the same device to reconnect.' }
+    if (-not $candidates.Count) {
+        throw ('Target HoloLens USB network is unavailable; waiting for the same device to reconnect.' + $(if ($cachedFailure) { ' ' + $cachedFailure } else { '' }))
+    }
     $errors = [Collections.Generic.List[string]]::new()
     foreach ($candidate in $candidates) {
         $probe = $null
@@ -115,8 +200,9 @@ function Find-HlDevice {
             # Only the existing authenticated SSH host fingerprint establishes identity.
             $probe = Connect-HlDevice $candidate.Address
             $script:HlDiscoveredGuid = $candidate.DiscoveryGuid
+            $script:HlConnectionMethod = 'discovered'
             if ($KeepConnection) {
-                $connection = [pscustomobject]@{ Address=$candidate.Address; Client=$probe }
+                $connection = [pscustomobject]@{ Address=$candidate.Address; Client=$probe; Method='discovered' }
                 $probe = $null
                 return $connection
             }
@@ -151,6 +237,9 @@ function Connect-HlDevice([string]$Address) {
         if (-not $client.RemoteDevice.Directory($script:HlConfig.RemoteWorkingDirectory).Exists) {
             $client.RemoteDevice.CreateDirectory($script:HlConfig.RemoteWorkingDirectory)
         }
+        # Remember this verified USB route so the next session can skip SDK
+        # discovery. Caching is optional and never affects the live session.
+        try { Save-HlEndpoint $Address $client.RemoteDevice.Sha1Fingerprint } catch {}
         return $client
     } catch {
         Close-HlDeviceConnection $client

@@ -8,5 +8,8 @@
   "ScheduledTaskName": "HoloLensUsbSshBridge",
   "KeepAliveSeconds": 5,
   "ReconnectSeconds": 5,
+  "FastReconnectSeconds": 1,
+  "FullDiscoverySeconds": 10,
+  "EndpointProbeMilliseconds": 800,
   "CommandTimeoutSeconds": 30
 }
