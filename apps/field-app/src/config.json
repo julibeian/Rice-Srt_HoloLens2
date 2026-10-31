@@ -1,1 +1,1 @@
-{"version":"1.0.0.0","apiOrigin":"https://rice-srt.cn","apiPrefix":"/hololens-app/api","deviceLabel":"HoloLens 2"}
+{"version":"1.0.0.0","apiOrigin":"https://rice-srt.cn","apiPrefix":"/hololens-app/api","deviceLabel":"HoloLens 2","dynamicFrameSize":384,"dynamicInputSize":160,"dynamicJpegQuality":0.72,"dynamicMinIntervalMs":750}

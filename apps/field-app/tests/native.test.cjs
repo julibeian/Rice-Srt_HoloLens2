@@ -12,9 +12,12 @@ function runtime(options={}){
  function Headers(){this.values={};this.tryAppendWithoutValidation=(key,value)=>{this.values[key]=value;};}
  function Message(method,uri){this.uri=uri;this.method=method;this.headers=new Headers();this.close=()=>{};}
  function Client(){this.defaultRequestHeaders=new Headers();this.close=()=>{};this.sendRequestAsync=message=>{
-  const endpoint=message.uri.slice(message.uri.lastIndexOf('/'));calls.push({endpoint,message});let value,status=200;
+  const uri=String(message.uri),endpoint=uri.slice(uri.indexOf('/api')+4);calls.push({endpoint,message});let value,status=200;
   if(endpoint==='/register')value={device_id:'device-test',device_key:'never-printed-test-key'};
   else if(endpoint==='/session')value={access_token:'test-session-'+(++token),expires_epoch:Date.now()/1000+3600};
+  else if(endpoint==='/dynamic/frame'){const fields=message.headers.values;value={predicted_class:'稻瘟病',confidence:.92,is_valid:true,message:'检测成功',top3_predictions:[['稻瘟病',.92]],frame_id:fields['X-Frame-ID'],image_sha256:fields['X-Image-SHA256'],model:{version:'v2-test',input_size:160},timing:{inference_ms:800,total_ms:820},annotation:{kind:'cam',grid:{width:5,height:5,values:[[1,0,0,0,0]]},box:[0,0,.2,.2]},capture_evidence:{channel:'hololens-app-dynamic',frame_id:fields['X-Frame-ID'],image_sha256:fields['X-Image-SHA256']}};
+   if(options.unauthorizedDynamic&&calls.filter(c=>c.endpoint==='/dynamic/frame').length===1){status=401;value={error:'session_expired',message:'连接已过期，请重试'};}
+  }
   else {const fields=message.headers.values;value={predicted_class:'健康水稻',is_valid:true,confidence:.97,capture_evidence:{channel:'hololens-app',request_id:fields['X-Request-ID'],image_sha256:options.badEvidence?'0'.repeat(64):hash,prediction_id:'prediction-test'}};
    if(options.unauthorized&&calls.filter(c=>c.endpoint==='/predict').length===1){status=401;value={error:'session_expired',message:'连接已过期，请重试'};}
   }
@@ -27,7 +30,7 @@ function runtime(options={}){
   Storage:{ApplicationData:{current:{localSettings:{values:settings},localFolder:{getFilesAsync:async()=>[],getFileAsync:async name=>{if(!local.has(name))throw new Error('missing');return local.get(name);},createFileAsync:async name=>{const f=file(name,Buffer.alloc(0));local.set(name,f);return f;}}}},CreationCollisionOption:{replaceExisting:1},NameCollisionOption:{failIfExists:0},FileIO:{readTextAsync:async f=>f.text,writeTextAsync:async(f,text)=>{f.text=text;},readBufferAsync:async f=>f.data,writeBufferAsync:async(f,data)=>{f.data=data;}},Streams:{UnicodeEncoding:{utf8:1}}},
   Media:{Capture:{CameraCaptureUI:function(){this.photoSettings={};this.captureFileAsync=async mode=>{calls.push({endpoint:'system-camera',mode,settings:this.photoSettings});return options.cancelSystem?null:file('shell.jpg');};},CameraCaptureUIPhotoFormat:{jpeg:0},CameraCaptureUIMaxPhotoResolution:{large3M:4},CameraCaptureUIMode:{photo:1}}},
   ApplicationModel:{Package:{current:{installedLocation:{getFileAsync:async()=>({text:JSON.stringify({apiOrigin:'https://example.test',apiPrefix:'/api',deviceLabel:'HoloLens'})}),tryGetItemAsync:async()=>options.noBootstrap?null:{text:JSON.stringify({pair_code:'12345678',expires_epoch:Date.now()/1000+(options.expired?-1:900)}),deleteAsync:async()=>{}}}}}},
-  Security:{Cryptography:{CryptographicBuffer:{generateRandom:()=>crypto.randomBytes(16),encodeToHexString:buffer=>buffer.toString('hex'),convertStringToBinary:text=>Buffer.from(text),convertBinaryToString:(_,buffer)=>buffer.toString()},BinaryStringEncoding:{utf8:1},Core:{HashAlgorithmProvider:{openAlgorithm:()=>({hashData:buffer=>crypto.createHash('sha256').update(buffer).digest()})}},DataProtection:{DataProtectionProvider:function(){this.protectAsync=async buffer=>buffer;this.unprotectAsync=async buffer=>buffer;}}}},
+  Security:{Cryptography:{CryptographicBuffer:{generateRandom:()=>crypto.randomBytes(16),encodeToHexString:buffer=>buffer.toString('hex'),convertStringToBinary:text=>Buffer.from(text),convertBinaryToString:(_,buffer)=>buffer.toString(),createFromByteArray:bytes=>Buffer.from(bytes)},BinaryStringEncoding:{utf8:1},Core:{HashAlgorithmProvider:{openAlgorithm:()=>({hashData:buffer=>crypto.createHash('sha256').update(buffer).digest()})}},DataProtection:{DataProtectionProvider:function(){this.protectAsync=async buffer=>buffer;this.unprotectAsync=async buffer=>buffer;}}}},
   Web:{Http:{HttpClient:Client,HttpRequestMessage:Message,HttpMethod:{get:'GET',post:'POST'},Filters:{HttpBaseProtocolFilter:function(){}},HttpStringContent:function(value){this.value=value;},HttpMultipartFormDataContent:function(){this.parts=[];this.add=(content,name,filename)=>this.parts.push({content,name,filename});},HttpBufferContent:function(buffer){this.buffer=buffer;this.headers={};},Headers:{HttpMediaTypeHeaderValue:function(value){this.value=value;}}}},
   System:{Profile:{AnalyticsInfo:{versionInfo:{deviceFamily:'Windows.Holographic'}}}},UI:{WebUI:{WebUIApplication:{addEventListener:()=>{}}}},
   Devices:{Geolocation:{Geolocator,GeolocationAccessStatus:{allowed:1},PositionStatus:{disabled:3},PositionAccuracy:{default:0}}}
@@ -69,3 +72,18 @@ test('denied native network monitoring cannot stop startup and polling still ena
 test('diagnostic history stays within native settings limits and cannot prevent startup or uploads',async()=>{const r=runtime({limitedDiagnosticSettings:true});await r.N.init();for(let i=0;i<35;i++)await r.N.log('camera_quality_probe',{message:'光照变化'.repeat(40),id:i});await r.N.log('app_ready',{});const state=JSON.parse(r.local.get('app-state.json').text);assert.equal(state.appReady,true);assert.ok(state.events.length<24);assert.ok(state.events.some(row=>row.event==='app_ready'));assert.equal((await upload(r.N)).statusCode,200);});
 
 test('denied diagnostic storage remains optional while the application and service initialize',async()=>{for(const options of [{deniedDiagnosticSettings:true},{deniedDiagnosticFile:true}]){const r=runtime(options);await r.N.init();await r.N.log('app_ready',{});assert.equal((await upload(r.N)).statusCode,200);}});
+
+test('dynamic frame is sent as raw JPEG with frame/hash binding and a verified result',async()=>{
+ const r=runtime();await r.N.init();const bytes=new Uint8Array([0xff,0xd8,0xff,1,2,3]),sha=crypto.createHash('sha256').update(Buffer.from(bytes)).digest('hex');
+ const value=await r.N.dynamicAnalyze({bytes,hash:sha,frameId:'dyn-test',size:160}).promise;
+ assert.equal(value.frame_id,'dyn-test');assert.equal(value.image_sha256,sha);assert.equal(value.model.version,'v2-test');
+ const call=r.calls.find(c=>c.endpoint==='/dynamic/frame');assert.equal(call.message.headers.values['X-Frame-ID'],'dyn-test');assert.equal(call.message.headers.values['X-Image-SHA256'],sha);assert.equal(call.message.headers.values['X-Dynamic-Size'],'160');assert.deepEqual([...call.message.content.buffer],[...bytes]);assert.equal(call.message.content.headers.contentType.value,'image/jpeg');
+});
+test('dynamic frame refreshes an expired session and retries the same frame identity',async()=>{
+ const r=runtime({unauthorizedDynamic:true});await r.N.init();const bytes=new Uint8Array([0xff,0xd8,0xff,9]),sha=crypto.createHash('sha256').update(Buffer.from(bytes)).digest('hex');
+ const value=await r.N.dynamicAnalyze({bytes,hash:sha,frameId:'dyn-retry',size:192}).promise;
+ assert.equal(value.frame_id,'dyn-retry');const frames=r.calls.filter(c=>c.endpoint==='/dynamic/frame');assert.equal(frames.length,2);assert.equal(frames[0].message.headers.values['X-Frame-ID'],frames[1].message.headers.values['X-Frame-ID']);assert.notEqual(frames[0].message.headers.values.Authorization,frames[1].message.headers.values.Authorization);
+});
+test('dynamic settings are bounded',async()=>{
+ const r=runtime();await r.N.init();const value=r.N.dynamicSettings();assert.ok(value.frameSize>=256&&value.frameSize<=512);assert.ok([128,160,192,224].includes(value.inputSize));assert.ok(value.quality>=.45&&value.quality<=.9);assert.ok(value.minIntervalMs>=500&&value.minIntervalMs<=4000);
+});

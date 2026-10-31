@@ -68,7 +68,7 @@ function collect(relative){for(const e of fs.readdirSync(path.join(source,relati
 collect('utils');collect('pages');
 const loader=`(function(){var modules={${modules.join(',\n')}},cache={};window.RiceRequire=function require(id){if(cache[id])return cache[id].exports;if(!modules[id])throw new Error('Module missing: '+id);var m=cache[id]={exports:{}};modules[id](function(relative){var parts=id.split('/');parts.pop();relative.split('/').forEach(function(p){if(p==='..')parts.pop();else if(p!=='.')parts.push(p);});return require(parts.join('/').replace(/\\.js$/,''));},m,m.exports);return m.exports;};}());`;
 fs.writeFileSync(path.join(output,'miniapp.js'),loader);
-for(const name of ['index.html','shell.css','renderer.js','capture-quality.js','camera-controls.js','native.js','bridge.js','app.js','boot.js','config.json']){const from=path.join(root,'src',name),to=path.join(output,name);if(name.endsWith('.css'))fs.writeFileSync(to,legacyCss(fs.readFileSync(from,'utf8')));else fs.copyFileSync(from,to);}
+for(const name of ['index.html','shell.css','renderer.js','capture-quality.js','camera-controls.js','dynamic.js','native.js','bridge.js','app.js','boot.js','config.json']){const from=path.join(root,'src',name),to=path.join(output,name);if(name.endsWith('.css'))fs.writeFileSync(to,legacyCss(fs.readFileSync(from,'utf8')));else fs.copyFileSync(from,to);}
 if(fs.existsSync(path.join(root,'vendor')))fs.cpSync(path.join(root,'vendor'),path.join(output,'vendor'),{recursive:true});
 fs.writeFileSync(path.join(output,'source-manifest.json'),JSON.stringify({source,generatedAt:new Date().toISOString(),files:manifest},null,2));
 console.log(JSON.stringify({output,sourceFiles:manifest.length,pages,bytes:fs.statSync(path.join(output,'miniapp.js')).size}));

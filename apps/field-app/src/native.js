@@ -2,7 +2,7 @@
  'use strict';
  var W=root.Windows, nativeMode=!!W, files={}, config, session=null, device=null, camera=null, stream=null, cameraUrl=null, logQueue=Promise.resolve(), fileQueue=Promise.resolve(), uploadIds={};
  var base='ms-appdata:///local',serviceWork=null,locationWork=null,lastPosition=null,locator=null;
- var cameraControls=null,cameraGeneration=0,captureBusy=false,analysisCanvas=null,Q=root.RiceCaptureQuality,K=root.RiceCameraControls,diagnosticSession=null,diagnosticIds={},previewWork=null,runtimeSession=null,appReady=false,cameraPreviewReady=false;
+ var cameraControls=null,cameraGeneration=0,captureBusy=false,analysisCanvas=null,Q=root.RiceCaptureQuality,K=root.RiceCameraControls,diagnosticSession=null,diagnosticIds={},previewWork=null,runtimeSession=null,appReady=false,cameraPreviewReady=false,dynamicCanvas=null;
  function id(){if(W)return W.Security.Cryptography.CryptographicBuffer.encodeToHexString(W.Security.Cryptography.CryptographicBuffer.generateRandom(16));return String(Date.now())+'-'+Math.random().toString(16).slice(2);}
  function fail(message){var e=new Error(message);e.errMsg=message;return e;}
  function success(options,value){if(options.success)options.success(value);if(options.complete)options.complete(value);}
@@ -85,11 +85,11 @@
   var canvas=document.createElement('canvas'),video=document.getElementById('camera-video');canvas.width=video.videoWidth||1280;canvas.height=video.videoHeight||720;canvas.getContext('2d').drawImage(video,0,0);var blob=await new Promise(function(resolve){canvas.toBlob(resolve,'image/jpeg',0.92);});files[virtual]={blob:blob,url:URL.createObjectURL(blob)};return virtual;
  }
  function cameraCapabilities(){return cameraControls?{supported:cameraControls.capabilities,enabled:cameraControls.enabled,photoSize:cameraControls.photoSize}:null;}
- async function readCameraCheck(){if(!diagnosticSession)return null;var file=await W.ApplicationModel.Package.current.installedLocation.tryGetItemAsync('camera-check.json');if(!file)return null;var command;try{command=JSON.parse(await W.Storage.FileIO.readTextAsync(file));}finally{await file.deleteAsync();}if(command.session!==diagnosticSession||!/^\w{16,64}$/.test(command.id)||diagnosticIds[command.id]||['controls','capture'].indexOf(command.action)<0){await log('camera_check_rejected',{});return null;}diagnosticIds[command.id]=true;return command;}
+ async function readCameraCheck(){if(!diagnosticSession)return null;var file=await W.ApplicationModel.Package.current.installedLocation.tryGetItemAsync('camera-check.json');if(!file)return null;var command;try{command=JSON.parse(await W.Storage.FileIO.readTextAsync(file));}finally{await file.deleteAsync();}if(command.session!==diagnosticSession||!/^\w{16,64}$/.test(command.id)||diagnosticIds[command.id]||['controls','capture','dynamic_start','dynamic_stop','dynamic_asset'].indexOf(command.action)<0){await log('camera_check_rejected',{});return null;}diagnosticIds[command.id]=true;return command;}
  async function diagnoseCamera(rect){if(!cameraControls)throw fail('原生相机未准备好');await K.target(W,cameraControls,rect,log);var metrics=sampleRegion(rect);var proof=Object.assign({assessment:Q.assess(metrics).reason},Q.summary(metrics));await log('camera_quality_probe',proof);return proof;}
  function sampleRegion(rect){var video=document.getElementById('camera-video');if(!video.videoWidth||video.readyState<2)throw fail('预览尚未准备好，请稍候');var region=Q.pixels(rect,video.videoWidth,video.videoHeight);if(!analysisCanvas){analysisCanvas=document.createElement('canvas');analysisCanvas.width=analysisCanvas.height=256;}var context=analysisCanvas.getContext('2d');context.drawImage(video,region.x,region.y,region.width,region.height,0,0,256,256);return Q.measure(context.getImageData(0,0,256,256));}
  async function loadPhoto(path){var image=new Image();return K.bound(new Promise(function(resolve,reject){image.onload=function(){resolve(image);};image.onerror=function(){reject(fail('原始照片读取失败，请重拍'));};image.src=root.RiceNative.imageUrl(path);}),10000);}
- function jpeg(canvas){if(!canvas.toBlob){var url=canvas.toDataURL('image/jpeg',.95);if(url.indexOf('data:image/jpeg;base64,')!==0)throw fail('当前相机无法生成 JPEG，请重开应用');var value=url.slice(url.indexOf(',')+1);return Promise.resolve({base64:value,size:Math.floor(value.length*3/4)-(value.endsWith('==')?2:value.endsWith('=')?1:0)});}return K.bound(new Promise(function(resolve,reject){canvas.toBlob(function(blob){if(blob&&blob.size>0)resolve(blob);else reject(fail('照片裁剪失败，请重拍'));},'image/jpeg',.95);}),10000);}
+ function jpeg(canvas,quality){quality=Number(quality)||.95;if(!canvas.toBlob){var url=canvas.toDataURL('image/jpeg',quality);if(url.indexOf('data:image/jpeg;base64,')!==0)throw fail('当前相机无法生成 JPEG，请重开应用');var value=url.slice(url.indexOf(',')+1);return Promise.resolve({base64:value,size:Math.floor(value.length*3/4)-(value.endsWith('==')?2:value.endsWith('=')?1:0)});}return K.bound(new Promise(function(resolve,reject){canvas.toBlob(function(blob){if(blob&&blob.size>0)resolve(blob);else reject(fail('照片裁剪失败，请重拍'));},'image/jpeg',quality);}),10000);}
  async function adjustExposure(metrics,generation,event){
   var state=cameraControls,decision=Q.exposure(metrics),supported=!!(state&&state.capabilities.compensation),adjusted=false,limit=false;
   if(supported){
@@ -195,6 +195,52 @@
   finally{clearTimeout(timer);current=null;try{message.close();c.close();}catch(_){}}
   }
  })();work.then(function(result){success(options,result);},function(e){log('upload_error',{message:e.message});failure(options,e);});return {abort:function(){aborted=true;if(current)try{current.cancel();}catch(_){}}};}
+ function dynamicSettings(){var value=config||{};return {frameSize:Math.max(256,Math.min(512,Number(value.dynamicFrameSize)||384)),inputSize:[128,160,192,224].indexOf(Number(value.dynamicInputSize))>=0?Number(value.dynamicInputSize):160,quality:Math.max(.45,Math.min(.9,Number(value.dynamicJpegQuality)||.72)),minIntervalMs:Math.max(500,Math.min(4000,Number(value.dynamicMinIntervalMs)||750))};}
+ function base64Bytes(value){var binary=atob(value),bytes=new Uint8Array(binary.length);for(var i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return bytes;}
+ async function captureDynamicFrame(options){
+  options=options||{};if(!nativeMode)throw fail('动态识图需在眼镜上运行');if(!Q||!K)throw fail('拍摄组件未加载，请重开应用');
+  var video=document.getElementById('camera-video');if(!video||!video.videoWidth||!video.videoHeight||video.readyState<2)throw fail('相机画面尚未准备好，请稍候');
+  var region=Q.pixels(options.rect,video.videoWidth,video.videoHeight),side=Math.max(256,Math.min(512,Math.round(Number(options.size)||dynamicSettings().frameSize)));
+  if(!dynamicCanvas)dynamicCanvas=document.createElement('canvas');if(dynamicCanvas.width!==side||dynamicCanvas.height!==side){dynamicCanvas.width=side;dynamicCanvas.height=side;}
+  var context=dynamicCanvas.getContext('2d');context.drawImage(video,region.x,region.y,region.width,region.height,0,0,side,side);
+  var encoded=await jpeg(dynamicCanvas,Number(options.quality)||dynamicSettings().quality),bytes;
+  if(encoded.base64)bytes=base64Bytes(encoded.base64);else bytes=new Uint8Array(await encoded.arrayBuffer());
+  if(!bytes.length||bytes.length>768*1024)throw fail('动态帧大小超出限制');
+  var buffer=W.Security.Cryptography.CryptographicBuffer.createFromByteArray(bytes),hash=W.Security.Cryptography.CryptographicBuffer.encodeToHexString(W.Security.Cryptography.Core.HashAlgorithmProvider.openAlgorithm('SHA256').hashData(buffer)).toLowerCase();
+  return {bytes:bytes,hash:hash,frameId:'dyn-'+id(),width:side,height:side,roi:Object.assign({},options.rect),capturedAt:Date.now(),bytesLength:bytes.length,region:region};
+ }
+ async function loadDynamicAsset(name){
+  if(!nativeMode)throw fail('动态识图需在眼镜上运行');if(!/^[a-z0-9-]+\.jpg$/.test(name||''))throw fail('测试图像名称无效');
+  var file=await getFile('assets/symptoms/'+name),buffer=await W.Storage.FileIO.readBufferAsync(file),bytes=bufferBytes(buffer);
+  if(!bytes.length)throw fail('测试图像为空');var hash=W.Security.Cryptography.CryptographicBuffer.encodeToHexString(W.Security.Cryptography.Core.HashAlgorithmProvider.openAlgorithm('SHA256').hashData(W.Security.Cryptography.CryptographicBuffer.createFromByteArray(bytes))).toLowerCase();
+  return {bytes:bytes,hash:hash,frameId:'asset-'+id(),roi:{x:0,y:0,width:1,height:1},asset:name};
+ }
+ function dynamicAnalyze(options){
+  options=options||{};var aborted=false,current=null,timer=null;
+  var promise=(async function(){
+   if(!nativeMode)throw fail('动态识图需在眼镜上运行');var bytes=options.bytes;if(!bytes||typeof bytes.length!=='number'||!bytes.length)throw fail('动态帧为空');if(!/^[a-f0-9]{64}$/.test(options.hash||'')||!/^[A-Za-z0-9._-]{1,80}$/.test(options.frameId||''))throw fail('动态帧编号无效');
+   var token=await ensureService();if(aborted)throw fail('动态识图已停止');
+   for(var attempt=0;attempt<2;attempt++){
+    if(attempt)token=await access();if(aborted)throw fail('动态识图已停止');
+    var buffer=W.Security.Cryptography.CryptographicBuffer.createFromByteArray(bytes),content=new W.Web.Http.HttpBufferContent(buffer);content.headers.contentType=new W.Web.Http.Headers.HttpMediaTypeHeaderValue('image/jpeg');
+    var c=client(),message=new W.Web.Http.HttpRequestMessage(W.Web.Http.HttpMethod.post,new W.Foundation.Uri(config.apiOrigin+config.apiPrefix+'/dynamic/frame'));
+    message.headers.tryAppendWithoutValidation('Authorization','Bearer '+token);message.headers.tryAppendWithoutValidation('X-Frame-ID',options.frameId);message.headers.tryAppendWithoutValidation('X-Image-SHA256',options.hash);if(options.size)message.headers.tryAppendWithoutValidation('X-Dynamic-Size',String(options.size));message.content=content;
+    current=c.sendRequestAsync(message);timer=setTimeout(function(){try{if(current)current.cancel();}catch(_){}},20000);
+    try{
+     var response=await current;if(aborted)throw fail('动态识图已停止');var text=await response.content.readAsStringAsync(),value;try{value=JSON.parse(text);}catch(_){throw fail('动态识别返回无法读取');}
+     if(response.statusCode===401&&attempt===0){session=null;continue;}
+     if(response.statusCode!==200){var error=fail(value.message||(value.error||{}).message||value.detail||'动态识别暂不可用');error.status=response.statusCode;error.code=value.error||'dynamic_error';if(response.statusCode===429)error.retryAfter=1;if(response.statusCode===401)session=null;throw error;}
+     var evidence=value.capture_evidence||{};if(value.frame_id!==options.frameId||value.image_sha256!==options.hash||evidence.channel!=='hololens-app-dynamic'||evidence.frame_id!==options.frameId)throw fail('动态识别结果与画面不匹配');
+     return value;
+    }finally{clearTimeout(timer);timer=null;current=null;try{message.close();c.close();}catch(_){}}
+   }
+  })();
+  return {promise:promise,abort:function(){aborted=true;if(current)try{current.cancel();}catch(_){}}};
+ }
+ async function dynamicHealth(){
+  if(!nativeMode)throw fail('动态识图需在眼镜上运行');var c=client(),message=new W.Web.Http.HttpRequestMessage(W.Web.Http.HttpMethod.get,new W.Foundation.Uri(config.apiOrigin+config.apiPrefix+'/dynamic/health')),current=c.sendRequestAsync(message),timer=setTimeout(function(){try{current.cancel();}catch(_){}},6000);
+  try{var response=await current,text=await response.content.readAsStringAsync(),value;try{value=JSON.parse(text);}catch(_){throw fail('动态识别服务响应异常');}if(response.statusCode!==200)throw fail('动态识别服务暂不可用');return value;}finally{clearTimeout(timer);try{message.close();c.close();}catch(_){}}
+ }
  function getLocation(){
   if(lastPosition&&Date.now()-lastPosition.acquiredAt<15000)return Promise.resolve(lastPosition);
   if(locationWork)return locationWork;
@@ -214,6 +260,7 @@
  async function saveReport(value){if(!nativeMode){var f=files[value],a=document.createElement('a');a.href=f.url;a.download='稻视界报告-'+Date.now()+'.png';a.click();return;}var file=await getFile(value),folder=await W.Storage.KnownFolders.picturesLibrary.createFolderAsync('稻视界报告',W.Storage.CreationCollisionOption.openIfExists);await file.copyAsync(folder,'稻视界报告-'+Date.now()+'.png',W.Storage.NameCollisionOption.generateUniqueName);await log('report_exported',{});}
  root.RiceNative={init:init,id:id,log:log,event:event,pair:pair,pairFromDeployment:pairFromDeployment,ensureService:ensureService,isPaired:function(){return !!device;},version:function(){return config?config.version:'1.0.0.0';},nativeMode:nativeMode,userPath:base,chooseImages:chooseImages,startCamera:startCamera,stopCamera:stopCamera,capturePhoto:capturePhoto,captureOptimizedPhoto:captureOptimizedPhoto,cameraCapabilities:cameraCapabilities,resumeCamera:function(){return Promise.resolve(document.getElementById('camera-video').play());},captureSystemPhoto:captureSystemPhoto,networkState:networkState,onNetworkChange:onNetworkChange,readFile:readFile,writeFile:writeFile,copyFile:copyFile,unlink:unlink,fileSystem:fileSystem,upload:upload,getLocation:getLocation,locationPermission:locationPermission,openSettings:openSettings,saveReport:saveReport,
   diagnosticsEnabled:function(){return !!diagnosticSession;},readCameraCheck:readCameraCheck,diagnoseCamera:diagnoseCamera,tunePreview:tunePreview,
+  dynamicSettings:dynamicSettings,captureDynamicFrame:captureDynamicFrame,loadDynamicAsset:loadDynamicAsset,dynamicAnalyze:dynamicAnalyze,dynamicHealth:dynamicHealth,
   imageUrl:function(value){if(value.indexOf('/assets/')===0)return value.slice(1);if(!nativeMode&&files[value])return files[value].url;return value;},
   writeBlob:async function(blob,name){var bytes=await new Promise(function(resolve,reject){var reader=new FileReader();reader.onload=function(){resolve(reader.result);};reader.onerror=function(){reject(fail('无法读取图片'));};reader.readAsArrayBuffer(blob);}),p=base+'/'+name;await writeFile(p,bytes);return p;},
   waitForFileWrites:function(){return fileQueue;},pendingCapture:pendingCapture

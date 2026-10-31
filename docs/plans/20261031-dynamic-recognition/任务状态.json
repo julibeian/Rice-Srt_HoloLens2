@@ -1,0 +1,162 @@
+{
+  "schema": 1,
+  "plan": "20261031-dynamic-recognition",
+  "objective": "部署阿里云端动态模型权重，开发眼镜动态识图软件，打通两端链路，测试并优化",
+  "updated_at": "2026-10-31T19:00:00+08:00",
+  "current_checkpoint": "云端动态服务、网关与眼镜动态模式已实现并完成真机闭环；直连 HTTPS 被当前 NJAU 网络阻断，真机经 PC USB 中继验证",
+  "tasks": [
+    {
+      "id": "D01",
+      "title": "实现阿里云动态帧推理模块",
+      "status": "completed",
+      "artifacts": ["apps/field-app/server/dynamic.py", "apps/field-app/server/cam.py"],
+      "acceptance": ["A-D01", "A-D02"],
+      "notes": "复用 app_v2 已加载权重；默认 160 输入；CAM 与预测共用一次前向；帧号幂等；无图像留存"
+    },
+    {
+      "id": "D02",
+      "title": "部署动态模型清单与云端服务",
+      "status": "completed",
+      "artifacts": ["apps/field-app/server/deploy.sh", "apps/field-app/server/patch_dynamic.py", "/opt/rice_disease/configs/dynamic-model.json"],
+      "acceptance": ["A-D01", "A-D07"],
+      "notes": "清单 v2-1ae2e8678431；权重 SHA256 1ae2e867…；类别哈希 be2689d4…；发布 20261031T102752Z-660375"
+    },
+    {
+      "id": "D03",
+      "title": "扩展网关动态帧通道",
+      "status": "completed",
+      "artifacts": ["apps/field-app/server/server.py"],
+      "acceptance": ["A-D03"],
+      "notes": "设备鉴权、1.5 MB 上限、帧号与哈希绑定、单飞、429/504 映射、指标；网关版本 1.1.0"
+    },
+    {
+      "id": "D04",
+      "title": "实现眼镜动态识图模式",
+      "status": "completed",
+      "artifacts": ["apps/field-app/src/dynamic.js", "apps/field-app/src/native.js", "apps/field-app/src/app.js", "apps/field-app/src/index.html", "apps/field-app/src/shell.css"],
+      "acceptance": ["A-D04"],
+      "notes": "连续取帧、节流、平滑、HUD 与关注区域叠加、停止恢复、诊断动作；静态模式不变"
+    },
+    {
+      "id": "D05",
+      "title": "补充云端、网关与前端测试",
+      "status": "completed",
+      "artifacts": ["apps/field-app/tests/"],
+      "acceptance": ["A-D01", "A-D03", "A-D04", "A-D06"],
+      "notes": "Node 56 项、Python 21 项通过；含动态逻辑、原生上传、网关、CAM、USB 中继"
+    },
+    {
+      "id": "D06",
+      "title": "构建并部署眼镜应用",
+      "status": "completed",
+      "artifacts": ["apps/field-app/.state/packages/20261031-184914-1.0.0.28"],
+      "acceptance": ["A-D04", "A-D06"],
+      "notes": "1.0.0.23 直连构建；1.0.0.25–1.0.0.28 为 USB 中继诊断构建；当前安装 1.0.0.28"
+    },
+    {
+      "id": "D07",
+      "title": "真机动态识图与链路验收",
+      "status": "in_progress",
+      "artifacts": ["reports/20261031-dynamic-recognition/"],
+      "acceptance": ["A-D04", "A-D05", "A-D09"],
+      "notes": "经 USB 中继连续约 2 分钟、约 40 次动态请求；内置症状图阳性 93.27%；静态回归通过；直连 HTTPS 仍被网络阻断"
+    },
+    {
+      "id": "D08",
+      "title": "性能优化与复现记录",
+      "status": "in_progress",
+      "artifacts": ["reports/20261031-dynamic-recognition/input-size-benchmark.json"],
+      "acceptance": ["A-D05", "A-D10"],
+      "notes": "默认 160 输入；CAM 阈值与透明度调优；长稳、断网、真实叶片仍待做"
+    }
+  ],
+  "acceptance_cases": [
+    {
+      "id": "A-D01",
+      "condition": "云端 /dynamic/health 返回模型版本、权重 SHA256、类别、输入尺寸；错误密钥被拒绝",
+      "status": "passed",
+      "evidence": ["reports/20261031-dynamic-recognition/cloud-dynamic-health.json", "reports/20261031-dynamic-recognition/cloud-manifest.json"]
+    },
+    {
+      "id": "A-D02",
+      "condition": "动态帧返回类别/置信度/top3/CAM/耗时；静态 /predict 回归不变",
+      "status": "passed",
+      "evidence": ["reports/20261031-dynamic-recognition/cloud-dynamic-frame-smoke.json"]
+    },
+    {
+      "id": "A-D03",
+      "condition": "网关动态帧需设备会话；哈希/帧号不符被拒绝；同帧重试幂等；并发 429",
+      "status": "passed",
+      "evidence": ["reports/20261031-dynamic-recognition/cloud-python-tests.txt"]
+    },
+    {
+      "id": "A-D04",
+      "condition": "真机连续 ≥20 帧显示动态结果和标注，停止后恢复静态按钮",
+      "status": "passed",
+      "evidence": ["reports/20261031-dynamic-recognition/device-1.0.0.25-dynamic-app-state.json", "reports/20261031-dynamic-recognition/screenshots/dynamic-invalid-20261031-184600.png"],
+      "notes": "经 USB 中继路径通过；直连路径见 A-D09，未通"
+    },
+    {
+      "id": "A-D05",
+      "condition": "记录端到端延迟、分析帧率、连续运行稳定性和优化前后对比",
+      "status": "passed",
+      "evidence": ["reports/20261031-dynamic-recognition/cloud-dynamic-frame-smoke.json", "reports/20261031-dynamic-recognition/input-size-benchmark.json"],
+      "notes": "真机端到端 1.05–1.25 s，请求间隔约 2–3 s；长稳和 2 小时未做"
+    },
+    {
+      "id": "A-D06",
+      "condition": "静态拍照、上传、结果和历史在动态版本上回归通过",
+      "status": "passed",
+      "evidence": ["reports/20261031-dynamic-recognition/device-1.0.0.28-app-state.json"]
+    },
+    {
+      "id": "A-D07",
+      "condition": "云端部署带权重哈希校验、健康检查和失败回滚证据",
+      "status": "passed",
+      "evidence": ["reports/20261031-dynamic-recognition/cloud-manifest.json", "reports/20261031-dynamic-recognition/cloud-dynamic-health.json"],
+      "notes": "备份 /var/lib/rice-hololens-app/backups/20261031T102752Z-660375；未实际触发回滚"
+    },
+    {
+      "id": "A-D08",
+      "condition": "断网、401、429、504 时动态模式退避并自动恢复，不伪造结果",
+      "status": "not_run",
+      "evidence": [],
+      "notes": "单元层有 401/429/504 映射；真机断网重连未做"
+    },
+    {
+      "id": "A-D09",
+      "condition": "眼镜直接 HTTPS 到阿里云（不经 PC 中继）",
+      "status": "not_run",
+      "evidence": ["reports/20261031-dynamic-recognition/README.md"],
+      "notes": "当前 NJAU Wi-Fi 对 rice-srt.cn、baidu、aliyun、microsoft 的 443 均超时；HTTP 80 可达；失败历史保留，不标记通过"
+    },
+    {
+      "id": "A-D10",
+      "condition": "30 分钟以上动态运行、断网恢复、跨休眠与真实叶片/多光照",
+      "status": "not_run",
+      "evidence": []
+    }
+  ],
+  "change_log": [
+    {
+      "at": "2026-10-31T18:10:00+08:00",
+      "change": "建立动态识图阶段入口与任务状态；记录 160/192/224/128 输入尺寸的云端实测延迟和 18 张照片一致性；未修改生产服务或眼镜应用。"
+    },
+    {
+      "at": "2026-10-31T18:28:00+08:00",
+      "change": "阿里云部署动态模块与模型清单 v2-1ae2e8678431，网关升级 1.1.0；HTTPS 动态健康通过；静态接口回归通过。"
+    },
+    {
+      "at": "2026-10-31T18:43:00+08:00",
+      "change": "眼镜 1.0.0.25 真机动态模式经 USB 中继运行，连续约 2 分钟、约 40 次动态请求，RTT 1.0–1.25 s；相机对房间时均为‘其他’，无伪造结果。"
+    },
+    {
+      "at": "2026-10-31T18:50:00+08:00",
+      "change": "眼镜 1.0.0.28 内置症状图经真实云端动态端点识别为霜霉病 93.27%，HUD 显示类别/置信度/延迟/模型版本；静态拍照 315,202 字节回归通过。"
+    },
+    {
+      "at": "2026-10-31T19:00:00+08:00",
+      "change": "记录直连 HTTPS 443 在该校园 Wi-Fi 全部超时、HTTP 80 可达；USB 中继仅作为开发闭环，直连验收保持 not_run。"
+    }
+  ]
+}

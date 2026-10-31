@@ -7,5 +7,5 @@
  <Applications><Application Id="Field" StartPage="index.html"><uap:VisualElements DisplayName="稻视界" Description="水稻叶片拍照识别、诊断报告与田块记录" Square150x150Logo="AppAssets\Logo150.png" Square44x44Logo="AppAssets\Logo44.png" BackgroundColor="#176B3A" />
  <Extensions><uap:Extension Category="windows.protocol"><uap:Protocol Name="rice-hololens-field"><uap:DisplayName>稻视界</uap:DisplayName></uap:Protocol></uap:Extension></Extensions>
  </Application></Applications>
- <Capabilities><Capability Name="internetClient" /><uap:Capability Name="picturesLibrary" /><DeviceCapability Name="webcam" /><DeviceCapability Name="location" /></Capabilities>
+ <Capabilities><Capability Name="internetClient" /><uap:Capability Name="picturesLibrary" /><DeviceCapability Name="webcam" /><DeviceCapability Name="location" /><DeviceCapability Name="privateNetworkClientServer" /></Capabilities>
 </Package>

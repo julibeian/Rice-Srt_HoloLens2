@@ -14,7 +14,7 @@ async function start(options={}){
  w.fetch=async url=>{if(String(url)==='config.json')return {json:async()=>JSON.parse(fs.readFileSync(path.join(root,'config.json')))};throw new Error('Unexpected test network: '+url);};
  w.URL.createObjectURL=()=> 'blob:test-image';w.URL.revokeObjectURL=()=>{};
  w.HTMLMediaElement.prototype.pause=function(){};w.HTMLMediaElement.prototype.load=function(){};
- for(const file of ['boot.js','capture-quality.js','camera-controls.js','native.js','bridge.js','miniapp.js'])w.eval(fs.readFileSync(path.join(root,file),'utf8')+'\n//# sourceURL='+file);
+ for(const file of ['boot.js','capture-quality.js','camera-controls.js','dynamic.js','native.js','bridge.js','miniapp.js'])w.eval(fs.readFileSync(path.join(root,file),'utf8')+'\n//# sourceURL='+file);
  const p='ms-appdata:///local/capture_ui.jpg';await w.RiceNative.writeFile(p,'/9j/dGVzdA==','base64');
  w.RiceNative.startCamera=async()=>{counts.started++;};w.RiceNative.stopCamera=async()=>{};w.RiceNative.resumeCamera=async()=>{};
  w.RiceNative.captureOptimizedPhoto=async(rect,progress)=>{counts.captured++;if(options.capture)return options.capture(rect,progress,w);return {path:p,selectedAt:Date.now()};};
@@ -89,6 +89,22 @@ test('restart restores the pending photo without opening camera again or assigni
 test('a failed upload resumes itself after a network-restored event',async()=>{
  let online,attempt=0;const s=await start({upload:()=>{if(attempt++===0)throw new Error('The server name or address could not be resolved');return {statusCode:200,data:JSON.stringify({predicted_class:'健康水稻',confidence:.96,is_valid:true})};},before:w=>{w.RiceNative.onNetworkChange=fn=>{online=fn;};w.RiceNative.networkState=()=> 'internet';}});try{
   click(s.w,'camera-shutter');await until(()=>s.counts.uploads===1&&!s.w.RiceApp.state.busy);assert.match(s.w.document.getElementById('result-message').textContent,/Wi-Fi/);online();await until(()=>s.counts.uploads===2&&!s.w.RiceApp.state.busy);assert.equal(s.counts.captured,1);assert.equal(s.w.RiceApp.state.result.displayStatus,'healthy');
+ }finally{s.close();}
+});
+
+test('dynamic mode starts, shows a stable label and returns to the static camera',async()=>{
+ let frames=0;
+ const s=await start({before:w=>{
+  w.RiceNative.nativeMode=true;
+  w.RiceNative.dynamicHealth=async()=>({status:'ok',upstream:{model:{loaded:true,version:'v2-test',input_size:160}}});
+  w.RiceNative.dynamicSettings=()=>({frameSize:384,inputSize:160,quality:.72,minIntervalMs:10});
+  w.RiceNative.captureDynamicFrame=async()=>{frames++;return {bytes:new Uint8Array([1]),hash:'a'.repeat(64),frameId:'dyn-'+frames,roi:{x:.25,y:.2,width:.5,height:.5}};};
+  w.RiceNative.dynamicAnalyze=()=>({promise:Promise.resolve({predicted_class:'稻瘟病',confidence:.9,is_valid:true,message:'检测成功',model:{version:'v2-test',input_size:160},timing:{inference_ms:50},annotation:{kind:'cam',grid:{width:5,height:5,values:[[1,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]},box:[0,0,.2,.2],peak:[.1,.1]}}),abort:()=>{}});
+ }});
+ try{
+  click(s.w,'dynamic-toggle');await until(()=>s.w.RiceApp.state.dynamic.active);await until(()=>s.w.document.getElementById('dynamic-label').textContent==='稻瘟病');
+  assert.equal(s.w.document.getElementById('dynamic-hud').hidden,false);assert.match(s.w.document.getElementById('dynamic-meta').textContent,/v2-test/);assert.equal(s.w.document.getElementById('dynamic-hud').getAttribute('data-status'),'stable');
+  click(s.w,'dynamic-toggle');await until(()=>!s.w.RiceApp.state.dynamic.active);assert.equal(s.w.document.getElementById('dynamic-hud').hidden,true);assert.equal(s.w.document.getElementById('camera-shutter').disabled,false);assert.ok(frames>=2);
  }finally{s.close();}
 });
 

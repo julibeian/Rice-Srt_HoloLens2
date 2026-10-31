@@ -1,4 +1,4 @@
-param([ValidatePattern('^\d+\.\d+\.\d+\.\d+$')][string]$Version='1.0.0.0',[switch]$CameraDiagnostics)
+param([ValidatePattern('^\d+\.\d+\.\d+\.\d+$')][string]$Version='1.0.0.0',[switch]$CameraDiagnostics,[string]$ApiOrigin)
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot
 $folder=Join-Path $root ('.state\packages\'+[DateTime]::Now.ToString('yyyyMMdd-HHmmss')+'-'+$Version)
@@ -10,7 +10,7 @@ $manifest=$manifest.Replace('Version="1.0.0.0"',('Version="'+$Version+'"'))
 $utf8=[Text.UTF8Encoding]::new($false)
 $entryHtml=Get-Content -LiteralPath (Join-Path $layout 'index.html') -Raw -Encoding utf8
 $scriptFiles=@()
-foreach($scriptName in @('boot.js','vendor/leaflet/leaflet.js','capture-quality.js','camera-controls.js','native.js','bridge.js','miniapp.js','app.js')){
+foreach($scriptName in @('boot.js','vendor/leaflet/leaflet.js','capture-quality.js','camera-controls.js','dynamic.js','native.js','bridge.js','miniapp.js','app.js')){
  $original=Join-Path $layout $scriptName
  $scriptHash=(Get-FileHash -LiteralPath $original).Hash
  $parent=[IO.Path]::GetDirectoryName($scriptName).Replace('\','/')
@@ -26,6 +26,11 @@ $manifest=$manifest.Replace('StartPage="index.html"',('StartPage="'+$entryPage+'
 [IO.File]::WriteAllText((Join-Path $layout 'AppxManifest.xml'),$manifest,$utf8)
 $config=Get-Content -LiteralPath (Join-Path $layout 'config.json') -Raw|ConvertFrom-Json
 $config.version=$Version
+if($ApiOrigin){
+ $uri=$null
+ if(-not [Uri]::TryCreate($ApiOrigin,[UriKind]::Absolute,[ref]$uri) -or $uri.Scheme -notin @('http','https')){throw 'ApiOrigin must be an absolute HTTP(S) origin.'}
+ $config.apiOrigin=$ApiOrigin.TrimEnd('/')
+}
 $config|Add-Member -NotePropertyName cameraDiagnostics -NotePropertyValue ([bool]$CameraDiagnostics) -Force
 [IO.File]::WriteAllText((Join-Path $layout 'config.json'),($config|ConvertTo-Json),$utf8)
 Add-Type -AssemblyName System.Drawing
@@ -41,7 +46,7 @@ try{
 $package=Join-Path $folder ('Rice.HoloLens.Field_'+$Version+'_neutral.appx')
 & 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\x64\makeappx.exe' pack /d $layout /p $package /l *> (Join-Path $folder 'makeappx.log')
 if($LASTEXITCODE -ne 0){Get-Content -LiteralPath (Join-Path $folder 'makeappx.log') -Tail 25;throw 'Appx validation or packaging failed.'}
-$proof=[ordered]@{Version=$Version;Package=$package;Layout=$layout;EntryPage=$entryPage;ScriptFiles=$scriptFiles;Sha256=(Get-FileHash -LiteralPath $package).Hash;Identity='Rice.HoloLens.Field_r5420n6798s24!Field';IncludesDeviceKey=$false;IncludesCampusCredentials=$false;BuiltAt=[DateTimeOffset]::Now.ToString('o')}
+$proof=[ordered]@{Version=$Version;Package=$package;Layout=$layout;EntryPage=$entryPage;ScriptFiles=$scriptFiles;Sha256=(Get-FileHash -LiteralPath $package).Hash;Identity='Rice.HoloLens.Field_r5420n6798s24!Field';ApiOrigin=$config.apiOrigin;IncludesDeviceKey=$false;IncludesCampusCredentials=$false;BuiltAt=[DateTimeOffset]::Now.ToString('o')}
 [IO.File]::WriteAllText((Join-Path $folder 'package-evidence.json'),($proof|ConvertTo-Json),$utf8)
 [IO.File]::WriteAllText((Join-Path $root '.state\current-package.txt'),$folder,$utf8)
 $proof|ConvertTo-Json -Compress

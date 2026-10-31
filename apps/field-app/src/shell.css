@@ -24,3 +24,22 @@
 .camera-full .menu-toggle{top:12px;left:12px;min-width:96px;min-height:56px;font-size:23px}.camera-full .camera-message{left:122px;right:12px;top:12px;font-size:20px;padding:8px;z-index:5}.camera-full .shutter{min-width:180px;min-height:76px;bottom:12px;font-size:28px;z-index:6}.camera-full .album-button{left:12px;bottom:18px;min-width:108px;min-height:64px;font-size:21px;z-index:6}.region-size,.camera-cancel{right:12px;bottom:18px;min-height:64px;min-width:128px;font-size:21px;z-index:6}.camera-retry{z-index:8}.camera-full .camera-cancel{background:#6b3b28}.camera-full .camera-message:empty{display:none}
 @media(max-width:540px){.camera-full .camera-message{left:116px;font-size:17px}.camera-full .shutter{min-width:156px;font-size:25px}.region-size,.camera-cancel{min-width:108px;font-size:18px}.camera-full .album-button{min-width:96px;font-size:18px}}
 @media(max-height:390px){.camera-full .camera-message{font-size:17px}.camera-full .shutter{min-height:64px;bottom:10px}.region-size,.camera-cancel,.camera-full .album-button{min-height:56px;bottom:14px}.camera-target span{font-size:14px}}
+/* Dynamic recognition: overlay canvas, HUD and toggle stay above the preview. */
+.dynamic-overlay{position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;pointer-events:none;z-index:3}
+.dynamic-hud{position:absolute;z-index:7;left:50%;top:14px;bottom:auto;transform:translateX(-50%);width:min(640px,86%);display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;background:rgba(8,28,16,.9);border:2px solid #b2e7bd;border-radius:12px;padding:10px 16px;pointer-events:none;text-shadow:0 1px 3px #000}
+.dynamic-hud>span{display:block}
+#dynamic-label{font-size:30px;font-weight:700;color:#eaffea;line-height:1.25}
+#dynamic-confidence{font-size:24px;color:#b2e7bd}
+#dynamic-meta{flex-basis:100%;font-size:15px;color:#cfe4d4;line-height:1.35}
+#dynamic-hint{flex-basis:100%;font-size:17px;color:#d8e9dc;line-height:1.35}
+.dynamic-hud[data-status=uncertain]{border-color:#f0c674}
+.dynamic-hud[data-status=invalid],.dynamic-hud[data-status=error]{border-color:#e07a5f}
+.dynamic-hud[data-status=stale]{opacity:.82}
+.dynamic-toggle{right:12px;bottom:100px;min-width:132px;min-height:60px;font-size:21px;z-index:9;background:rgba(28,78,48,.94);border-color:#b2e7bd}
+.dynamic-active .shutter,.dynamic-active .album-button,.dynamic-active .region-size{display:none!important}
+.dynamic-active .camera-message{display:none}
+.camera-full .dynamic-hud{top:88px;bottom:auto;width:min(720px,72%)}
+.camera-full #dynamic-label{font-size:36px}.camera-full #dynamic-confidence{font-size:28px}.camera-full #dynamic-hint{font-size:19px}
+.camera-full .dynamic-toggle{bottom:112px;min-width:180px;min-height:76px;font-size:27px}
+@media(max-width:740px){.dynamic-hud{width:92%;top:10px}.dynamic-toggle{right:10px;bottom:90px;min-width:114px;min-height:54px;font-size:18px}.camera-full .dynamic-hud{width:88%;top:80px}.camera-full .dynamic-toggle{bottom:102px;min-width:140px;min-height:64px;font-size:22px}#dynamic-label{font-size:25px}.camera-full #dynamic-label{font-size:29px}}
+@media(max-height:390px){.dynamic-hud{top:8px;padding:7px 12px}.camera-full .dynamic-hud{top:72px}.dynamic-toggle{bottom:84px;min-height:50px;font-size:17px}.camera-full .dynamic-toggle{bottom:94px;min-height:58px;font-size:20px}#dynamic-label{font-size:24px}.camera-full #dynamic-label{font-size:27px}#dynamic-meta{font-size:13px}#dynamic-hint{font-size:15px}.camera-full #dynamic-hint{font-size:16px}}

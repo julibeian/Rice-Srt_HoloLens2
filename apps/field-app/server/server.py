@@ -23,11 +23,16 @@ from email.parser import BytesParser
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlsplit
+from collections import deque
 
 PREFIX='/hololens-app/api'
-VERSION='1.0.0'
+VERSION='1.1.0'
 MAX_UPLOAD=8*1024*1024
+DYNAMIC_MAX=1536*1024
+DYNAMIC_CHANNEL='hololens-app-dynamic'
+DYNAMIC_TYPES=('image/jpeg','image/png','image/webp')
 ID=re.compile(r'^[A-Za-z0-9._-]{1,80}$')
+HEX64=re.compile(r'^[a-f0-9]{64}$')
 
 def now():return dt.datetime.now(dt.timezone.utc).isoformat()
 def digest(text):return hashlib.sha256(text.encode('utf-8')).hexdigest()
@@ -68,6 +73,9 @@ class Store:
         self.upstream_host=target.hostname;self.upstream_port=target.port or 80
         self.upstream_key=upstream_key or secrets.token_urlsafe(48)
         self.attempts={}
+        self.dynamic_lock=threading.Lock();self.dynamic_inflight=False
+        self.dynamic_attempts={};self.dynamic_stats=deque(maxlen=200)
+        self.dynamic_model=None;self.dynamic_model_at=0.0;self.dynamic_error=None;self.dynamic_last=None
     def save(self):atomic(self.path,self.data)
     def issue_pair(self):
         code=''.join(secrets.choice('0123456789') for _ in range(8));expires=time.time()+900
@@ -161,6 +169,74 @@ class Store:
                 self.save()
             return result
         finally:self.inference.release()
+    def _refresh_dynamic_model(self,force=False):
+        stamp=time.monotonic()
+        if not force and self.dynamic_model and stamp-self.dynamic_model_at<60:return
+        connection=None
+        try:
+            connection=http.client.HTTPConnection(self.upstream_host,self.upstream_port,timeout=5)
+            connection.request('GET','/dynamic/health')
+            response=connection.getresponse();payload=response.read(65537)
+            if response.status==200 and len(payload)<=65536:
+                value=json.loads(payload)
+                if isinstance(value,dict) and isinstance(value.get('model'),dict):self.dynamic_model=value['model'];self.dynamic_model_at=stamp;self.dynamic_error=None
+        except (OSError,TimeoutError,http.client.HTTPException,ValueError,UnicodeError):self.dynamic_error='unreachable'
+        finally:
+            if connection:connection.close()
+    def dynamic_health(self):
+        self._refresh_dynamic_model()
+        with self.dynamic_lock:inflight=self.dynamic_inflight
+        with self.dynamic_lock:rows=list(self.dynamic_stats)
+        times=sorted(row['total_ms'] for row in rows if isinstance(row.get('total_ms'),(int,float)))
+        def percentile(fraction):
+            if not times:return None
+            return round(times[min(len(times)-1,max(0,int(round((len(times)-1)*fraction))))],2)
+        return {'status':'ok' if self.dynamic_model else 'upstream_unavailable','gateway_version':VERSION,'dynamic':True,'upstream':{'model':self.dynamic_model,'error':self.dynamic_error},'inflight':inflight,'samples':len(rows),'latency_ms':{'p50':percentile(.5),'p95':percentile(.95),'last':rows[-1].get('total_ms') if rows else None},'last':rows[-1] if rows else None,'frames_stored':False,'server_time':now()}
+    def dynamic_frame(self,device,frame_id,image_hash,body,content_type,size=''):
+        if not ID.fullmatch(frame_id) or not HEX64.fullmatch(image_hash):raise Error(422,'invalid_frame_id','动态帧编号或哈希无效')
+        content_type=(content_type or '').split(';')[0].strip().lower()
+        if content_type not in DYNAMIC_TYPES:raise Error(415,'frame_format','动态帧必须是 JPEG、PNG 或 WebP')
+        if len(body)>DYNAMIC_MAX:raise Error(413,'frame_too_large','动态帧过大')
+        if not hmac.compare_digest(hashlib.sha256(body).hexdigest(),image_hash):raise Error(422,'frame_hash','动态帧校验失败')
+        stamp=time.time()
+        with self.dynamic_lock:
+            attempts=[t for t in self.dynamic_attempts.get(device,[]) if stamp-t<5]
+            if len(attempts)>=12:raise Error(429,'frame_rate','动态帧发送过快，请稍后重试')
+            attempts.append(stamp);self.dynamic_attempts[device]=attempts
+            if len(self.dynamic_attempts)>256:self.dynamic_attempts.clear()
+            if self.dynamic_inflight:raise Error(429,'dynamic_busy','动态识别正在处理上一帧，请稍后重试')
+            self.dynamic_inflight=True
+        received=now();started=time.monotonic();connection=None
+        try:
+            connection=http.client.HTTPConnection(self.upstream_host,self.upstream_port,timeout=20)
+            headers={'Content-Type':content_type,'Content-Length':str(len(body)),'X-Rice-Channel-Key':self.upstream_key,'X-Frame-ID':frame_id,'X-Image-SHA256':image_hash}
+            if size:headers['X-Dynamic-Size']=str(size)
+            connection.request('POST','/dynamic/analyze',body=body,headers=headers)
+            response=connection.getresponse();payload=response.read(262145)
+            if response.status==429:raise Error(429,'dynamic_busy','动态识别正在处理上一帧，请稍后重试')
+            if response.status in (401,403):raise Error(502,'upstream_auth','动态识别服务鉴权失败')
+            if response.status==504:raise Error(504,'upstream_timeout','动态识别超时，请稍后重试')
+            if 400<=response.status<500:
+                detail='动态识别服务拒绝了画面'
+                try:
+                    rejected=json.loads(payload)
+                    if isinstance(rejected,dict) and isinstance(rejected.get('detail'),str):detail=rejected['detail'][:120]
+                except (ValueError,UnicodeError):pass
+                raise Error(response.status if response.status in (409,413,415,422) else 422,'frame_rejected',detail)
+            if response.status!=200 or len(payload)>262144:raise Error(502,'upstream_failed','动态识别服务暂时无法处理画面')
+            try:result=json.loads(payload)
+            except (ValueError,UnicodeError):raise Error(502,'upstream_response','动态识别服务返回格式异常') from None
+            if (not isinstance(result,dict) or not isinstance(result.get('predicted_class'),str) or type(result.get('is_valid')) is not bool or type(result.get('confidence')) not in (int,float) or not math.isfinite(result['confidence']) or not 0<=result['confidence']<=1 or result.get('frame_id')!=frame_id or result.get('image_sha256')!=image_hash or not isinstance(result.get('model'),dict) or not isinstance(result.get('timing'),dict) or not (result.get('annotation') is None or isinstance(result.get('annotation'),dict))):raise Error(502,'upstream_response','动态识别服务返回格式异常')
+            elapsed=round((time.monotonic()-started)*1000,2);model=result['model']
+            result['capture_evidence']={'channel':DYNAMIC_CHANNEL,'device_id':device,'frame_id':frame_id,'image_sha256':image_hash,'model_version':model.get('version'),'input_size':model.get('input_size'),'received_at':received,'completed_at':now(),'upstream_elapsed_ms':elapsed}
+            result['link']={'gateway':'rice-hololens-app','upstream':'rice-disease','upstream_elapsed_ms':elapsed}
+            with self.dynamic_lock:self.dynamic_stats.append({'at':now(),'total_ms':elapsed,'inference_ms':result['timing'].get('inference_ms'),'cache':result.get('cache'),'model':model.get('version')})
+            return result
+        except Error:raise
+        except (OSError,TimeoutError,http.client.HTTPException):raise Error(504,'upstream_timeout','动态识别超时，请稍后重试') from None
+        finally:
+            if connection:connection.close()
+            with self.dynamic_lock:self.dynamic_inflight=False
 
 class Server(ThreadingHTTPServer):
     daemon_threads=True
@@ -194,6 +270,7 @@ class Handler(BaseHTTPRequestHandler):
         path=urlsplit(self.path).path
         try:
             if path==PREFIX+'/health':self.send(200,{'status':'ok','channel':'hololens-app','version':VERSION});return
+            if path==PREFIX+'/dynamic/health':self.send(200,self.server.store.dynamic_health());return
             if path==PREFIX+'/diagnostics':
                 device=self.server.store.authenticate(self.headers.get('Authorization',''))
                 with self.server.store.lock:rows=[x for x in self.server.store.data['events'] if x['device_id']==device]
@@ -206,6 +283,8 @@ class Handler(BaseHTTPRequestHandler):
             if path==PREFIX+'/register':self.send(200,store.register(self.json_body(),self.headers.get('X-Real-IP',self.client_address[0])));return
             if path==PREFIX+'/session':self.send(200,store.session(self.json_body()));return
             device=store.authenticate(self.headers.get('Authorization',''))
+            if path==PREFIX+'/dynamic/frame':
+                result=store.dynamic_frame(device,self.headers.get('X-Frame-ID') or '',(self.headers.get('X-Image-SHA256') or '').lower(),self.read(DYNAMIC_MAX),self.headers.get('Content-Type',''),self.headers.get('X-Dynamic-Size',''));self.send(200,result);return
             if path==PREFIX+'/events':
                 value=self.json_body();store.record(device,value.get('event'),value.get('details',{}));self.send(200,{'ok':True});return
             if path==PREFIX+'/predict':
