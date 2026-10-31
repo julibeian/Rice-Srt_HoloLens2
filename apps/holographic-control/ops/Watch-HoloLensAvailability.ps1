@@ -12,7 +12,7 @@ param(
 # bridge (the only observed non-destructive wake trigger) and verifies a
 # decodable frame before recording success. Attempts are rate limited.
 $ErrorActionPreference='Stop'
-$root=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
+$root=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..'))
 . (Join-Path $PSScriptRoot 'Holographic.Common.ps1')
 $stateDir=Join-Path $script:HolographicRoot '.state\supervisor'
 [IO.Directory]::CreateDirectory($stateDir)|Out-Null

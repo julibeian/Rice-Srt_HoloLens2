@@ -8,7 +8,7 @@ param(
     [ValidateSet('PowerShell','Native')][string]$Reader='PowerShell'
 )
 $ErrorActionPreference='Stop';$ProgressPreference='SilentlyContinue'
-$workspace=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
+$workspace=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..'))
 . (Join-Path $workspace 'apps/holographic-control/ops/Holographic.Common.ps1')
 $folder=Join-Path $workspace ('reports/phase2-full-control/'+$RunId)
 $resultPath=Join-Path $folder 'result.json'

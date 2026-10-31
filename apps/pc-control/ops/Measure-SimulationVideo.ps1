@@ -4,7 +4,7 @@ param(
  [ValidateRange(2,10)][int]$Seconds=5
 )
 $ErrorActionPreference='Stop'
-$workspace=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
+$workspace=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..'))
 $folder=Join-Path $workspace ('reports/phase2-full-control/'+$RunId)
 $resultPath=Join-Path $folder 'result.json'
 if(Test-Path -LiteralPath $resultPath){Get-Content -LiteralPath $resultPath -Raw;return}

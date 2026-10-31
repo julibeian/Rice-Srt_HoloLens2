@@ -9,7 +9,7 @@ $ErrorActionPreference='Stop'
 # This also keeps Chinese evidence paths intact in the desktop session log.
 [Console]::OutputEncoding=[Text.UTF8Encoding]::new($false)
 $OutputEncoding=[Text.UTF8Encoding]::new($false)
-$workspace=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
+$workspace=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..'))
 switch($Operation){
     'BridgeStatus' { & (Join-Path $workspace 'usb-terminal/Connect-HoloLens.ps1') -Command status }
     'Portal' { & (Join-Path $workspace 'apps/holographic-control\ops\Test-Connection.ps1') }

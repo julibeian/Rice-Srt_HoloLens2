@@ -1,5 +1,5 @@
 $ErrorActionPreference='Stop'
-$workspace=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
+$workspace=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..'))
 . (Join-Path $workspace 'apps/holographic-control/ops/Holographic.Common.ps1')
 . (Join-Path $PSScriptRoot 'Video.Health.Model.ps1')
 $context=New-HoloAuthenticatedPortalContext

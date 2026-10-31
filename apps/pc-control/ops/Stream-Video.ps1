@@ -1,7 +1,7 @@
 param([ValidateSet('Interactive','Detail')][string]$VideoProfile='Interactive')
 $ErrorActionPreference='Stop'
 $ProgressPreference='SilentlyContinue'
-$workspace=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
+$workspace=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..'))
 . (Join-Path $workspace 'apps/holographic-control\ops\Holographic.Common.ps1')
 $context=$null;$response=$null;$stream=$null
 try {

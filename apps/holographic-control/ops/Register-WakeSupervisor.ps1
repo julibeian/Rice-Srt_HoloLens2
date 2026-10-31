@@ -6,7 +6,7 @@ param(
 # only restarts the local bridge and verifies a decodable frame; it never
 # changes device identity, credentials, security or audio settings.
 $ErrorActionPreference='Stop'
-$root=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
+$root=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..'))
 $taskName='HoloLensWakeSupervisor'
 $existing=Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
 if($Uninstall){

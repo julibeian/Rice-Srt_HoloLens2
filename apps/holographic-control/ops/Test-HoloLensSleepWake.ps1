@@ -12,7 +12,7 @@ param(
 # then probed directly (certificate pin + saved credential) so the observation
 # no longer depends on the bridge. The bridge is always restarted afterwards.
 $ErrorActionPreference='Stop'
-$root=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
+$root=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\..'))
 . (Join-Path $PSScriptRoot 'Holographic.Common.ps1')
 $folder=Join-Path $root ('reports\phase2-full-control\t07-sleepwake-20261029\'+$RunId)
 [IO.Directory]::CreateDirectory($folder)|Out-Null

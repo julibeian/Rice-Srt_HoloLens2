@@ -7,8 +7,8 @@ param(
 # established by the saved SSH fingerprint records plus the pinned server key;
 # no credential is sent to an unverified peer.
 $ErrorActionPreference='Stop'
-$root=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..'))
 . (Join-Path $PSScriptRoot 'Holographic.Common.ps1')
+$root=$script:HolographicWorkspace
 $config=Get-Content -LiteralPath (Join-Path $root 'config.json') -Raw -Encoding UTF8|ConvertFrom-Json
 $pin=Get-Content -LiteralPath (Join-Path $script:HolographicRoot '.state\portal-tls-pin.json') -Raw|ConvertFrom-Json
 $saved=Import-Clixml -LiteralPath (Join-Path $script:HolographicRoot '.state\portal-credential.clixml')
