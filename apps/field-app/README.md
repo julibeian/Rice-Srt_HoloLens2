@@ -1,6 +1,6 @@
 # 稻视界眼镜应用
 
-`apps/field-app` 是当前 HoloLens 独立应用，版本 **1.0.0.40 诊断/自动回退、1.0.0.41 直连生产构建 · 动态识图实验**。使用应用内原始 PV 预览完成目标选择、相机控制、高清采集、质量检查与裁剪，直接向识别网关上传并核对返回结果；新增动态模式按取景框连续取帧并叠加上云识别结果。
+`apps/field-app` 是当前 HoloLens 独立应用，版本 **1.0.0.42 诊断/自动回退、1.0.0.43 直连生产构建 · 动态识图实验**。使用应用内原始 PV 预览完成目标选择、相机控制、高清采集、质量检查与裁剪，直接向识别网关上传并核对返回结果；新增动态模式按取景框连续取帧并叠加上云识别结果。
 
 ## 使用
 
@@ -22,7 +22,7 @@ python -B -m unittest discover -s apps/field-app/tests -p 'test_*.py'
 生产构建（优先直连阿里云；`relayOrigin` 存在时直连健康探测失败自动改走 USB 中继）：
 
 ```powershell
-runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Build-App.ps1 -Version 1.0.0.41
+runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Build-App.ps1 -Version 1.0.0.43
 ```
 
 USB 中继启动与停止（仅绑定 USB 主机地址，转发 `/hololens-app/api/*` 到生产 HTTPS）：
@@ -35,7 +35,7 @@ runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Stop-UsbRelay.ps
 强制中继诊断构建（不使用自动回退，便于复现校园网络问题）：
 
 ```powershell
-runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Build-App.ps1 -Version 1.0.0.40 -CameraDiagnostics -ApiOrigin http://169.254.216.241:9021
+runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Build-App.ps1 -Version 1.0.0.42 -CameraDiagnostics -ApiOrigin http://169.254.216.241:9021
 ```
 
 诊断构建支持通过 `camera-check.json` 触发 `controls`、`capture`、`dynamic_start`、`dynamic_stop`、`dynamic_asset`；生产构建不启用该轮询。

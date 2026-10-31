@@ -112,9 +112,8 @@ test('a failed direct dynamic request retries on the relay origin with the same 
  const value=await r.N.dynamicAnalyze({bytes,hash:sha,frameId:'dyn-fallback',size:160}).promise;
  assert.equal(value.frame_id,'dyn-fallback');const frames=r.calls.filter(c=>c.endpoint==='/dynamic/frame');assert.equal(frames.length,2);assert.ok(String(frames[1].message.uri).startsWith('http://169.254.216.241:9021'));assert.equal(frames[0].message.headers.values['X-Frame-ID'],frames[1].message.headers.values['X-Frame-ID']);
 });
-test('a failed direct upload switches the cached origin for the next upload',async()=>{
+test('a failed direct upload retries the same upload on the relay origin',async()=>{
  const r=runtime({relayOrigin:'http://169.254.216.241:9021',directPredictNetworkError:true});await r.N.init();await r.N.ensureService();
- await assert.rejects(upload(r.N),e=>/could not be established/.test(e.errMsg));
  const result=await upload(r.N);assert.equal(result.statusCode,200);
- const predictions=r.calls.filter(c=>c.endpoint==='/predict');assert.equal(predictions.length,2);assert.ok(String(predictions[0].message.uri).startsWith('https://example.test'));assert.ok(String(predictions[1].message.uri).startsWith('http://169.254.216.241:9021'));
+ const predictions=r.calls.filter(c=>c.endpoint==='/predict');assert.equal(predictions.length,2);assert.ok(String(predictions[0].message.uri).startsWith('https://example.test'));assert.ok(String(predictions[1].message.uri).startsWith('http://169.254.216.241:9021'));assert.equal(predictions[0].message.headers.values['X-Request-ID'],predictions[1].message.headers.values['X-Request-ID']);
 });

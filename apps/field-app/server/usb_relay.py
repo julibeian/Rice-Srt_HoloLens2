@@ -141,6 +141,18 @@ class Handler(BaseHTTPRequestHandler):
         self.relay()
 
 
+class RelayServer(ThreadingHTTPServer):
+    daemon_threads = True
+
+    def handle_error(self, request, client_address):
+        # The app cancels in-flight frames when the user stops dynamic mode;
+        # those resets are expected and must not flood the relay log.
+        import sys
+        if isinstance(sys.exc_info()[1], (ConnectionResetError, BrokenPipeError)):
+            return
+        super().handle_error(request, client_address)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--host', default='169.254.216.241')
@@ -148,8 +160,7 @@ def main():
     parser.add_argument('--upstream', default='rice-srt.cn')
     parser.add_argument('--test-upstream-scheme', default='https', choices=('http', 'https'))
     args = parser.parse_args()
-    server = ThreadingHTTPServer((args.host, args.port), Handler)
-    server.daemon_threads = True
+    server = RelayServer((args.host, args.port), Handler)
     server.relay = Relay(args.upstream, args.test_upstream_scheme)
     print(json.dumps({'relay': 'listening', 'host': args.host, 'port': args.port,
                       'upstream': args.upstream, 'scheme': args.test_upstream_scheme}), flush=True)

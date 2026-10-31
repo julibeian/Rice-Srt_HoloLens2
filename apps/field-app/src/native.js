@@ -209,7 +209,10 @@
   try{var response=await current,text=await response.content.readAsStringAsync(),value;try{value=JSON.parse(text);}catch(_){throw fail('服务器返回了无法读取的结果');}if(response.statusCode===401&&attempt===0){session=null;continue;}if(response.statusCode!==200){var error=fail(value.message||(value.error||{}).message||'识别服务暂不可用');error.status=response.statusCode;error.code=value.error;if(response.statusCode===401)session=null;throw error;}var evidence=value.capture_evidence||{};if(evidence.request_id!==requestId||evidence.image_sha256!==hash||evidence.channel!=='hololens-app')throw fail('照片与识别结果不匹配，请重试');log('prediction_received',{request_id:requestId,image_sha256:hash,prediction_id:evidence.prediction_id,is_valid:value.is_valid,predicted_class:value.predicted_class});return {statusCode:response.statusCode,data:text};}
   finally{clearTimeout(timer);current=null;try{message.close();c.close();}catch(_){}}
   }
- })();work.then(function(result){success(options,result);},function(e){if(networkError(e)&&chosenOrigin){var other=otherOrigin(chosenOrigin);if(other)rememberOrigin(other);}log('upload_error',{message:e.message});failure(options,e);});return {abort:function(){aborted=true;if(current)try{current.cancel();}catch(_){}}};}
+ })();work.then(function(result){success(options,result);},function(e){
+  if(networkError(e)&&chosenOrigin&&!options._relayRetry){var other=otherOrigin(chosenOrigin);if(other){rememberOrigin(other);upload(Object.assign({},options,{_relayRetry:true}));return;}}
+  log('upload_error',{message:e.message});failure(options,e);
+ });return {abort:function(){aborted=true;if(current)try{current.cancel();}catch(_){}}};}
  function dynamicSettings(){var value=config||{};return {frameSize:Math.max(256,Math.min(512,Number(value.dynamicFrameSize)||384)),inputSize:[128,160,192,224].indexOf(Number(value.dynamicInputSize))>=0?Number(value.dynamicInputSize):160,quality:Math.max(.45,Math.min(.9,Number(value.dynamicJpegQuality)||.72)),gapMs:Math.max(0,Math.min(2000,Number(value.dynamicGapMs)||0))};}
  function base64Bytes(value){var binary=atob(value),bytes=new Uint8Array(binary.length);for(var i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return bytes;}
  async function captureDynamicFrame(options){

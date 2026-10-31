@@ -2,8 +2,8 @@
   "schema": 1,
   "plan": "20261031-dynamic-recognition",
   "objective": "部署阿里云端动态模型权重，开发眼镜动态识图软件，打通两端链路，测试并优化",
-  "updated_at": "2026-10-31T19:25:00+08:00",
-  "current_checkpoint": "直连 HTTPS 被校园网阻断（443 超时、80 端口 TLS 被代理拦截）；真机经 USB 中继稳定运行，动态循环优化到约 1.5 s/帧、164 帧零失败",
+  "updated_at": "2026-10-31T20:30:00+08:00",
+  "current_checkpoint": "30 分钟长稳 1615 帧零失败；自动直连/中继回退与上传自动重试已真机验证；跨休眠唤醒未通过；直连 HTTPS 仍被校园网阻断",
   "tasks": [
     {
       "id": "D01",
@@ -75,7 +75,7 @@
       "status": "completed",
       "artifacts": ["apps/field-app/src/native.js", "apps/field-app/src/config.json", "apps/field-app/ops/Start-UsbRelay.ps1", "apps/field-app/ops/Stop-UsbRelay.ps1"],
       "acceptance": ["A-D12"],
-      "notes": "直连 /health 2.5 s 探测失败后走链路本地中继；请求中途网络失败切源重试；选择缓存 60 s；1.0.0.40 真机验证 relay 选择、31 帧动态与静态回归；1.0.0.41 生产包已构建"
+      "notes": "直连 /health 2.5 s 探测失败后走链路本地中继；请求中途网络失败切源重试（含同一上传请求）；选择缓存 60 s；1.0.0.40 真机验证 relay 选择、31 帧动态与静态回归；1.0.0.42 增加上传自动重试并通过静态回归；1.0.0.43 生产包已构建"
     }
   ],
   "acceptance_cases": [
@@ -163,8 +163,8 @@
       "id": "A-D12",
       "condition": "同一应用包在直连不可用时自动选择 USB 中继，直连可用时优先直连；网络切换不伪造结果",
       "status": "passed",
-      "evidence": ["reports/20261031-dynamic-recognition/device-1.0.0.40-fallback-startup.json", "reports/20261031-dynamic-recognition/device-1.0.0.40-fallback-app-state.json"],
-      "notes": "1.0.0.40 启动记录 transport_selected=relay、service_ready；动态 31 帧 0 失败；静态 309,317 字节 prediction/history 成功。直连可用时优先直连由单元测试覆盖"
+      "evidence": ["reports/20261031-dynamic-recognition/device-1.0.0.40-fallback-startup.json", "reports/20261031-dynamic-recognition/device-1.0.0.40-fallback-app-state.json", "reports/20261031-dynamic-recognition/device-1.0.0.42-fallback-static-app-state.json"],
+      "notes": "1.0.0.40 启动记录 transport_selected=relay、service_ready；动态 31 帧 0 失败；1.0.0.42 静态 309,317 字节 prediction/history 成功并含上传失败自动切中继。直连可用时优先直连由单元测试覆盖"
     }
   ],
   "change_log": [
@@ -203,6 +203,10 @@
     {
       "at": "2026-10-31T20:17:00+08:00",
       "change": "跨休眠实验未通过：sleepwake-20261031-2010 在 30.4 s 观察到睡眠候选，桥重启 3.0 s，但 301.6 s 内无视频，状态 wake_unverified；受控重启后 1.0.0.40 恢复并再次选择 USB 中继。A-D10 仍 not_run，不能用重启替代跨休眠验收。"
+    },
+    {
+      "at": "2026-10-31T20:30:00+08:00",
+      "change": "上传自动回退与构建：直连上传遇到网络错误时用同一 request_id/hash 自动改走中继；单元测试覆盖。1.0.0.42 诊断包真机静态回归通过（309,317 字节 prediction/history），1.0.0.43 生产包已构建。中继进程经 python.exe 分离启动，当前监听 169.254.216.241:9021。"
     }
   ]
 }
