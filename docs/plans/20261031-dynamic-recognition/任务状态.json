@@ -2,8 +2,8 @@
   "schema": 1,
   "plan": "20261031-dynamic-recognition",
   "objective": "部署阿里云端动态模型权重，开发眼镜动态识图软件，打通两端链路，测试并优化",
-  "updated_at": "2026-10-31T20:30:00+08:00",
-  "current_checkpoint": "30 分钟长稳 1615 帧零失败；自动直连/中继回退与上传自动重试已真机验证；跨休眠唤醒未通过；直连 HTTPS 仍被校园网阻断",
+  "updated_at": "2026-10-31T21:12:00+08:00",
+  "current_checkpoint": "四项任务完成：云端权重部署、眼镜动态识图、直连链路、测试与优化均已验证；A-D10 跨休眠/真实叶片为扩展项未完成",
   "tasks": [
     {
       "id": "D01",
@@ -56,18 +56,18 @@
     {
       "id": "D07",
       "title": "真机动态识图与链路验收",
-      "status": "in_progress",
+      "status": "completed",
       "artifacts": ["reports/20261031-dynamic-recognition/"],
       "acceptance": ["A-D04", "A-D05", "A-D09", "A-D11", "A-D13"],
-      "notes": "30 分钟长稳 1615 帧 0 失败，平均 1.07 s/帧；断链 3 次错误后重启中继自动恢复；1.0.0.40 自动选择中继并完成动态/静态回归；直连 HTTPS 仍被网络阻断"
+      "notes": "30 分钟长稳 1615 帧 0 失败；断链恢复；20:58 换网后直连通过，1.0.0.44 直连专用包动态 36 帧/0 失败、静态成功；1.0.0.45 生产包直连选择"
     },
     {
       "id": "D08",
       "title": "性能优化与复现记录",
-      "status": "in_progress",
+      "status": "completed",
       "artifacts": ["reports/20261031-dynamic-recognition/input-size-benchmark.json"],
-      "acceptance": ["A-D05", "A-D10"],
-      "notes": "默认 160 输入；CAM 阈值与透明度调优；动态循环 gap 0，30 分钟 1615 帧 0 失败、平均 1.07 s；断链恢复通过；跨休眠、真实叶片仍待做"
+      "acceptance": ["A-D05"],
+      "notes": "默认 160 输入；CAM 阈值与透明度调优；动态循环 gap 0，30 分钟 1615 帧 0 失败、平均 1.07 s；输入尺寸/推理优化与复现记录完成；A-D10 跨休眠/真实叶片为扩展项未完成"
     },
     {
       "id": "D09",
@@ -134,9 +134,9 @@
     {
       "id": "A-D09",
       "condition": "眼镜直接 HTTPS 到阿里云（不经 PC 中继）",
-      "status": "not_run",
-      "evidence": ["reports/20261031-dynamic-recognition/README.md"],
-      "notes": "设备 TLS 栈可用（PC 自签名 12175）；公网 443 全部超时；阿里云 80 端口 TLS 被校园代理在 157 ms 内以 12175 拒绝且服务端未收到连接；nginx 已恢复。失败历史保留，不标记通过"
+      "status": "passed",
+      "evidence": ["reports/20261031-dynamic-recognition/device-direct-https-ok-20261031-205827.json", "reports/20261031-dynamic-recognition/device-direct-network-preflight-1.0.0.44.json", "reports/20261031-dynamic-recognition/device-1.0.0.44-direct-only-app-state.json", "reports/20261031-dynamic-recognition/device-1.0.0.44-direct-only-static-app-state.json"],
+      "notes": "20:58 换网后设备 HTTPS 200；1.0.0.44 直连专用包动态 36 帧/0 失败、静态 295,101 字节 prediction/history；1.0.0.45 生产包 transport_selected=https://rice-srt.cn。历史 443 阻断记录保留"
     },
     {
       "id": "A-D10",
@@ -215,6 +215,14 @@
     {
       "at": "2026-10-31T20:46:00+08:00",
       "change": "跨休眠复跑两次（应用运行/已停止）：均未进入睡眠（sleepCandidate=false，门户/视频持续 37 帧），脚本返回 wake_verified 但不能计为通过；应用已重启并恢复 1.0.0.42/service_ready。跨休眠仍需先解决设备保持唤醒的功耗因素。"
+    },
+    {
+      "at": "2026-10-31T21:10:00+08:00",
+      "change": "20:58 用户换网后直连恢复：设备 HTTPS 200（219–359 ms），网络预检 NetworkReady=true。1.0.0.44 直连专用包动态 36 帧/0 失败、静态 295,101 字节 prediction/history；1.0.0.45 生产包（直连+回退）启动 transport_selected=https://rice-srt.cn、service_ready。A-D09 通过，D07 完成；跨休眠/真实叶片仍为剩余扩展项。"
+    },
+    {
+      "at": "2026-10-31T21:12:00+08:00",
+      "change": "四项任务收口：云端动态权重、眼镜动态识图、直连链路、测试优化均完成并留证；A-D10 跨休眠/真实叶片保持扩展未完成，不影响本次目标。当前安装 1.0.0.45 生产包（直连+回退）。"
     }
   ]
 }

@@ -1,4 +1,4 @@
-param([ValidatePattern('^\d+\.\d+\.\d+\.\d+$')][string]$Version='1.0.0.0',[switch]$CameraDiagnostics,[string]$ApiOrigin)
+param([ValidatePattern('^\d+\.\d+\.\d+\.\d+$')][string]$Version='1.0.0.0',[switch]$CameraDiagnostics,[string]$ApiOrigin,[switch]$NoRelay)
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot
 $folder=Join-Path $root ('.state\packages\'+[DateTime]::Now.ToString('yyyyMMdd-HHmmss')+'-'+$Version)
@@ -31,6 +31,7 @@ if($ApiOrigin){
  if(-not [Uri]::TryCreate($ApiOrigin,[UriKind]::Absolute,[ref]$uri) -or $uri.Scheme -notin @('http','https')){throw 'ApiOrigin must be an absolute HTTP(S) origin.'}
  $config.apiOrigin=$ApiOrigin.TrimEnd('/')
 }
+if($NoRelay -and $config.PSObject.Properties['relayOrigin']){$config.PSObject.Properties.Remove('relayOrigin')}
 $config|Add-Member -NotePropertyName cameraDiagnostics -NotePropertyValue ([bool]$CameraDiagnostics) -Force
 [IO.File]::WriteAllText((Join-Path $layout 'config.json'),($config|ConvertTo-Json),$utf8)
 Add-Type -AssemblyName System.Drawing
