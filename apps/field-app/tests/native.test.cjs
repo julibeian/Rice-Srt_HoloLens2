@@ -14,6 +14,7 @@ function runtime(options={}){
  function Client(){this.defaultRequestHeaders=new Headers();this.close=()=>{};this.sendRequestAsync=message=>{
   const uri=String(message.uri),endpoint=uri.slice(uri.indexOf('/api')+4);calls.push({endpoint,message});let value,status=200;
   if(options.directSessionNetworkError&&endpoint==='/session'&&uri.indexOf('https://example.test')===0&&!options.sessionThrown){options.sessionThrown=true;const op=Promise.reject(new Error('A connection with the server could not be established'));op.cancel=()=>{};return op;}
+  if(options.directPredictNetworkError&&endpoint==='/predict'&&uri.indexOf('https://example.test')===0&&!options.predictThrown){options.predictThrown=true;const op=Promise.reject(new Error('A connection with the server could not be established'));op.cancel=()=>{};return op;}
   if(options.directDynamicNetworkError&&endpoint==='/dynamic/frame'&&uri.indexOf('https://example.test')===0&&!options.dynamicThrown){options.dynamicThrown=true;const op=Promise.reject(new Error('A connection with the server could not be established'));op.cancel=()=>{};return op;}
   if(endpoint==='/health'){const relay=uri.indexOf('http://169.254.216.241:9021')===0;status=relay?200:(options.directHealth===false?503:200);value={status:'ok'};}
   else if(endpoint==='/register')value={device_id:'device-test',device_key:'never-printed-test-key'};
@@ -110,4 +111,10 @@ test('a failed direct dynamic request retries on the relay origin with the same 
  const bytes=new Uint8Array([0xff,0xd8,0xff,7]),sha=crypto.createHash('sha256').update(Buffer.from(bytes)).digest('hex');
  const value=await r.N.dynamicAnalyze({bytes,hash:sha,frameId:'dyn-fallback',size:160}).promise;
  assert.equal(value.frame_id,'dyn-fallback');const frames=r.calls.filter(c=>c.endpoint==='/dynamic/frame');assert.equal(frames.length,2);assert.ok(String(frames[1].message.uri).startsWith('http://169.254.216.241:9021'));assert.equal(frames[0].message.headers.values['X-Frame-ID'],frames[1].message.headers.values['X-Frame-ID']);
+});
+test('a failed direct upload switches the cached origin for the next upload',async()=>{
+ const r=runtime({relayOrigin:'http://169.254.216.241:9021',directPredictNetworkError:true});await r.N.init();await r.N.ensureService();
+ await assert.rejects(upload(r.N),e=>/could not be established/.test(e.errMsg));
+ const result=await upload(r.N);assert.equal(result.statusCode,200);
+ const predictions=r.calls.filter(c=>c.endpoint==='/predict');assert.equal(predictions.length,2);assert.ok(String(predictions[0].message.uri).startsWith('https://example.test'));assert.ok(String(predictions[1].message.uri).startsWith('http://169.254.216.241:9021'));
 });

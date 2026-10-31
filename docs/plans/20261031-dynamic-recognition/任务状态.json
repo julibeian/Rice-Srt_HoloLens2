@@ -58,8 +58,8 @@
       "title": "真机动态识图与链路验收",
       "status": "in_progress",
       "artifacts": ["reports/20261031-dynamic-recognition/"],
-      "acceptance": ["A-D04", "A-D05", "A-D09", "A-D11"],
-      "notes": "经 USB 中继连续约 4 分钟、164 帧动态请求，0 失败；1.0.0.31 平均周期约 1.52 s；断链 3 次错误后重启中继自动恢复；内置症状图阳性 93.27%；静态回归通过；直连 HTTPS 仍被网络阻断"
+      "acceptance": ["A-D04", "A-D05", "A-D09", "A-D11", "A-D13"],
+      "notes": "30 分钟长稳 1615 帧 0 失败，平均 1.07 s/帧；断链 3 次错误后重启中继自动恢复；1.0.0.40 自动选择中继并完成动态/静态回归；直连 HTTPS 仍被网络阻断"
     },
     {
       "id": "D08",
@@ -67,15 +67,15 @@
       "status": "in_progress",
       "artifacts": ["reports/20261031-dynamic-recognition/input-size-benchmark.json"],
       "acceptance": ["A-D05", "A-D10"],
-      "notes": "默认 160 输入；CAM 阈值与透明度调优；动态循环 gap 0，164 帧 0 失败、平均 1.52 s；断链恢复通过；长稳、跨休眠、真实叶片仍待做"
+      "notes": "默认 160 输入；CAM 阈值与透明度调优；动态循环 gap 0，30 分钟 1615 帧 0 失败、平均 1.07 s；断链恢复通过；跨休眠、真实叶片仍待做"
     },
     {
       "id": "D09",
       "title": "自动直连/USB 中继回退",
-      "status": "in_progress",
+      "status": "completed",
       "artifacts": ["apps/field-app/src/native.js", "apps/field-app/src/config.json", "apps/field-app/ops/Start-UsbRelay.ps1", "apps/field-app/ops/Stop-UsbRelay.ps1"],
       "acceptance": ["A-D12"],
-      "notes": "直连 /health 2.5 s 探测失败后走链路本地中继；请求中途网络失败切源重试；选择缓存 60 s；1.0.0.36/37 已构建，设备验证待做"
+      "notes": "直连 /health 2.5 s 探测失败后走链路本地中继；请求中途网络失败切源重试；选择缓存 60 s；1.0.0.40 真机验证 relay 选择、31 帧动态与静态回归；1.0.0.41 生产包已构建"
     }
   ],
   "acceptance_cases": [
@@ -152,11 +152,18 @@
       "notes": "3 次 dynamic_error 后重启中继，11:21:43 起恢复新帧；停止统计 frames=38, ok=38, fail=3"
     },
     {
+      "id": "A-D13",
+      "condition": "30 分钟以上连续动态运行，无失败、无重启",
+      "status": "passed",
+      "evidence": ["reports/20261031-dynamic-recognition/device-1.0.0.33-30min-app-state.json"],
+      "notes": "1.0.0.33，19:24:30–19:53:14，约 1724 s；frames=1615, ok=1615, fail=0；网关窗口 P50 806.48 ms、P95 867.93 ms"
+    },
+    {
       "id": "A-D12",
       "condition": "同一应用包在直连不可用时自动选择 USB 中继，直连可用时优先直连；网络切换不伪造结果",
-      "status": "not_run",
-      "evidence": [],
-      "notes": "单元测试覆盖选择/重试；1.0.0.36 设备验证待做"
+      "status": "passed",
+      "evidence": ["reports/20261031-dynamic-recognition/device-1.0.0.40-fallback-startup.json", "reports/20261031-dynamic-recognition/device-1.0.0.40-fallback-app-state.json"],
+      "notes": "1.0.0.40 启动记录 transport_selected=relay、service_ready；动态 31 帧 0 失败；静态 309,317 字节 prediction/history 成功。直连可用时优先直连由单元测试覆盖"
     }
   ],
   "change_log": [
@@ -187,6 +194,10 @@
     {
       "at": "2026-10-31T19:30:00+08:00",
       "change": "断链恢复真机验证：动态运行中停止 USB 中继，记录 3 次 dynamic_error 并按失败退避；重启中继后 11:21:43 起恢复新帧，停止统计 frames=38, ok=38, fail=3。直连 HTTPS 仍 not_run。"
+    },
+    {
+      "at": "2026-10-31T20:07:00+08:00",
+      "change": "30 分钟长稳通过：1.0.0.33 从 19:24:30 到 19:53:14，frames=1615、ok=1615、fail=0，平均 1.07 s/帧，网关 P50 806.48 ms、P95 867.93 ms。新增自动直连/中继回退（1.0.0.40/41）：设备启动记录 transport_selected=relay、service_ready，动态 31 帧 0 失败，静态 309,317 字节成功；此前 1.0.0.38 因旧进程残留未激活，受控重启后 1.0.0.40 正常。修复 relayOrigin 的 new URL 兼容性问题。"
     }
   ]
 }

@@ -31,7 +31,7 @@
  function client(){var filter=new W.Web.Http.Filters.HttpBaseProtocolFilter();filter.allowAutoRedirect=false;filter.useProxy=false;var c=new W.Web.Http.HttpClient(filter);c.defaultRequestHeaders.tryAppendWithoutValidation('User-Agent','RiceHoloLensField/1.0 (+https://rice-srt.cn)');return c;}
  var originCache=null;
  function endpointUrl(origin,endpoint){return origin+config.apiPrefix+endpoint;}
- function relayOrigin(){var value=config&&config.relayOrigin;if(typeof value!=='string')return null;try{var uri=new URL(value);if(uri.protocol!=='http:'||!/^(169\.254\.|127\.0\.0\.1$|localhost$)/.test(uri.hostname))return null;return value.replace(/\/+$/,'');}catch(_){return null;}}
+ function relayOrigin(){var value=config&&config.relayOrigin;if(typeof value!=='string'||value.indexOf('http://')!==0)return null;var rest=value.slice(7),cut=rest.search(/[\/?#]/);if(cut>=0)rest=rest.slice(0,cut);var host=rest.split(':')[0];if(!/^(169\.254\.|127\.0\.0\.1$|localhost$)/.test(host))return null;return 'http://'+rest;}
  function origins(){var list=[config.apiOrigin],relay=relayOrigin();if(relay&&list.indexOf(relay)<0)list.push(relay);return list;}
  function otherOrigin(origin){var list=origins();for(var i=0;i<list.length;i++)if(list[i]!==origin)return list[i];return null;}
  function networkError(error){if(!error||error.status)return false;var message=String(error.errMsg||error.message||error);return /could not be established|could not connect|name or address|network|timeout|timed out|12007|12002|0x80072|canceled|cancelled/i.test(message);}
