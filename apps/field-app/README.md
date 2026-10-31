@@ -6,7 +6,7 @@
 
 点击预览移动取景框，用“范围”切换大小；点击“拍照”后等待画面稳定，应用保存原图和裁剪图，上传并显示结果。“查看原图”核对采集范围，“继续拍照”返回预览，失败上传可恢复。定位失败不阻止识别，历史照片重传保留原采集信息。
 
-动态模式：点“动态识图”后应用每轮从取景框裁剪 384×384 JPEG，按端到端延迟自动节流上传到 `/hololens-app/api/dynamic/frame`；HUD 显示稳定类别、置信度、端到端延迟、推理耗时、模型版本和输入尺寸，画布叠加 CAM 关注区域。再点“停止动态”恢复静态拍照。云端默认 160 输入，可在 `config.json` 调整 `dynamicFrameSize`、`dynamicInputSize`、`dynamicJpegQuality`、`dynamicGapMs`（0 表示请求完成立即下一帧）。
+动态模式：点“动态识图”后应用每轮从取景框裁剪 384×384 JPEG，按端到端延迟自动节流上传到 `/hololens-app/api/dynamic/frame`；HUD 显示稳定类别、置信度、端到端延迟、推理耗时、模型版本和输入尺寸，画布叠加 CAM 关注区域。再点“停止动态”恢复静态拍照。云端默认 160 输入，可在 `config.json` 调整 `dynamicFrameSize`、`dynamicInputSize`、`dynamicJpegQuality`、`dynamicGapMs`（0 表示请求完成立即下一帧）。若直连健康探测失败且配置了链路本地 `relayOrigin`，应用自动改走 USB 中继；请求中途网络失败会切换到另一来源重试一次，不伪造结果。`relayOrigin` 只接受 `169.254.*`、`127.0.0.1` 或 `localhost`，中继不记录请求体或令牌。
 
 ## 构建与测试
 
@@ -19,16 +19,23 @@ node --test apps/field-app/tests/*.test.cjs
 python -B -m unittest discover -s apps/field-app/tests -p 'test_*.py'
 ```
 
-生产构建（直连阿里云）：
+生产构建（优先直连阿里云；`relayOrigin` 存在时直连健康探测失败自动改走 USB 中继）：
 
 ```powershell
-runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Build-App.ps1 -Version 1.0.0.29
+runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Build-App.ps1 -Version 1.0.0.36
 ```
 
-USB 中继开发构建（当前校园 Wi-Fi 阻断出站 443 时使用；PC 先运行 `python -B apps/field-app/server/usb_relay.py --host 169.254.216.241 --port 9021`）：
+USB 中继启动与停止（仅绑定 USB 主机地址，转发 `/hololens-app/api/*` 到生产 HTTPS）：
 
 ```powershell
-runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Build-App.ps1 -Version 1.0.0.29 -CameraDiagnostics -ApiOrigin http://169.254.216.241:9021
+runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Start-UsbRelay.ps1
+runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Stop-UsbRelay.ps1
+```
+
+强制中继诊断构建（不使用自动回退，便于复现校园网络问题）：
+
+```powershell
+runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Build-App.ps1 -Version 1.0.0.36 -CameraDiagnostics -ApiOrigin http://169.254.216.241:9021
 ```
 
 诊断构建支持通过 `camera-check.json` 触发 `controls`、`capture`、`dynamic_start`、`dynamic_stop`、`dynamic_asset`；生产构建不启用该轮询。

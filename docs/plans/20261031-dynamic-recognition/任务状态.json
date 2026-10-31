@@ -68,6 +68,14 @@
       "artifacts": ["reports/20261031-dynamic-recognition/input-size-benchmark.json"],
       "acceptance": ["A-D05", "A-D10"],
       "notes": "默认 160 输入；CAM 阈值与透明度调优；动态循环 gap 0，164 帧 0 失败、平均 1.52 s；断链恢复通过；长稳、跨休眠、真实叶片仍待做"
+    },
+    {
+      "id": "D09",
+      "title": "自动直连/USB 中继回退",
+      "status": "in_progress",
+      "artifacts": ["apps/field-app/src/native.js", "apps/field-app/src/config.json", "apps/field-app/ops/Start-UsbRelay.ps1", "apps/field-app/ops/Stop-UsbRelay.ps1"],
+      "acceptance": ["A-D12"],
+      "notes": "直连 /health 2.5 s 探测失败后走链路本地中继；请求中途网络失败切源重试；选择缓存 60 s；1.0.0.36/37 已构建，设备验证待做"
     }
   ],
   "acceptance_cases": [
@@ -142,6 +150,13 @@
       "status": "passed",
       "evidence": ["reports/20261031-dynamic-recognition/device-1.0.0.31-recovery-app-state.json"],
       "notes": "3 次 dynamic_error 后重启中继，11:21:43 起恢复新帧；停止统计 frames=38, ok=38, fail=3"
+    },
+    {
+      "id": "A-D12",
+      "condition": "同一应用包在直连不可用时自动选择 USB 中继，直连可用时优先直连；网络切换不伪造结果",
+      "status": "not_run",
+      "evidence": [],
+      "notes": "单元测试覆盖选择/重试；1.0.0.36 设备验证待做"
     }
   ],
   "change_log": [

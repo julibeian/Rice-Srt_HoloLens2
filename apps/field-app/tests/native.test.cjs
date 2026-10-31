@@ -13,7 +13,10 @@ function runtime(options={}){
  function Message(method,uri){this.uri=uri;this.method=method;this.headers=new Headers();this.close=()=>{};}
  function Client(){this.defaultRequestHeaders=new Headers();this.close=()=>{};this.sendRequestAsync=message=>{
   const uri=String(message.uri),endpoint=uri.slice(uri.indexOf('/api')+4);calls.push({endpoint,message});let value,status=200;
-  if(endpoint==='/register')value={device_id:'device-test',device_key:'never-printed-test-key'};
+  if(options.directSessionNetworkError&&endpoint==='/session'&&uri.indexOf('https://example.test')===0&&!options.sessionThrown){options.sessionThrown=true;const op=Promise.reject(new Error('A connection with the server could not be established'));op.cancel=()=>{};return op;}
+  if(options.directDynamicNetworkError&&endpoint==='/dynamic/frame'&&uri.indexOf('https://example.test')===0&&!options.dynamicThrown){options.dynamicThrown=true;const op=Promise.reject(new Error('A connection with the server could not be established'));op.cancel=()=>{};return op;}
+  if(endpoint==='/health'){const relay=uri.indexOf('http://169.254.216.241:9021')===0;status=relay?200:(options.directHealth===false?503:200);value={status:'ok'};}
+  else if(endpoint==='/register')value={device_id:'device-test',device_key:'never-printed-test-key'};
   else if(endpoint==='/session')value={access_token:'test-session-'+(++token),expires_epoch:Date.now()/1000+3600};
   else if(endpoint==='/dynamic/frame'){const fields=message.headers.values;value={predicted_class:'稻瘟病',confidence:.92,is_valid:true,message:'检测成功',top3_predictions:[['稻瘟病',.92]],frame_id:fields['X-Frame-ID'],image_sha256:fields['X-Image-SHA256'],model:{version:'v2-test',input_size:160},timing:{inference_ms:800,total_ms:820},annotation:{kind:'cam',grid:{width:5,height:5,values:[[1,0,0,0,0]]},box:[0,0,.2,.2]},capture_evidence:{channel:'hololens-app-dynamic',frame_id:fields['X-Frame-ID'],image_sha256:fields['X-Image-SHA256']}};
    if(options.unauthorizedDynamic&&calls.filter(c=>c.endpoint==='/dynamic/frame').length===1){status=401;value={error:'session_expired',message:'连接已过期，请重试'};}
@@ -29,7 +32,7 @@ function runtime(options={}){
   Foundation:{Uri:function(value){return new String(value);}},
   Storage:{ApplicationData:{current:{localSettings:{values:settings},localFolder:{getFilesAsync:async()=>[],getFileAsync:async name=>{if(!local.has(name))throw new Error('missing');return local.get(name);},createFileAsync:async name=>{const f=file(name,Buffer.alloc(0));local.set(name,f);return f;}}}},CreationCollisionOption:{replaceExisting:1},NameCollisionOption:{failIfExists:0},FileIO:{readTextAsync:async f=>f.text,writeTextAsync:async(f,text)=>{f.text=text;},readBufferAsync:async f=>f.data,writeBufferAsync:async(f,data)=>{f.data=data;}},Streams:{UnicodeEncoding:{utf8:1}}},
   Media:{Capture:{CameraCaptureUI:function(){this.photoSettings={};this.captureFileAsync=async mode=>{calls.push({endpoint:'system-camera',mode,settings:this.photoSettings});return options.cancelSystem?null:file('shell.jpg');};},CameraCaptureUIPhotoFormat:{jpeg:0},CameraCaptureUIMaxPhotoResolution:{large3M:4},CameraCaptureUIMode:{photo:1}}},
-  ApplicationModel:{Package:{current:{installedLocation:{getFileAsync:async()=>({text:JSON.stringify({apiOrigin:'https://example.test',apiPrefix:'/api',deviceLabel:'HoloLens'})}),tryGetItemAsync:async()=>options.noBootstrap?null:{text:JSON.stringify({pair_code:'12345678',expires_epoch:Date.now()/1000+(options.expired?-1:900)}),deleteAsync:async()=>{}}}}}},
+  ApplicationModel:{Package:{current:{installedLocation:{getFileAsync:async()=>({text:JSON.stringify({apiOrigin:'https://example.test',apiPrefix:'/api',deviceLabel:'HoloLens',relayOrigin:options.relayOrigin})}),tryGetItemAsync:async()=>options.noBootstrap?null:{text:JSON.stringify({pair_code:'12345678',expires_epoch:Date.now()/1000+(options.expired?-1:900)}),deleteAsync:async()=>{}}}}}},
   Security:{Cryptography:{CryptographicBuffer:{generateRandom:()=>crypto.randomBytes(16),encodeToHexString:buffer=>buffer.toString('hex'),convertStringToBinary:text=>Buffer.from(text),convertBinaryToString:(_,buffer)=>buffer.toString(),createFromByteArray:bytes=>Buffer.from(bytes)},BinaryStringEncoding:{utf8:1},Core:{HashAlgorithmProvider:{openAlgorithm:()=>({hashData:buffer=>crypto.createHash('sha256').update(buffer).digest()})}},DataProtection:{DataProtectionProvider:function(){this.protectAsync=async buffer=>buffer;this.unprotectAsync=async buffer=>buffer;}}}},
   Web:{Http:{HttpClient:Client,HttpRequestMessage:Message,HttpMethod:{get:'GET',post:'POST'},Filters:{HttpBaseProtocolFilter:function(){}},HttpStringContent:function(value){this.value=value;},HttpMultipartFormDataContent:function(){this.parts=[];this.add=(content,name,filename)=>this.parts.push({content,name,filename});},HttpBufferContent:function(buffer){this.buffer=buffer;this.headers={};},Headers:{HttpMediaTypeHeaderValue:function(value){this.value=value;}}}},
   System:{Profile:{AnalyticsInfo:{versionInfo:{deviceFamily:'Windows.Holographic'}}}},UI:{WebUI:{WebUIApplication:{addEventListener:()=>{}}}},
@@ -86,4 +89,25 @@ test('dynamic frame refreshes an expired session and retries the same frame iden
 });
 test('dynamic settings are bounded',async()=>{
  const r=runtime();await r.N.init();const value=r.N.dynamicSettings();assert.ok(value.frameSize>=256&&value.frameSize<=512);assert.ok([128,160,192,224].includes(value.inputSize));assert.ok(value.quality>=.45&&value.quality<=.9);assert.ok(value.gapMs>=0&&value.gapMs<=2000);
+});
+
+test('relay origin is selected when the direct health probe fails',async()=>{
+ const r=runtime({relayOrigin:'http://169.254.216.241:9021',directHealth:false});await r.N.init();await r.N.ensureService();
+ const health=r.calls.filter(c=>c.endpoint==='/health');assert.equal(health.length,2);
+ const session=r.calls.find(c=>c.endpoint==='/session');assert.ok(String(session.message.uri).startsWith('http://169.254.216.241:9021'));
+});
+test('direct origin wins when both health probes succeed',async()=>{
+ const r=runtime({relayOrigin:'http://169.254.216.241:9021'});await r.N.init();await r.N.ensureService();
+ assert.equal(r.calls.filter(c=>c.endpoint==='/health').length,1);
+ const session=r.calls.find(c=>c.endpoint==='/session');assert.ok(String(session.message.uri).startsWith('https://example.test'));
+});
+test('a failed direct session request retries on the relay origin',async()=>{
+ const r=runtime({relayOrigin:'http://169.254.216.241:9021',directSessionNetworkError:true});await r.N.init();await r.N.ensureService();
+ const sessions=r.calls.filter(c=>c.endpoint==='/session');assert.equal(sessions.length,2);assert.ok(String(sessions[1].message.uri).startsWith('http://169.254.216.241:9021'));
+});
+test('a failed direct dynamic request retries on the relay origin with the same frame',async()=>{
+ const r=runtime({relayOrigin:'http://169.254.216.241:9021',directDynamicNetworkError:true});await r.N.init();await r.N.ensureService();
+ const bytes=new Uint8Array([0xff,0xd8,0xff,7]),sha=crypto.createHash('sha256').update(Buffer.from(bytes)).digest('hex');
+ const value=await r.N.dynamicAnalyze({bytes,hash:sha,frameId:'dyn-fallback',size:160}).promise;
+ assert.equal(value.frame_id,'dyn-fallback');const frames=r.calls.filter(c=>c.endpoint==='/dynamic/frame');assert.equal(frames.length,2);assert.ok(String(frames[1].message.uri).startsWith('http://169.254.216.241:9021'));assert.equal(frames[0].message.headers.values['X-Frame-ID'],frames[1].message.headers.values['X-Frame-ID']);
 });

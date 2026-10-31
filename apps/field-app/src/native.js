@@ -29,13 +29,27 @@
   logQueue=next.catch(function(){});return logQueue;
  }
  function client(){var filter=new W.Web.Http.Filters.HttpBaseProtocolFilter();filter.allowAutoRedirect=false;filter.useProxy=false;var c=new W.Web.Http.HttpClient(filter);c.defaultRequestHeaders.tryAppendWithoutValidation('User-Agent','RiceHoloLensField/1.0 (+https://rice-srt.cn)');return c;}
- async function request(endpoint,data,token){
-  var c=client(),request=new W.Web.Http.HttpRequestMessage(data==null?W.Web.Http.HttpMethod.get:W.Web.Http.HttpMethod.post,new W.Foundation.Uri(config.apiOrigin+config.apiPrefix+endpoint));
+ var originCache=null;
+ function endpointUrl(origin,endpoint){return origin+config.apiPrefix+endpoint;}
+ function relayOrigin(){var value=config&&config.relayOrigin;if(typeof value!=='string')return null;try{var uri=new URL(value);if(uri.protocol!=='http:'||!/^(169\.254\.|127\.0\.0\.1$|localhost$)/.test(uri.hostname))return null;return value.replace(/\/+$/,'');}catch(_){return null;}}
+ function origins(){var list=[config.apiOrigin],relay=relayOrigin();if(relay&&list.indexOf(relay)<0)list.push(relay);return list;}
+ function otherOrigin(origin){var list=origins();for(var i=0;i<list.length;i++)if(list[i]!==origin)return list[i];return null;}
+ function networkError(error){if(!error||error.status)return false;var message=String(error.errMsg||error.message||error);return /could not be established|could not connect|name or address|network|timeout|timed out|12007|12002|0x80072|canceled|cancelled/i.test(message);}
+ async function probeOrigin(origin,timeoutMs){var c=client(),message=new W.Web.Http.HttpRequestMessage(W.Web.Http.HttpMethod.get,new W.Foundation.Uri(endpointUrl(origin,'/health'))),op=c.sendRequestAsync(message),timer=setTimeout(function(){try{op.cancel();}catch(_){}},timeoutMs||2500);try{var response=await op;return response.statusCode===200;}catch(_){return false;}finally{clearTimeout(timer);try{message.close();c.close();}catch(_){}}}
+ function rememberOrigin(origin){var changed=!originCache||originCache.origin!==origin;originCache={origin:origin,at:Date.now()};if(changed)log('transport_selected',{origin:origin});}
+ async function chooseOrigin(force){var list=origins();if(list.length===1){rememberOrigin(list[0]);return list[0];}if(!force&&originCache&&Date.now()-originCache.at<60000)return originCache.origin;var chosen=null;for(var i=0;i<list.length;i++){if(await probeOrigin(list[i],2500)){chosen=list[i];break;}}if(!chosen)chosen=list[0];rememberOrigin(chosen);return chosen;}
+ async function requestAt(origin,endpoint,data,token){
+  var c=client(),request=new W.Web.Http.HttpRequestMessage(data==null?W.Web.Http.HttpMethod.get:W.Web.Http.HttpMethod.post,new W.Foundation.Uri(endpointUrl(origin,endpoint)));
   if(token)request.headers.tryAppendWithoutValidation('Authorization','Bearer '+token);
   if(data!=null)request.content=new W.Web.Http.HttpStringContent(JSON.stringify(data),W.Storage.Streams.UnicodeEncoding.utf8,'application/json');
   var op=c.sendRequestAsync(request),timer=setTimeout(function(){try{op.cancel();}catch(_){}},15000);
   try{var response=await op;var text=await response.content.readAsStringAsync(),result;try{result=JSON.parse(text);}catch(_){throw fail('识别服务响应异常，请稍后重试');}if(response.statusCode<200||response.statusCode>=300){var e=fail(result.message||(result.error||{}).message||'识别服务暂不可用');e.status=response.statusCode;throw e;}return result;}
   finally{clearTimeout(timer);try{request.close();c.close();}catch(_){}}
+ }
+ async function request(endpoint,data,token,retried){
+  var origin=await chooseOrigin();
+  try{return await requestAt(origin,endpoint,data,token);}
+  catch(error){if(!retried&&networkError(error)){var other=otherOrigin(origin);if(other){rememberOrigin(other);return request(endpoint,data,token,true);}}throw error;}
  }
  async function protectDevice(value){var provider=new W.Security.Cryptography.DataProtection.DataProtectionProvider('LOCAL=user');var input=W.Security.Cryptography.CryptographicBuffer.convertStringToBinary(JSON.stringify(value),W.Security.Cryptography.BinaryStringEncoding.utf8);var protectedBuffer=await provider.protectAsync(input);var f=await W.Storage.ApplicationData.current.localFolder.createFileAsync('connection.dat',W.Storage.CreationCollisionOption.replaceExisting);await W.Storage.FileIO.writeBufferAsync(f,protectedBuffer);}
  async function recoverDevice(){try{var f=await W.Storage.ApplicationData.current.localFolder.getFileAsync('connection.dat'),buffer=await W.Storage.FileIO.readBufferAsync(f),provider=new W.Security.Cryptography.DataProtection.DataProtectionProvider(),clear=await provider.unprotectAsync(buffer);return JSON.parse(W.Security.Cryptography.CryptographicBuffer.convertBinaryToString(W.Security.Cryptography.BinaryStringEncoding.utf8,clear));}catch(_){return null;}}
@@ -180,21 +194,22 @@
   getFileInfo:function(o){fileSize(o.filePath).then(function(n){success(o,{size:n});},function(e){failure(o,e);});},
   unlinkSync:unlink,readdirSync:function(){return Object.keys(files).filter(function(p){return p.indexOf(base+'/')===0;}).map(function(p){return p.slice(base.length+1);});}
  };}
- function upload(options){var current=null,aborted=false;var work=(async function(){
+ function upload(options){var current=null,aborted=false,chosenOrigin=null;var work=(async function(){
   if(!nativeMode){if(!root.RicePreviewUpload)throw fail('界面预览未连接真机识别');return root.RicePreviewUpload(options,files[options.filePath]);}
   var token=await ensureService();if(aborted)throw fail('上传已取消');var f=await getFile(options.filePath),buffer=await W.Storage.FileIO.readBufferAsync(f);if(!buffer.length||buffer.length>7*1024*1024)throw fail('照片超过上传大小限制');
+  chosenOrigin=await chooseOrigin();
   var hash=W.Security.Cryptography.CryptographicBuffer.encodeToHexString(W.Security.Cryptography.Core.HashAlgorithmProvider.openAlgorithm('SHA256').hashData(buffer)).toLowerCase(),requestId=options.requestId||uploadIds[options.filePath]||(uploadIds[options.filePath]='field-'+id());
   if(!/^[A-Za-z0-9._-]{1,80}$/.test(requestId))throw fail('本次照片编号无效');
   for(var attempt=0;attempt<2;attempt++){
   if(aborted)throw fail('上传已取消');if(attempt)token=await access();
   var content=new W.Web.Http.HttpMultipartFormDataContent(),image=new W.Web.Http.HttpBufferContent(buffer);image.headers.contentType=new W.Web.Http.Headers.HttpMediaTypeHeaderValue(f.fileType.toLowerCase()==='.png'?'image/png':f.fileType.toLowerCase()==='.webp'?'image/webp':'image/jpeg');content.add(image,'file',f.name);
-  var c=client(),message=new W.Web.Http.HttpRequestMessage(W.Web.Http.HttpMethod.post,new W.Foundation.Uri(config.apiOrigin+config.apiPrefix+'/predict'));message.headers.tryAppendWithoutValidation('Authorization','Bearer '+token);message.headers.tryAppendWithoutValidation('X-Request-ID',requestId);message.headers.tryAppendWithoutValidation('X-Image-SHA256',hash);message.content=content;
+  var c=client(),message=new W.Web.Http.HttpRequestMessage(W.Web.Http.HttpMethod.post,new W.Foundation.Uri(endpointUrl(chosenOrigin,'/predict')));message.headers.tryAppendWithoutValidation('Authorization','Bearer '+token);message.headers.tryAppendWithoutValidation('X-Request-ID',requestId);message.headers.tryAppendWithoutValidation('X-Image-SHA256',hash);message.content=content;
   current=c.sendRequestAsync(message);var timer=setTimeout(function(){if(current)try{current.cancel();}catch(_){}},45000);
   await log('upload_started',{request_id:requestId,image_sha256:hash,bytes:buffer.length});
   try{var response=await current,text=await response.content.readAsStringAsync(),value;try{value=JSON.parse(text);}catch(_){throw fail('服务器返回了无法读取的结果');}if(response.statusCode===401&&attempt===0){session=null;continue;}if(response.statusCode!==200){var error=fail(value.message||(value.error||{}).message||'识别服务暂不可用');error.status=response.statusCode;error.code=value.error;if(response.statusCode===401)session=null;throw error;}var evidence=value.capture_evidence||{};if(evidence.request_id!==requestId||evidence.image_sha256!==hash||evidence.channel!=='hololens-app')throw fail('照片与识别结果不匹配，请重试');log('prediction_received',{request_id:requestId,image_sha256:hash,prediction_id:evidence.prediction_id,is_valid:value.is_valid,predicted_class:value.predicted_class});return {statusCode:response.statusCode,data:text};}
   finally{clearTimeout(timer);current=null;try{message.close();c.close();}catch(_){}}
   }
- })();work.then(function(result){success(options,result);},function(e){log('upload_error',{message:e.message});failure(options,e);});return {abort:function(){aborted=true;if(current)try{current.cancel();}catch(_){}}};}
+ })();work.then(function(result){success(options,result);},function(e){if(networkError(e)&&chosenOrigin){var other=otherOrigin(chosenOrigin);if(other)rememberOrigin(other);}log('upload_error',{message:e.message});failure(options,e);});return {abort:function(){aborted=true;if(current)try{current.cancel();}catch(_){}}};}
  function dynamicSettings(){var value=config||{};return {frameSize:Math.max(256,Math.min(512,Number(value.dynamicFrameSize)||384)),inputSize:[128,160,192,224].indexOf(Number(value.dynamicInputSize))>=0?Number(value.dynamicInputSize):160,quality:Math.max(.45,Math.min(.9,Number(value.dynamicJpegQuality)||.72)),gapMs:Math.max(0,Math.min(2000,Number(value.dynamicGapMs)||0))};}
  function base64Bytes(value){var binary=atob(value),bytes=new Uint8Array(binary.length);for(var i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return bytes;}
  async function captureDynamicFrame(options){
@@ -219,27 +234,37 @@
   options=options||{};var aborted=false,current=null,timer=null;
   var promise=(async function(){
    if(!nativeMode)throw fail('动态识图需在眼镜上运行');var bytes=options.bytes;if(!bytes||typeof bytes.length!=='number'||!bytes.length)throw fail('动态帧为空');if(!/^[a-f0-9]{64}$/.test(options.hash||'')||!/^[A-Za-z0-9._-]{1,80}$/.test(options.frameId||''))throw fail('动态帧编号无效');
-   var token=await ensureService();if(aborted)throw fail('动态识图已停止');
-   for(var attempt=0;attempt<2;attempt++){
+   var token=await ensureService();if(aborted)throw fail('动态识图已停止');var origin=await chooseOrigin(),originRetried=false,refreshed=false;
+   for(var attempt=0;attempt<3;attempt++){
     if(attempt)token=await access();if(aborted)throw fail('动态识图已停止');
     var buffer=W.Security.Cryptography.CryptographicBuffer.createFromByteArray(bytes),content=new W.Web.Http.HttpBufferContent(buffer);content.headers.contentType=new W.Web.Http.Headers.HttpMediaTypeHeaderValue('image/jpeg');
-    var c=client(),message=new W.Web.Http.HttpRequestMessage(W.Web.Http.HttpMethod.post,new W.Foundation.Uri(config.apiOrigin+config.apiPrefix+'/dynamic/frame'));
+    var c=client(),message=new W.Web.Http.HttpRequestMessage(W.Web.Http.HttpMethod.post,new W.Foundation.Uri(endpointUrl(origin,'/dynamic/frame')));
     message.headers.tryAppendWithoutValidation('Authorization','Bearer '+token);message.headers.tryAppendWithoutValidation('X-Frame-ID',options.frameId);message.headers.tryAppendWithoutValidation('X-Image-SHA256',options.hash);if(options.size)message.headers.tryAppendWithoutValidation('X-Dynamic-Size',String(options.size));message.content=content;
     current=c.sendRequestAsync(message);timer=setTimeout(function(){try{if(current)current.cancel();}catch(_){}},20000);
     try{
      var response=await current;if(aborted)throw fail('动态识图已停止');var text=await response.content.readAsStringAsync(),value;try{value=JSON.parse(text);}catch(_){throw fail('动态识别返回无法读取');}
-     if(response.statusCode===401&&attempt===0){session=null;continue;}
+     if(response.statusCode===401&&!refreshed){session=null;refreshed=true;continue;}
      if(response.statusCode!==200){var error=fail(value.message||(value.error||{}).message||value.detail||'动态识别暂不可用');error.status=response.statusCode;error.code=value.error||'dynamic_error';if(response.statusCode===429)error.retryAfter=1;if(response.statusCode===401)session=null;throw error;}
      var evidence=value.capture_evidence||{};if(value.frame_id!==options.frameId||value.image_sha256!==options.hash||evidence.channel!=='hololens-app-dynamic'||evidence.frame_id!==options.frameId)throw fail('动态识别结果与画面不匹配');
      return value;
+    }catch(network){
+     if(!originRetried&&networkError(network)){var other=otherOrigin(origin);if(other){origin=other;rememberOrigin(other);originRetried=true;continue;}}
+     throw network;
     }finally{clearTimeout(timer);timer=null;current=null;try{message.close();c.close();}catch(_){}}
    }
   })();
   return {promise:promise,abort:function(){aborted=true;if(current)try{current.cancel();}catch(_){}}};
  }
- async function dynamicHealth(){
-  if(!nativeMode)throw fail('动态识图需在眼镜上运行');var c=client(),message=new W.Web.Http.HttpRequestMessage(W.Web.Http.HttpMethod.get,new W.Foundation.Uri(config.apiOrigin+config.apiPrefix+'/dynamic/health')),current=c.sendRequestAsync(message),timer=setTimeout(function(){try{current.cancel();}catch(_){}},6000);
+ async function dynamicHealthAt(origin){
+  var c=client(),message=new W.Web.Http.HttpRequestMessage(W.Web.Http.HttpMethod.get,new W.Foundation.Uri(endpointUrl(origin,'/dynamic/health'))),current=c.sendRequestAsync(message),timer=setTimeout(function(){try{current.cancel();}catch(_){}},6000);
   try{var response=await current,text=await response.content.readAsStringAsync(),value;try{value=JSON.parse(text);}catch(_){throw fail('动态识别服务响应异常');}if(response.statusCode!==200)throw fail('动态识别服务暂不可用');return value;}finally{clearTimeout(timer);try{message.close();c.close();}catch(_){}}
+ }
+ async function dynamicHealth(){
+  if(!nativeMode)throw fail('动态识图需在眼镜上运行');var origin=await chooseOrigin(),lastError=null;
+  for(var i=0;i<origins().length;i++){
+   try{return await dynamicHealthAt(origin);}catch(error){lastError=error;var other=otherOrigin(origin);if(!other||!networkError(error))throw error;origin=other;rememberOrigin(other);}
+  }
+  throw lastError||fail('动态识别服务暂不可用');
  }
  function getLocation(){
   if(lastPosition&&Date.now()-lastPosition.acquiredAt<15000)return Promise.resolve(lastPosition);
