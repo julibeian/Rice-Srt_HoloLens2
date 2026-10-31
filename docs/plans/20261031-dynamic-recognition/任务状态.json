@@ -143,7 +143,7 @@
       "condition": "跨休眠自动唤醒与真实叶片/多光照",
       "status": "not_run",
       "evidence": ["reports/20261031-dynamic-recognition/device-sleepwake-20261031-2010.json"],
-      "notes": "30 分钟长稳见 A-D13；跨休眠实验 wake_unverified：30.4 s 进入睡眠候选，桥重启 3.0 s 后 301.6 s 无视频，受控重启恢复；可用性监督器的 Save-Attempt 缺陷已修复，-Once 健康检查 15 帧，但未复跑完整睡眠周期；真实叶片/多光照仍未做"
+      "notes": "30 分钟长稳见 A-D13；2010 跨休眠实验 wake_unverified：30.4 s 进入睡眠候选，桥重启 3.0 s 后 301.6 s 无视频，受控重启恢复；2040/2045 复跑未进入睡眠（sleepCandidate=false，视频持续 37 帧），不能计通过；可用性监督器 Save-Attempt 已修复，-Once 健康 15 帧；真实叶片/多光照仍未做"
     },
     {
       "id": "A-D11",
@@ -211,6 +211,10 @@
     {
       "at": "2026-10-31T20:36:00+08:00",
       "change": "修复 Watch-HoloLensAvailability.ps1 的 Save-Attempt 有序字典属性赋值缺陷；-Once 监督检查返回 portalOk=true、low=false、15 帧视频。跨休眠完整周期未再复跑，A-D10 仍 not_run。"
+    },
+    {
+      "at": "2026-10-31T20:46:00+08:00",
+      "change": "跨休眠复跑两次（应用运行/已停止）：均未进入睡眠（sleepCandidate=false，门户/视频持续 37 帧），脚本返回 wake_verified 但不能计为通过；应用已重启并恢复 1.0.0.42/service_ready。跨休眠仍需先解决设备保持唤醒的功耗因素。"
     }
   ]
 }
