@@ -10,14 +10,17 @@
 
 ```powershell
 pwsh -NoProfile -File usb-terminal/Connect-HoloLens.ps1 -Command status
+pwsh -NoProfile -File usb-terminal/Connect-HoloLens.ps1 -Command connect
 pwsh -NoProfile -File usb-terminal/Start-HoloLensBridge.ps1 -InstallAutostart
 ```
 
 后台桥与监督进程负责恢复连接；命令失败或超时不自动重放。终端支持目录查询、文件传输和运行设备端已有程序，不提供通用的远程 PowerShell shell。
 
+首次 SSH 指纹核对通过后，已验证 USB 端点缓存在 `usb-terminal/.state/endpoint.json`（当前 Windows 用户，被 Git 忽略）。之后重连先探测该端点并直接认证，命中约 0.9 秒；只有缓存端点不可达时才回退完整发现，且最多每 10 秒一次。缓存必须同时匹配 `config.json` 的设备名和指纹，并在本次连接重新通过 SSH 指纹核对，才会被使用。
+
 SDK 发现最长等待 12 秒，超时只结束本次创建的发现进程。重新连接复用已验证主机指纹的 SSH 会话；断开失败也会释放旧对象。SDK 未返回设备元数据时保留诊断，不能据此丢弃已通过身份验证的连接。
 
-监督进程同时检查桥的进度时间。桥停止推进超过 120 秒（命令超时设置较长时相应延长）会替换该桥进程，再发现原设备；正在执行的命令结果记为未知，不自动重发。`status` 中的 `UpdatedAt`、`ActiveOperation` 和 `SourceHashes` 可核对当前进度与实际加载的源码。设备关机、深度休眠或链路本身不可用期间，桥仍须等待设备恢复，不能只凭后台进程存在宣称在线。
+监督进程同时检查桥的进度时间。桥停止推进超过 120 秒（命令超时设置较长时相应延长）会替换该桥进程，再发现原设备；正在执行的命令结果记为未知，不自动重发。`status` 中的 `UpdatedAt`、`ActiveOperation`、`ConnectionMethod`、`LastConnectMs` 和 `SourceHashes` 可核对当前进度、本次会话路径与实际加载的源码。设备关机、深度休眠或链路本身不可用期间，桥仍须等待设备恢复，不能只凭后台进程存在宣称在线。
 
 恢复检查需在重新连接后实际运行设备端只读命令，再检查门户认证。`reconnect` 返回表示请求已接受；等待 `connected` 后的命令成功才证明本轮通道可用。NJAU 的 Wi-Fi 关联、云端健康 HTTP 200 和电脑到眼镜的管理通道分别验收；不能用其中一项替代另外两项。
 

@@ -20,7 +20,7 @@ flowchart LR
 
 ## 实验控制
 
-根目录 PowerShell 与 `native/` 提供 USB/SSH 管理。`apps/holographic-control/` 通过官方显示与输入接口辅助设备实验，建立限时恢复保护后才发送输入，结束后恢复默认模式。
+根目录 PowerShell 与 `native/` 提供 USB/SSH 管理。首次 SSH 指纹核对通过后，已验证 USB 端点写入本机 `.state` 缓存；后续重连先探测该端点并直接认证，失败才回退完整发现，缓存本身不放宽指纹校验。`apps/holographic-control/` 通过官方显示与输入接口辅助设备实验，建立限时恢复保护后才发送输入，结束后恢复默认模式。
 
 控制接口接受请求与用户实际看到结果分别验证。PC 工具服务于部署和调试；应用正常识别路径由眼镜直接访问云端。
 
