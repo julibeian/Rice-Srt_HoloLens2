@@ -8,7 +8,9 @@
 
 ## 启动
 
-在本机完成配置和构建后，双击桌面的 **稻视界眼镜控制**，或打开 `dist/RiceHoloLensControl.exe`。软件启动后核对配置的 USB 设备、SSH 身份、门户服务器密钥和当前 Windows 用户保存的凭据，随后显示画面。已有认证通过时，无需在窗口中重复输入密码或 PIN。
+在本机完成配置和构建后，双击桌面的 **稻视界眼镜控制**，或从开始菜单的 **稻视界眼镜控制** 打开，也可直接运行 `dist/RiceHoloLensControl.exe`。软件启动后核对配置的 USB 设备、SSH 身份、门户服务器密钥和当前 Windows 用户保存的凭据，随后显示画面。已有认证通过时，无需在窗口中重复输入密码或 PIN。
+
+程序不再按固定层数推算仓库根目录，而是从可执行文件所在目录向上查找 `usb-terminal/Connect-HoloLens.ps1`。`apps/` 目录重构后，旧的桌面快捷方式仍指向 `pc-control\dist`，双击没有反应；重新执行 `Build.ps1 -DesktopShortcut -StartMenuShortcut` 会同时修好桌面与开始菜单两个快捷方式。
 
 1. 等待实时画面更新，再点击 **开始控制**。控制会话不强制打开业务应用；可先使用 **开始菜单**，或从 **已安装应用** 中选择入口并点击 **打开所选应用**。首次点按时校准鼠标，校准期间不要点按其他控件。
 2. 在视频里单击要操作的位置。软件会移动眼镜准星，从新的画面确认其位置，再发送一次点按。查看画面确认实际页面变化。
@@ -58,7 +60,7 @@ runtime/powershell/pwsh.exe -NoProfile -File usb-terminal/Enable-HoloLensUsbPowe
 
 ```powershell
 runtime/powershell/pwsh.exe -NoProfile -File apps/holographic-control/ops/Build-Control.ps1
-runtime/powershell/pwsh.exe -NoProfile -File apps/pc-control/Build.ps1 -DesktopShortcut
+runtime/powershell/pwsh.exe -NoProfile -File apps/pc-control/Build.ps1 -DesktopShortcut -StartMenuShortcut
 runtime/powershell/pwsh.exe -NoProfile -File apps/pc-control/ops/Build-Tests.ps1
 ```
 

@@ -164,8 +164,19 @@ namespace Rice.HoloLens.Control {
         [DllImport("user32.dll")]static extern bool SetProcessDpiAwarenessContext(IntPtr context);
         static void SetDpi(){try{if(SetProcessDpiAwarenessContext(new IntPtr(-4)))return;}catch(EntryPointNotFoundException){}SetProcessDPIAware();}
         [DllImport("user32.dll")]static extern bool AllowSetForegroundWindow(int processId);
+        static string FindWorkspace(string start){
+            // The apps/-layout move changed the depth from the executable to the
+            // repository root, so resolve it by the USB terminal entry instead of
+            // a fixed number of parent directories.
+            var directory=new DirectoryInfo(Path.GetFullPath(start));
+            while(directory!=null){
+                if(File.Exists(Path.Combine(directory.FullName,@"usb-terminal\Connect-HoloLens.ps1")))return directory.FullName;
+                directory=directory.Parent;
+            }
+            return Path.GetFullPath(Path.Combine(start,"..\\..\\.."));
+        }
         [STAThread]static void Main(string[] args){
-            string workspace=Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"..\\.."));
+            string workspace=FindWorkspace(AppDomain.CurrentDomain.BaseDirectory);
             if(args.Length==3&&args[0]=="--render-preview"){SetDpi();Application.EnableVisualStyles();Application.SetCompatibleTextRenderingDefault(false);using(var preview=new MainForm(workspace,null,true))preview.RenderPreview(args[1],args[2]);return;}
             bool owner;using(var mutex=new Mutex(true,"Local\\RiceHoloLensDesktopControl",out owner)){
                 if(!owner){try{foreach(var process in System.Diagnostics.Process.GetProcessesByName("RiceHoloLensControl")){try{if(process.Id!=System.Diagnostics.Process.GetCurrentProcess().Id&&process.MainModule.FileName==Application.ExecutablePath)AllowSetForegroundWindow(process.Id);}catch{}finally{process.Dispose();}}using(var request=EventWaitHandle.OpenExisting("Local\\RiceHoloLensDesktopShow"))request.Set();}catch{MessageBox.Show("眼镜控制或验收会话正在运行。","稻视界",MessageBoxButtons.OK,MessageBoxIcon.Information);}return;}
