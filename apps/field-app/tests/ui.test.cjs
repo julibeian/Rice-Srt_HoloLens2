@@ -97,7 +97,7 @@ test('dynamic mode starts, shows a stable label and returns to the static camera
  const s=await start({before:w=>{
   w.RiceNative.nativeMode=true;
   w.RiceNative.dynamicHealth=async()=>({status:'ok',upstream:{model:{loaded:true,version:'v2-test',input_size:160}}});
-  w.RiceNative.dynamicSettings=()=>({frameSize:384,inputSize:160,quality:.72,minIntervalMs:10});
+  w.RiceNative.dynamicSettings=()=>({frameSize:384,inputSize:160,quality:.72,gapMs:10});
   w.RiceNative.captureDynamicFrame=async()=>{frames++;return {bytes:new Uint8Array([1]),hash:'a'.repeat(64),frameId:'dyn-'+frames,roi:{x:.25,y:.2,width:.5,height:.5}};};
   w.RiceNative.dynamicAnalyze=()=>({promise:Promise.resolve({predicted_class:'稻瘟病',confidence:.9,is_valid:true,message:'检测成功',model:{version:'v2-test',input_size:160},timing:{inference_ms:50},annotation:{kind:'cam',grid:{width:5,height:5,values:[[1,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]]},box:[0,0,.2,.2],peak:[.1,.1]}}),abort:()=>{}});
  }});

@@ -2,8 +2,8 @@
   "schema": 1,
   "plan": "20261031-dynamic-recognition",
   "objective": "部署阿里云端动态模型权重，开发眼镜动态识图软件，打通两端链路，测试并优化",
-  "updated_at": "2026-10-31T19:00:00+08:00",
-  "current_checkpoint": "云端动态服务、网关与眼镜动态模式已实现并完成真机闭环；直连 HTTPS 被当前 NJAU 网络阻断，真机经 PC USB 中继验证",
+  "updated_at": "2026-10-31T19:25:00+08:00",
+  "current_checkpoint": "直连 HTTPS 被校园网阻断（443 超时、80 端口 TLS 被代理拦截）；真机经 USB 中继稳定运行，动态循环优化到约 1.5 s/帧、164 帧零失败",
   "tasks": [
     {
       "id": "D01",
@@ -59,7 +59,7 @@
       "status": "in_progress",
       "artifacts": ["reports/20261031-dynamic-recognition/"],
       "acceptance": ["A-D04", "A-D05", "A-D09"],
-      "notes": "经 USB 中继连续约 2 分钟、约 40 次动态请求；内置症状图阳性 93.27%；静态回归通过；直连 HTTPS 仍被网络阻断"
+      "notes": "经 USB 中继连续约 4 分钟、164 帧动态请求，0 失败；1.0.0.31 平均周期约 1.52 s；内置症状图阳性 93.27%；静态回归通过；直连 HTTPS 仍被网络阻断"
     },
     {
       "id": "D08",
@@ -67,7 +67,7 @@
       "status": "in_progress",
       "artifacts": ["reports/20261031-dynamic-recognition/input-size-benchmark.json"],
       "acceptance": ["A-D05", "A-D10"],
-      "notes": "默认 160 输入；CAM 阈值与透明度调优；长稳、断网、真实叶片仍待做"
+      "notes": "默认 160 输入；CAM 阈值与透明度调优；动态循环 gap 0，164 帧 0 失败、平均 1.52 s；长稳、断网、真实叶片仍待做"
     }
   ],
   "acceptance_cases": [
@@ -100,8 +100,8 @@
       "id": "A-D05",
       "condition": "记录端到端延迟、分析帧率、连续运行稳定性和优化前后对比",
       "status": "passed",
-      "evidence": ["reports/20261031-dynamic-recognition/cloud-dynamic-frame-smoke.json", "reports/20261031-dynamic-recognition/input-size-benchmark.json"],
-      "notes": "真机端到端 1.05–1.25 s，请求间隔约 2–3 s；长稳和 2 小时未做"
+      "evidence": ["reports/20261031-dynamic-recognition/cloud-dynamic-frame-smoke.json", "reports/20261031-dynamic-recognition/input-size-benchmark.json", "reports/20261031-dynamic-recognition/README.md"],
+      "notes": "真机端到端 0.95–1.25 s，1.0.0.31 164 帧/约 250 s、0 失败、P50 808 ms；长稳和 2 小时未做"
     },
     {
       "id": "A-D06",
@@ -128,7 +128,7 @@
       "condition": "眼镜直接 HTTPS 到阿里云（不经 PC 中继）",
       "status": "not_run",
       "evidence": ["reports/20261031-dynamic-recognition/README.md"],
-      "notes": "当前 NJAU Wi-Fi 对 rice-srt.cn、baidu、aliyun、microsoft 的 443 均超时；HTTP 80 可达；失败历史保留，不标记通过"
+      "notes": "设备 TLS 栈可用（PC 自签名 12175）；公网 443 全部超时；阿里云 80 端口 TLS 被校园代理在 157 ms 内以 12175 拒绝且服务端未收到连接；nginx 已恢复。失败历史保留，不标记通过"
     },
     {
       "id": "A-D10",
@@ -157,6 +157,10 @@
     {
       "at": "2026-10-31T19:00:00+08:00",
       "change": "记录直连 HTTPS 443 在该校园 Wi-Fi 全部超时、HTTP 80 可达；USB 中继仅作为开发闭环，直连验收保持 not_run。"
+    },
+    {
+      "at": "2026-10-31T19:25:00+08:00",
+      "change": "直连诊断：设备访问 PC 自签名 HTTPS 得到 12175，说明 TLS 栈可用；阿里云 80 端口临时 TLS/HTTP 多路复用后 PC 访问 200，但设备 157 ms 返回 12175 且服务端 tcpdump 无连接，判定校园代理拦截；nginx 已恢复原配置。性能优化：动态循环改为请求完成即下一帧，1.0.0.31 实测 164 帧/约 250 s、0 失败、P50 808 ms、平均周期约 1.52 s。"
     }
   ]
 }

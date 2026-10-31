@@ -85,5 +85,5 @@ test('dynamic frame refreshes an expired session and retries the same frame iden
  assert.equal(value.frame_id,'dyn-retry');const frames=r.calls.filter(c=>c.endpoint==='/dynamic/frame');assert.equal(frames.length,2);assert.equal(frames[0].message.headers.values['X-Frame-ID'],frames[1].message.headers.values['X-Frame-ID']);assert.notEqual(frames[0].message.headers.values.Authorization,frames[1].message.headers.values.Authorization);
 });
 test('dynamic settings are bounded',async()=>{
- const r=runtime();await r.N.init();const value=r.N.dynamicSettings();assert.ok(value.frameSize>=256&&value.frameSize<=512);assert.ok([128,160,192,224].includes(value.inputSize));assert.ok(value.quality>=.45&&value.quality<=.9);assert.ok(value.minIntervalMs>=500&&value.minIntervalMs<=4000);
+ const r=runtime();await r.N.init();const value=r.N.dynamicSettings();assert.ok(value.frameSize>=256&&value.frameSize<=512);assert.ok([128,160,192,224].includes(value.inputSize));assert.ok(value.quality>=.45&&value.quality<=.9);assert.ok(value.gapMs>=0&&value.gapMs<=2000);
 });

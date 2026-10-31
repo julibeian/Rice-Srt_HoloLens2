@@ -195,7 +195,7 @@
   finally{clearTimeout(timer);current=null;try{message.close();c.close();}catch(_){}}
   }
  })();work.then(function(result){success(options,result);},function(e){log('upload_error',{message:e.message});failure(options,e);});return {abort:function(){aborted=true;if(current)try{current.cancel();}catch(_){}}};}
- function dynamicSettings(){var value=config||{};return {frameSize:Math.max(256,Math.min(512,Number(value.dynamicFrameSize)||384)),inputSize:[128,160,192,224].indexOf(Number(value.dynamicInputSize))>=0?Number(value.dynamicInputSize):160,quality:Math.max(.45,Math.min(.9,Number(value.dynamicJpegQuality)||.72)),minIntervalMs:Math.max(500,Math.min(4000,Number(value.dynamicMinIntervalMs)||750))};}
+ function dynamicSettings(){var value=config||{};return {frameSize:Math.max(256,Math.min(512,Number(value.dynamicFrameSize)||384)),inputSize:[128,160,192,224].indexOf(Number(value.dynamicInputSize))>=0?Number(value.dynamicInputSize):160,quality:Math.max(.45,Math.min(.9,Number(value.dynamicJpegQuality)||.72)),gapMs:Math.max(0,Math.min(2000,Number(value.dynamicGapMs)||0))};}
  function base64Bytes(value){var binary=atob(value),bytes=new Uint8Array(binary.length);for(var i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);return bytes;}
  async function captureDynamicFrame(options){
   options=options||{};if(!nativeMode)throw fail('动态识图需在眼镜上运行');if(!Q||!K)throw fail('拍摄组件未加载，请重开应用');

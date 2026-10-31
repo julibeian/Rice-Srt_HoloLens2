@@ -10,9 +10,9 @@ test('frame plan uses the selected square ROI and a bounded output size',()=>{
  assert.throws(()=>D.plan(1920,1080,{x:.9,y:.9,width:.5,height:.5},384),/取景区域/);
 });
 
-test('interval adapts to round trip and backs off on failures',()=>{
- assert.equal(D.intervalFor({rttMs:1200,inferenceMs:800}),1450);
- assert.equal(D.intervalFor({rttMs:200,inferenceMs:100,minIntervalMs:750}),750);
+test('interval uses an immediate next frame and backs off on failures',()=>{
+ assert.equal(D.intervalFor({rttMs:1200,inferenceMs:800}),0);
+ assert.equal(D.intervalFor({rttMs:1200},{gapMs:800}),800);
  assert.equal(D.intervalFor({failures:1,lastIntervalMs:1000}),1800);
  assert.equal(D.intervalFor({failures:3,lastIntervalMs:3500,maxIntervalMs:4000}),4000);
 });

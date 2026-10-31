@@ -103,7 +103,7 @@
   text('result-location',result.location&&result.location.status==='located'?result.locationBadge+' · 精度约 '+Math.ceil(result.location.accuracy||0)+' 米':result.location&&result.location.reason==='pending'?'位置获取中，不影响识别':'未取得位置，可在地图补充');
   text('result-time',state.recordId?time(state.recordId).slice(5):'');
  }
- function dynamicConfig(){try{return N.dynamicSettings();}catch(_){return {frameSize:384,inputSize:160,quality:.72,minIntervalMs:750};}}
+ function dynamicConfig(){try{return N.dynamicSettings();}catch(_){return {frameSize:384,inputSize:160,quality:.72,gapMs:0};}}
  function updateDynamicUi(){
   var active=state.dynamic.active,starting=state.dynamic.starting;
   el('app').classList.toggle('dynamic-active',active||starting);
@@ -151,10 +151,10 @@
    var config=dynamicConfig();
    state.dynamic.model=model;state.dynamic.last=null;state.dynamic.lastRoi=null;state.dynamic.view=null;state.dynamic.stats=null;state.dynamic.active=true;state.dynamic.starting=false;
    var session=D.createSession({
-    minIntervalMs:config.minIntervalMs,maxIntervalMs:4000,windowMs:8000,staleMs:4500,
-    capture:function(){return N.captureDynamicFrame({rect:targetRegion(),size:config.frameSize,quality:config.quality});},
-    analyze:function(frame){state.dynamic.lastRoi=frame.roi;return N.dynamicAnalyze({bytes:frame.bytes,hash:frame.hash,frameId:frame.frameId,size:config.inputSize});},
-    onResult:function(result,view,stats){state.dynamic.last=result;state.dynamic.view=view;state.dynamic.stats=stats;state.dynamic.error=null;renderDynamicHud(result,view,stats);drawDynamicOverlay();var count=stats&&stats.frames||0;if(count<=2||count%5===0){var modelInfo=result.model||{};N.log('dynamic_frame',{frame_id:result.frame_id,predicted_class:result.predicted_class,confidence:result.confidence,is_valid:result.is_valid,rtt_ms:Math.round(stats&&stats.lastRtt||0),inference_ms:Math.round((result.timing&&result.timing.inference_ms)||0),model:modelInfo.version,input_size:modelInfo.input_size,view:view.status});}},
+    gapMs:config.gapMs,maxIntervalMs:4000,windowMs:8000,staleMs:4500,
+    capture:async function(){var started=Date.now(),frame=await N.captureDynamicFrame({rect:targetRegion(),size:config.frameSize,quality:config.quality});state.dynamic.captureMs=Date.now()-started;return frame;},
+    analyze:function(frame){state.dynamic.lastRoi=frame.roi;var started=Date.now(),operation=N.dynamicAnalyze({bytes:frame.bytes,hash:frame.hash,frameId:frame.frameId,size:config.inputSize});operation.promise.then(function(){state.dynamic.analyzeMs=Date.now()-started;},function(){state.dynamic.analyzeMs=Date.now()-started;});return operation;},
+    onResult:function(result,view,stats){state.dynamic.last=result;state.dynamic.view=view;state.dynamic.stats=stats;state.dynamic.error=null;renderDynamicHud(result,view,stats);drawDynamicOverlay();var count=stats&&stats.frames||0;if(count<=2||count%5===0){var modelInfo=result.model||{};N.log('dynamic_frame',{frame_id:result.frame_id,predicted_class:result.predicted_class,confidence:result.confidence,is_valid:result.is_valid,rtt_ms:Math.round(stats&&stats.lastRtt||0),capture_ms:state.dynamic.captureMs||0,analyze_ms:state.dynamic.analyzeMs||0,inference_ms:Math.round((result.timing&&result.timing.inference_ms)||0),model:modelInfo.version,input_size:modelInfo.input_size,view:view.status});}},
     onError:function(error,stats){state.dynamic.error=error;state.dynamic.stats=stats;renderDynamicError(error,stats);N.log('dynamic_error',{message:errorText(error),status:error.status||0,code:error.code||''});},
     onStop:function(stats){state.dynamic.stats=stats;}
    });

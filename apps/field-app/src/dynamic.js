@@ -10,11 +10,9 @@
   return {x:Math.max(0,Math.min(width-1,Math.round(rect.x*width))),y:Math.max(0,Math.min(height-1,Math.round(rect.y*height))),width:Math.max(1,Math.min(width-Math.round(rect.x*width),Math.round(rect.width*width))),height:Math.max(1,Math.min(height-Math.round(rect.y*height),Math.round(rect.height*height))),size:side};
  }
  function intervalFor(stats,options){
-  stats=stats||{};options=options||{};var minimum=finite(options.minIntervalMs)?options.minIntervalMs:750,maximum=finite(options.maxIntervalMs)?options.maxIntervalMs:4000,last=finite(stats.lastIntervalMs)?stats.lastIntervalMs:1200;
+  stats=stats||{};options=options||{};var maximum=finite(options.maxIntervalMs)?options.maxIntervalMs:4000,last=finite(stats.lastIntervalMs)?stats.lastIntervalMs:1200,gap=finite(options.gapMs)?options.gapMs:0;
   if(stats.failures>0)return clamp(Math.round(Math.max(1500,last*1.8)),1500,maximum);
-  var next=Math.max(minimum,(finite(stats.rttMs)?stats.rttMs:1000)+250);
-  if(finite(stats.inferenceMs)&&stats.inferenceMs>0)next=Math.max(next,stats.inferenceMs+300);
-  return clamp(Math.round(next),minimum,maximum);
+  return clamp(Math.round(gap),0,maximum);
  }
  function average(rows,key){if(!rows.length)return null;var total=0,count=0;rows.forEach(function(row){if(finite(row[key])){total+=row[key];count++;}});return count?total/count:null;}
  function stableView(history,now,options){
@@ -52,7 +50,7 @@
   function snapshot(){return {frames:stats.frames,ok:stats.ok,fail:stats.fail,failures:stats.failures,lastRtt:stats.lastRtt,lastInference:stats.lastInference,startedAt:stats.startedAt,uptimeMs:stats.startedAt?Math.max(0,now()-stats.startedAt):0};}
   function emit(callback,args){if(typeof callback!=='function')return;try{callback.apply(null,args);}catch(_){}}
   async function loop(){
-   var lastInterval=finite(options.minIntervalMs)?options.minIntervalMs:750;
+   var lastInterval=finite(options.gapMs)?options.gapMs:0;
    while(running){
     var started=now();
     try{
@@ -67,7 +65,7 @@
      if(!running)break;currentAbort=null;stats.fail++;stats.failures++;emit(options.onError,[error,snapshot()]);
      lastInterval=intervalFor({failures:stats.failures,lastIntervalMs:lastInterval,minIntervalMs:options.minIntervalMs,maxIntervalMs:options.maxIntervalMs},options);
     }
-    if(!running)break;await wait(lastInterval);
+    if(!running)break;if(lastInterval>0)await wait(lastInterval);
    }
    running=false;emit(options.onStop,[snapshot()]);
   }
