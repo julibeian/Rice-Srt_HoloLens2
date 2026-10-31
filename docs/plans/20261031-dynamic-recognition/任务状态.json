@@ -58,8 +58,8 @@
       "title": "真机动态识图与链路验收",
       "status": "in_progress",
       "artifacts": ["reports/20261031-dynamic-recognition/"],
-      "acceptance": ["A-D04", "A-D05", "A-D09"],
-      "notes": "经 USB 中继连续约 4 分钟、164 帧动态请求，0 失败；1.0.0.31 平均周期约 1.52 s；内置症状图阳性 93.27%；静态回归通过；直连 HTTPS 仍被网络阻断"
+      "acceptance": ["A-D04", "A-D05", "A-D09", "A-D11"],
+      "notes": "经 USB 中继连续约 4 分钟、164 帧动态请求，0 失败；1.0.0.31 平均周期约 1.52 s；断链 3 次错误后重启中继自动恢复；内置症状图阳性 93.27%；静态回归通过；直连 HTTPS 仍被网络阻断"
     },
     {
       "id": "D08",
@@ -67,7 +67,7 @@
       "status": "in_progress",
       "artifacts": ["reports/20261031-dynamic-recognition/input-size-benchmark.json"],
       "acceptance": ["A-D05", "A-D10"],
-      "notes": "默认 160 输入；CAM 阈值与透明度调优；动态循环 gap 0，164 帧 0 失败、平均 1.52 s；长稳、断网、真实叶片仍待做"
+      "notes": "默认 160 输入；CAM 阈值与透明度调优；动态循环 gap 0，164 帧 0 失败、平均 1.52 s；断链恢复通过；长稳、跨休眠、真实叶片仍待做"
     }
   ],
   "acceptance_cases": [
@@ -121,7 +121,7 @@
       "condition": "断网、401、429、504 时动态模式退避并自动恢复，不伪造结果",
       "status": "not_run",
       "evidence": [],
-      "notes": "单元层有 401/429/504 映射；真机断网重连未做"
+      "notes": "单元层有 401/429/504 映射；真机断网恢复见 A-D11，尚未单独触发 401/429/504 设备场景"
     },
     {
       "id": "A-D09",
@@ -132,9 +132,16 @@
     },
     {
       "id": "A-D10",
-      "condition": "30 分钟以上动态运行、断网恢复、跨休眠与真实叶片/多光照",
+      "condition": "30 分钟以上动态运行、跨休眠与真实叶片/多光照",
       "status": "not_run",
       "evidence": []
+    },
+    {
+      "id": "A-D11",
+      "condition": "USB 中继中断后动态模式退避、重试并在中继恢复后自动继续，不伪造结果",
+      "status": "passed",
+      "evidence": ["reports/20261031-dynamic-recognition/device-1.0.0.31-recovery-app-state.json"],
+      "notes": "3 次 dynamic_error 后重启中继，11:21:43 起恢复新帧；停止统计 frames=38, ok=38, fail=3"
     }
   ],
   "change_log": [
@@ -161,6 +168,10 @@
     {
       "at": "2026-10-31T19:25:00+08:00",
       "change": "直连诊断：设备访问 PC 自签名 HTTPS 得到 12175，说明 TLS 栈可用；阿里云 80 端口临时 TLS/HTTP 多路复用后 PC 访问 200，但设备 157 ms 返回 12175 且服务端 tcpdump 无连接，判定校园代理拦截；nginx 已恢复原配置。性能优化：动态循环改为请求完成即下一帧，1.0.0.31 实测 164 帧/约 250 s、0 失败、P50 808 ms、平均周期约 1.52 s。"
+    },
+    {
+      "at": "2026-10-31T19:30:00+08:00",
+      "change": "断链恢复真机验证：动态运行中停止 USB 中继，记录 3 次 dynamic_error 并按失败退避；重启中继后 11:21:43 起恢复新帧，停止统计 frames=38, ok=38, fail=3。直连 HTTPS 仍 not_run。"
     }
   ]
 }
