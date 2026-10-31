@@ -109,8 +109,8 @@ function Save-Attempt([string]$outcome,[switch]$Restart){
     $previous=$null
     if(Test-Path -LiteralPath $statePath){try{$previous=Get-Content -LiteralPath $statePath -Raw|ConvertFrom-Json}catch{}}
     $state=[ordered]@{lastAttemptAt=[DateTimeOffset]::Now.ToString('o');lastOutcome=$outcome;runId=$RunId;device=$config.DeviceName}
-    if($previous -and $previous.lastRestartAt){$state.lastRestartAt=$previous.lastRestartAt}
-    if($Restart){$state.lastRestartAt=[DateTimeOffset]::Now.ToString('o')}
+    if($previous -and ($previous.PSObject.Properties.Name -contains 'lastRestartAt')){$state['lastRestartAt']=$previous.lastRestartAt}
+    if($Restart){$state['lastRestartAt']=[DateTimeOffset]::Now.ToString('o')}
     [IO.File]::WriteAllText($statePath,($state|ConvertTo-Json),[Text.UTF8Encoding]::new($false))
 }
 function Restart-Bridge {

@@ -143,7 +143,7 @@
       "condition": "跨休眠自动唤醒与真实叶片/多光照",
       "status": "not_run",
       "evidence": ["reports/20261031-dynamic-recognition/device-sleepwake-20261031-2010.json"],
-      "notes": "30 分钟长稳见 A-D13；跨休眠实验 wake_unverified：30.4 s 进入睡眠候选，桥重启 3.0 s 后 301.6 s 无视频，受控重启恢复；真实叶片/多光照仍未做"
+      "notes": "30 分钟长稳见 A-D13；跨休眠实验 wake_unverified：30.4 s 进入睡眠候选，桥重启 3.0 s 后 301.6 s 无视频，受控重启恢复；可用性监督器的 Save-Attempt 缺陷已修复，-Once 健康检查 15 帧，但未复跑完整睡眠周期；真实叶片/多光照仍未做"
     },
     {
       "id": "A-D11",
@@ -207,6 +207,10 @@
     {
       "at": "2026-10-31T20:30:00+08:00",
       "change": "上传自动回退与构建：直连上传遇到网络错误时用同一 request_id/hash 自动改走中继；单元测试覆盖。1.0.0.42 诊断包真机静态回归通过（309,317 字节 prediction/history），1.0.0.43 生产包已构建。中继进程改由 WMI Win32_Process.Create 分离启动，Start-UsbRelay 可立即返回，当前监听 169.254.216.241:9021。"
+    },
+    {
+      "at": "2026-10-31T20:36:00+08:00",
+      "change": "修复 Watch-HoloLensAvailability.ps1 的 Save-Attempt 有序字典属性赋值缺陷；-Once 监督检查返回 portalOk=true、low=false、15 帧视频。跨休眠完整周期未再复跑，A-D10 仍 not_run。"
     }
   ]
 }
