@@ -5,7 +5,9 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.IO;
+using System.Runtime.ExceptionServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
@@ -41,6 +43,7 @@ namespace Rice.HoloLens.Control {
         float pitch=.1f,yaw=-.23f;
         public bool Connected {get;private set;}
         public bool Controlling {get;private set;}
+        public bool HasPendingControlRestore {get{return stopping&&!Controlling&&leaseRun!=null;}}
         public string DeviceName {get;private set;}
         public DateTime ControlExpires {get;private set;}
         public double ControlRemainingSeconds {get{return Math.Max(0,(controlDeadlineTicks-Stopwatch.GetTimestamp())/(double)Stopwatch.Frequency);}}
@@ -78,14 +81,21 @@ namespace Rice.HoloLens.Control {
             if(await Task.WhenAny(work,Task.Delay(milliseconds))!=work)throw new TimeoutException(label+"超时；先核对本次结果，再继续操作");return await work;
         }
         string OperationCommand(string operation){return "-NoLogo -NoProfile -NonInteractive -File "+Quote(Path.Combine(Workspace,"apps/pc-control\\ops\\Invoke-Operation.ps1"))+" -Operation "+Quote(operation);}
+        static void ValidateRunId(string runId){
+            if(runId==null||!Regex.IsMatch(runId,@"\A[A-Za-z0-9_-]{1,64}\z"))throw new InvalidOperationException("控制编号格式无效，操作未发送");
+        }
+        static bool SameExecutablePath(string actual,string expected){
+            return string.Equals(Path.GetFullPath(actual),Path.GetFullPath(expected),StringComparison.OrdinalIgnoreCase);
+        }
         async Task<Dictionary<string,object>> RunScript(string operation,params string[] arguments) {
+            for(int i=0;i<arguments.Length;i++)if(arguments[i]=="-RunId")ValidateRunId(i+1<arguments.Length?arguments[i+1]:null);
             var command=OperationCommand(operation);
             foreach(var argument in arguments)command+=" "+Quote(argument);
             OperationOutput result;
             try{result=await OperationProcess.RunAsync(StartInfo(powershell,command),45000).ConfigureAwait(false);}
             catch(TimeoutException timeout){Log("script_timeout",new{operation=operation,arguments=arguments,processId=timeout.Data["ProcessId"],exitConfirmed=timeout.Data["ProcessExitConfirmed"],replayed=false});throw;}
             Log("script",new{operation=operation,arguments=arguments,exit=result.ExitCode,output=result.Output,error=result.Error});
-            if(result.ExitCode!=0)throw new InvalidOperationException("设备操作未完成，详情已保存在运行记录中");
+            if(result.ExitCode!=0)throw new InvalidOperationException((operation=="StartLease"?"建立控制保护失败":operation=="StopLease"?"控制保护恢复未确认":"设备操作未完成")+"，详情已保存在运行记录中");
             return json.Deserialize<Dictionary<string,object>>(result.Output.Trim().TrimStart('\uFEFF'));
         }
         static bool True(Dictionary<string,object> data,string name){return data.ContainsKey(name)&&data[name] is bool&&(bool)data[name];}
@@ -234,15 +244,24 @@ namespace Rice.HoloLens.Control {
         }
         public async Task StartControlAsync() {
             await lifecycle.WaitAsync();
-            Exception failure=null;
-            try{await StartControlCore();}catch(Exception error){failure=error;}
-            try{if(failure!=null){await StopInternal();throw failure;}}finally{lifecycle.Release();}
+            try{
+                if(Controlling)return;
+                // Resolve the previous named lease once before creating a new
+                // one. A failed check must not dispatch another start/cleanup.
+                if(leaseRun!=null)await StopInternal();
+                Exception failure=null;
+                try{await StartControlCore();}catch(Exception error){failure=error;}
+                if(failure!=null){
+                    try{await StopInternal();}catch(Exception cleanupError){Log("control_start_cleanup_pending",new{error=cleanupError.Message,originalError=failure.Message});}
+                    ExceptionDispatchInfo.Capture(failure).Throw();
+                }
+            }finally{lifecycle.Release();}
         }
         async Task StartControlCore() {
                 if(Controlling)return;if(!Connected)throw new InvalidOperationException("请先连接眼镜");
-                if(leaseRun!=null){await StopInternal();if(leaseRun!=null)throw new InvalidOperationException("上次控制恢复仍待核对");}
+                var runId="pc-control-"+Guid.NewGuid().ToString("N");ValidateRunId(runId);
                 stopping=false;controlCancellation.Dispose();controlCancellation=new CancellationTokenSource();
-                leaseRun="apps/pc-control-"+Guid.NewGuid().ToString("N");ControlExpires=DateTime.UtcNow.AddSeconds(300);controlDeadlineTicks=Stopwatch.GetTimestamp()+300L*Stopwatch.Frequency;
+                leaseRun=runId;ControlExpires=DateTime.UtcNow.AddSeconds(300);controlDeadlineTicks=Stopwatch.GetTimestamp()+300L*Stopwatch.Frequency;
                 Say("正在建立限时控制保护…");
                 var lease=await RunScript("StartLease","-RunId",leaseRun);
                 if(!True(lease,"Active"))throw new InvalidOperationException("未能建立控制保护");
@@ -255,7 +274,7 @@ namespace Rice.HoloLens.Control {
                 if(ready.ContainsKey("AdapterProcessId")){
                     var adapter=Process.GetProcessById(Convert.ToInt32(ready["AdapterProcessId"]));
                     string expected=Path.Combine(Workspace,"apps/holographic-control\\.state\\desktop-x86\\PerceptionControl.exe");
-                    if(!string.Equals(adapter.MainModule.FileName,expected,StringComparison.OrdinalIgnoreCase)){adapter.Dispose();throw new InvalidOperationException("控制子进程身份未通过核对");}
+                    if(!SameExecutablePath(adapter.MainModule.FileName,expected)){adapter.Dispose();throw new InvalidOperationException("控制子进程身份未通过核对");}
                     controllerAdapter=adapter;
                 }
                 Controlling=true;pitch=.1f;yaw=-.23f;
@@ -350,7 +369,7 @@ namespace Rice.HoloLens.Control {
         public async Task MoveAsync(float distance){await lifecycle.WaitAsync();try{if(!Controlling)throw new InvalidOperationException("请先开始控制");RequireFresh();await Send("move 0 0 "+distance.ToString("F3",CultureInfo.InvariantCulture));pointerMap=null;await SettleView(FrameSequence);Say("观看距离已调整，下次点按时自动校准");}finally{lifecycle.Release();}}
         public async Task StopControlAsync(){stopping=true;controlCancellation.Cancel();await lifecycle.WaitAsync();try{await StopInternal();}finally{lifecycle.Release();}}
         async Task StopInternal() {
-            Controlling=false;pointerMap=null;
+            stopping=true;Controlling=false;pointerMap=null;
             if(controller!=null){
                 try{if(!controller.HasExited){
                     if(!controllerOutcomeUnknown){try{await Send("hand off",true);}catch{}var closed=await Send("exit",true);if(!closed.ContainsKey("state")||(string)closed["state"]!="closed"||!closed.ContainsKey("httpStatus")||Convert.ToInt32(closed["httpStatus"])!=200)throw new InvalidOperationException("Own stream closure not confirmed");Log("stream_closed",closed);}
@@ -360,8 +379,8 @@ namespace Rice.HoloLens.Control {
             }
             if(leaseRun!=null){
                 Say("正在恢复眼镜正常控制…");
-                try{var result=await RunScript("StopLease","-RunId",leaseRun);if(!True(result,"Restored"))throw new InvalidOperationException("恢复未确认");Log("restored",new{run=leaseRun,result=result});leaseRun=null;Say("已停止控制，眼镜已恢复正常模式");}
-                catch{Say("恢复结果仍待核对；设备端保护最晚于 "+ControlExpires.ToLocalTime().ToString("HH:mm:ss")+" 到期");throw;}
+                try{var result=await RunScript("StopLease","-RunId",leaseRun);if(!True(result,"Restored"))throw new InvalidOperationException("恢复未确认");Log("restored",new{run=leaseRun,result=result});leaseRun=null;ControlExpires=default(DateTime);controlDeadlineTicks=0;Say("已停止控制，眼镜已恢复正常模式");}
+                catch{Say("控制保护的恢复状态仍待核对，请点击“核对恢复”");throw;}
             }
         }
         async Task MonitorVideo(){

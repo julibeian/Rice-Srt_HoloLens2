@@ -9,7 +9,7 @@ $PackageFullName=@($PackageFullName|ForEach-Object {$_ -split ','}|ForEach-Objec
 # Only developer test packages this project installed may be removed. The field
 # apps and every system or store package stay outside this allowlist so a typo
 # cannot uninstall the business app.
-$allowed=@('Rice.HoloLens.SurfaceProbe','Rice.HoloLens.NativeSurface','Rice.HoloLens.InputProbe','Rice.HoloLens.ScreenProbe')
+$allowed=@('Rice.HoloLens.SurfaceProbe','Rice.HoloLens.NativeSurface','Rice.HoloLens.InputProbe','Rice.HoloLens.ScreenProbe','Rice.HoloLens.OnnxProbe')
 $workspace=Split-Path -Parent (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
 $folder=Join-Path $workspace ('apps/pc-control\.state\application-operations\'+$RunId)
 $invocationPath=Join-Path $folder 'invocation.json';$resultPath=Join-Path $folder 'result.json'

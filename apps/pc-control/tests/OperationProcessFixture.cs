@@ -25,7 +25,9 @@ class OperationProcessFixture {
             byte[] bytes=Encoding.UTF8.GetBytes("{\"message\":\"眼镜原身份已核对，点按未重发\",\"value\":7}");
             using(var output=Console.OpenStandardOutput())for(int i=0;i<bytes.Length;i++){output.Write(bytes,i,1);output.Flush();Thread.Sleep(1);}return 0;
         }
-        if(mode=="excess-output"){for(int i=0;i<2304;i++)Console.Out.Write(new string('o',4096));return 0;}
+        // A single binary write tests the byte cap without making thousands
+        // of TextWriter flushes a machine-dependent throughput benchmark.
+        if(mode=="excess-output"){byte[] excess=new byte[9*1024*1024];using(var output=Console.OpenStandardOutput())output.Write(excess,0,excess.Length);return 0;}
         if(mode=="holder"){Thread.Sleep(65000);return 0;}
         if(mode=="inherited-writers"){
             using(var current=Process.GetCurrentProcess())using(var child=Process.Start(new ProcessStartInfo(current.MainModule.FileName,"--mode holder --marker \""+marker+".holder\""){UseShellExecute=false,CreateNoWindow=true})){
