@@ -1,0 +1,4 @@
+LIBRARY Rice.HoloLens.Yolo
+EXPORTS
+ DllGetActivationFactory
+ DllCanUnloadNow

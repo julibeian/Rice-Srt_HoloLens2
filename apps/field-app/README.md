@@ -1,65 +1,55 @@
-# 稻视界眼镜应用
+# 稻视界眼镜内动态检测
 
-`apps/field-app` 是当前 HoloLens 独立应用，版本 **1.0.0.45 生产（直连 + 链路本地回退）、1.0.0.44 直连验收构建 · 动态识图实验**。使用应用内原始 PV 预览完成目标选择、相机控制、高清采集、质量检查与裁剪，直接向识别网关上传并核对返回结果；新增动态模式按取景框连续取帧并叠加上云识别结果。
+当前实现为 **1.0.0.48、ARM64、包内 YOLOv8n 六类目标检测**。HoloLens 连续读取原始 PV 新帧，在眼镜内完成预处理、WinML GPU 推理、分类别 NMS 和检测框显示。相机预览独立持续运行；停止识别后释放模型与工作线程，预览保留。
 
-## 使用
+应用只申请相机权限，页面设置 `connect-src 'none'`，启动不需要识别服务或 Wi-Fi 预检。旧 ConvNeXt 十类动态分类、CAM、图像上传和 USB 识别中继回退均不属于当前应用。云端旧动态挂载已撤除；不恢复用户已否决的静态拍照加识别反馈路线。
 
-点击预览移动取景框，用“范围”切换大小；点击“拍照”后等待画面稳定，应用保存原图和裁剪图，上传并显示结果。“查看原图”核对采集范围，“继续拍照”返回预览，失败上传可恢复。定位失败不阻止识别，历史照片重传保留原采集信息。
+## 使用与限制
 
-动态模式：点“动态识图”后应用每轮从取景框裁剪 384×384 JPEG，按端到端延迟自动节流上传到 `/hololens-app/api/dynamic/frame`；HUD 显示稳定类别、置信度、端到端延迟、推理耗时、模型版本和输入尺寸，画布叠加 CAM 关注区域。再点“停止动态”恢复静态拍照。云端默认 160 输入，可在 `config.json` 调整 `dynamicFrameSize`、`dynamicInputSize`、`dynamicJpegQuality`、`dynamicGapMs`（0 表示请求完成立即下一帧）。若直连健康探测失败且配置了链路本地 `relayOrigin`，应用自动改走 USB 中继；请求中途网络失败会切换到另一来源重试一次，不伪造结果。`relayOrigin` 只接受 `169.254.*`、`127.0.0.1` 或 `localhost`，中继不记录请求体或令牌。
+打开应用后自动开始连续检测；“停止识别”释放模型，“开始识别”重新加载。未检出目标不代表健康。结果超过 5 秒会清除旧框，不把上一帧结果永久留在预览上。
 
-## 构建与测试
+固定类别顺序：稻纵卷叶螟、稻水象甲、稻叶蝉、白叶枯病、胡麻斑病、稻瘟病。默认输入 320×320、RGB NCHW `/255`、letterbox 填充 114，置信度阈值 0.4，分类别 NMS IoU 0.45。模型输出为 `[1,10,2100]`。
 
-在仓库根目录执行：
+原下载模型为 640×640、opset19/IR9。适配保留训练权重，改为 opset12/IR7，并为 320 输入重建检测网格与形状常量。算子转换与同尺寸参考图的数值一致，不代表 320 与原 640 的预测完全相同。没有量化或重新训练。
+
+眼镜实测推理约 0.6 秒/帧，属于持续检测，尚未达到视频逐帧检测速度。现有样本存在稻瘟病误判为胡麻斑病、胡麻斑病在默认阈值下漏检的问题。真实叶片、多光照和准确率仍未验收。内置图像只供诊断同一本地引擎及框显示，不能代替实物效果。
+
+## 构建、部署与核验
+
+在仓库根目录依次执行；模型转换使用本机 Python3.9 的 ONNX Runtime，以及 `.state/model-analysis-20261101/deps` 中的 ONNX1.17。构建依赖现有 Windows SDK、MSVC 链接器、Zig 和 Node.js；四张诊断图默认从旁边的 `srt-rice/手机端可跑版/samples` 读取，可通过 `RICE_YOLO_SAMPLES` 指定目录。
 
 ```powershell
-npm --prefix apps/field-app ci
-node apps/field-app/build.mjs
+py -3.9 -B apps/field-app/ops/Adapt-YoloModel.py --size 320 --output apps/field-app/.state/yolo-320/model.onnx
+runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Test-YoloCore.ps1 -InputSize 320
+runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Build-App.ps1 -Version 1.0.0.48 -InputSize 320
+runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Install-App.ps1 -Launch
+```
+
+待至少 30 个真实新帧完成后，以新 RunId 核对原设备、实际进程、模型、包文件回读哈希、权限和诊断入口关闭状态：
+
+```powershell
+runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Verify-YoloDeployment.ps1 -RunId yolo-production-check
+```
+
+同一 RunId 只取回原证据；需新观察时使用新名称。安装、启动接受或 `networkRequests=0` 字段本身不能替代实际推理和网络独立性证据。核验脚本不会断开整台设备网络。
+
+测试：
+
+```powershell
 node --test apps/field-app/tests/*.test.cjs
 python -B -m unittest discover -s apps/field-app/tests -p 'test_*.py'
+runtime/powershell/pwsh.exe -NoProfile -File tests/HoloLens.Discovery.Tests.ps1
 ```
 
-生产构建（优先直连阿里云；`relayOrigin` 存在时直连健康探测失败自动改走 USB 中继）：
-
-```powershell
-runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Build-App.ps1 -Version 1.0.0.45
-```
-
-直连专用验收构建（从配置中移除 `relayOrigin`，用于证明不经过中继）：
-
-```powershell
-runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Build-App.ps1 -Version 1.0.0.46 -CameraDiagnostics -NoRelay
-```
-
-USB 中继启动与停止（仅绑定 USB 主机地址，转发 `/hololens-app/api/*` 到生产 HTTPS）：
-
-```powershell
-runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Start-UsbRelay.ps1
-runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Stop-UsbRelay.ps1
-```
-
-强制中继诊断构建（不使用自动回退，便于复现校园网络问题）：
-
-```powershell
-runtime/powershell/pwsh.exe -NoProfile -File apps/field-app/ops/Build-App.ps1 -Version 1.0.0.42 -CameraDiagnostics -ApiOrigin http://169.254.216.241:9021
-```
-
-诊断构建支持通过 `camera-check.json` 触发 `controls`、`capture`、`dynamic_start`、`dynamic_stop`、`dynamic_asset`；生产构建不启用该轮询。
-
-共用界面输入见 [upstream-miniprogram](upstream-miniprogram/README.md)。Windows 打包、SDK 与设备配置见 [开发指南](../../docs/development.md) 和 [设备调试](../../docs/device-debugging.md)。动态阶段云端清单与实测见 [动态识图交付](../../reports/20261031-dynamic-recognition/README.md)。
-
-## 代码
+## 代码与证据
 
 | 路径 | 职责 |
 | --- | --- |
-| `src/native.js` | WinRT 相机、存储、位置、上传、恢复与动态帧 |
-| `src/camera-controls.js` | 相机能力、区域控制与曝光反馈 |
-| `src/capture-quality.js` | 图像质量、稳定性与裁剪坐标 |
-| `src/dynamic.js` | 动态节流、平滑、标注映射与循环（纯逻辑） |
-| `src/app.js`、`bridge.js` | 应用流程与业务接口 |
-| `ops/`、`device/` | 构建、部署、运行诊断与证据导出 |
-| `server/` | 识别网关、动态模型模块、CAM 与 USB 中继 |
+| `src/native.js` | 原始相机预览、新帧传递、本地组件身份与资源生命周期 |
+| `src/app.js`、`dynamic.js` | 持续预览、开始/停止、框映射与过期清除 |
+| `yolo-native/` | ARM64 WinRT 组件、WinML、预处理和 NMS |
+| `ops/Adapt-YoloModel.py` | 版本语义转换、检测网格适配、权重与数值核验 |
+| `ops/Build-App.ps1`、`Verify-YoloDeployment.ps1` | 包构建和真机文件/运行核验 |
+| `server/retire_dynamic.py` | 有备份及回滚的旧动态云端挂载撤除 |
 
-网关使用 `/register`、`/session`、`/predict` 管理设备会话与图像请求，动态模式使用 `/dynamic/frame`、`/dynamic/health`。首次配置由部署工具完成，之后复用设备身份。上传请求与 `capture_evidence` 使用同一请求编号和图像 SHA256；动态帧使用帧编号和图像 SHA256。
-
-相机与上传测试使用明确的接口替身。真机验证范围及未完成实验见 [版本验证摘要](../../experiments/results/pipeline-v1.0.0.22.md)，不将 API 接受或旧版本日志当作当前运行证据。
+[执行步骤](../../docs/plans/20261101-yolo-on-device/执行入口.md)、[部署报告](../../reports/20261101-yolo-on-device/部署报告.md)保存当前证据与限制。旧版本及已被否决的产品流程仅作历史记录。根目录 `README.md` 继续由用户维护。

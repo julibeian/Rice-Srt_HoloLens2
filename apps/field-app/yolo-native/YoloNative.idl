@@ -1,0 +1,15 @@
+import "inspectable.idl";
+import "Windows.Storage.Streams.idl";
+namespace Rice.HoloLens.Yolo
+{
+    [uuid(7e0645c1-3d55-4e34-99bb-416665922c31), version(1.0), exclusiveto(Detector)]
+    interface IDetector : IInspectable
+    {
+        HRESULT Start([in] HSTRING modelPath, [in] HSTRING expectedSha256, [in] UINT32 deviceKind);
+        HRESULT Submit([in] Windows.Storage.Streams.IBuffer* pixels, [in] INT32 width, [in] INT32 height, [in] DOUBLE frameTime, [in] boolean diagnostic, [out, retval] boolean* accepted);
+        HRESULT GetState([out, retval] HSTRING* value);
+        HRESULT Stop();
+    }
+    [version(1.0), activatable(1.0), threading(both), marshaling_behavior(agile)]
+    runtimeclass Detector { [default] interface IDetector; }
+}

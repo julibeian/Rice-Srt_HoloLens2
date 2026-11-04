@@ -1,20 +1,20 @@
-param([ValidateSet('controls','capture')][string]$Action='controls',[ValidateRange(0,1)][double]$TargetX=0.5,[ValidateRange(0,1)][double]$TargetY=0.46)
+param([ValidateSet('dynamic_start','dynamic_stop','dynamic_asset','yolo_state')][string]$Action='yolo_state',[ValidateSet('','bacterial_blight_0.jpg','brown_spot_0.jpg','rice_blast_0.jpg','rice_water_weevil_0.jpg')][string]$Asset='', [ValidatePattern('^[A-Za-z0-9_-]{1,64}$')][string]$RunId=('yolo-'+[guid]::NewGuid().ToString('N')))
 $ErrorActionPreference='Stop'
-$root=Split-Path -Parent $PSScriptRoot
-$workspace=Split-Path -Parent (Split-Path -Parent $root)
+$root=Split-Path -Parent $PSScriptRoot;$workspace=Split-Path -Parent (Split-Path -Parent $root)
 . (Join-Path $workspace 'usb-terminal/HoloLens.Common.ps1')
-& (Join-Path $PSScriptRoot 'Get-AppState.ps1')|Out-Null
-$runtime=Get-Content -LiteralPath (Join-Path $root '.state\runtime-status.json') -Raw|ConvertFrom-Json
-$state=Get-Content -LiteralPath (Join-Path $runtime.Evidence 'app-state.json') -Raw|ConvertFrom-Json
-if(-not $state.cameraSession -or $state.version -ne $runtime.Version){throw 'A current CameraDiagnostics build must be running.'}
-$requestId=[Guid]::NewGuid().ToString('N')
-$folder=Join-Path $root '.state\camera-checks'
-[IO.Directory]::CreateDirectory($folder)|Out-Null
-$path=Join-Path $folder ($requestId+'.json')
-$command=[ordered]@{id=$requestId;session=$state.cameraSession;action=$Action;target=@{x=$TargetX;y=$TargetY}}
-[IO.File]::WriteAllText($path,($command|ConvertTo-Json -Compress),[Text.UTF8Encoding]::new($false))
-$installed=Get-Content -LiteralPath (Join-Path $root '.state\installed.json') -Raw|ConvertFrom-Json
+$folder=Join-Path $root ('.state/camera-checks/'+$RunId);$record=Join-Path $folder 'invocation.json'
+if(Test-Path -LiteralPath $record){Get-Content -LiteralPath $record -Raw;return}
+if(($Action -eq 'dynamic_asset') -ne [bool]$Asset){throw 'Asset is required only for dynamic_asset'}
+$runtime=& (Join-Path $PSScriptRoot 'Get-AppState.ps1')|ConvertFrom-Json
+$state=Get-Content -Raw -LiteralPath (Join-Path $runtime.Evidence 'app-state.json')|ConvertFrom-Json
+if(-not $runtime.RuntimeVerified -or -not $state.cameraSession -or $state.version -ne $runtime.Version){throw 'Current CameraDiagnostics build is not verified running'}
+$installed=Get-Content -Raw -LiteralPath (Join-Path $root '.state/installed.json')|ConvertFrom-Json
 $remote=$installed.RemoteLayout+'\camera-check.json'
-if((Invoke-HlBridge @{action='stat';path=$remote}).Exists){throw 'A previous camera check has not been consumed; it was not overwritten or repeated.'}
-Invoke-HlBridge @{action='put';local=$path;path=$remote}|Out-Null
-[ordered]@{Id=$requestId;Action=$Action;Version=$runtime.Version;Submitted=$true;Completed=$false;Evidence=$path}|ConvertTo-Json -Compress
+if((Invoke-HlBridge @{action='stat';path=$remote}).Exists){throw 'Prior command remains; not overwritten or repeated'}
+[IO.Directory]::CreateDirectory($folder)|Out-Null
+$requestId=[guid]::NewGuid().ToString('N');$command=@{id=$requestId;session=$state.cameraSession;action=$Action;asset=$Asset}
+$commandPath=Join-Path $folder 'command.json';$command|ConvertTo-Json -Compress|Set-Content -LiteralPath $commandPath -Encoding utf8NoBOM
+$proof=@{RunId=$RunId;Id=$requestId;Action=$Action;Asset=$Asset;Session=$state.runtimeSession;Version=$runtime.Version;Attempted=$true;Completed=$false;ReplayAllowed=$false;Evidence=$folder}
+$proof|ConvertTo-Json|Set-Content -LiteralPath $record -Encoding utf8NoBOM
+Invoke-HlBridge @{action='put';local=$commandPath;path=$remote}|Out-Null
+$proof|ConvertTo-Json -Compress

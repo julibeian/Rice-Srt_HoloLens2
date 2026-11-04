@@ -15,7 +15,7 @@ if($LASTEXITCODE -ne 0){throw 'Device file deployment failed.'}
 & $sdk registerfiles -remotedeploydir $RemoteDirectory -ip $info.Address 2>&1|Tee-Object -FilePath (Join-Path $PackageDirectory 'register.log')
 if($LASTEXITCODE -ne 0){throw 'Device app registration failed.'}
 $remoteLayout='U:\Users\DefaultAccount\AppData\Local\DevelopmentFiles\'+$RemoteDirectory
-$installed=[ordered]@{Version=$proof.Version;Identity=$proof.Identity;RemoteLayout=$remoteLayout;InstalledAt=[DateTimeOffset]::Now.ToString('o');PackageSha256=$proof.Sha256}
+$installed=[ordered]@{Version=$proof.Version;Identity=$proof.Identity;RemoteLayout=$remoteLayout;InstalledAt=[DateTimeOffset]::Now.ToString('o');PackageSha256=$proof.Sha256;RecognitionMode=$proof.RecognitionMode;ModelSha256=$proof.ModelSha256}
 [IO.File]::WriteAllText((Join-Path $root '.state\installed.json'),($installed|ConvertTo-Json),[Text.UTF8Encoding]::new($false))
 if($Launch){& (Join-Path $PSScriptRoot 'Start-App.ps1')|Out-Null;$installed=Get-Content -LiteralPath (Join-Path $root '.state\installed.json') -Raw|ConvertFrom-Json}
 $installed|ConvertTo-Json -Compress

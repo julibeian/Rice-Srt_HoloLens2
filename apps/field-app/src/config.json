@@ -1,1 +1,1 @@
-{"version":"1.0.0.0","apiOrigin":"https://rice-srt.cn","apiPrefix":"/hololens-app/api","deviceLabel":"HoloLens 2","relayOrigin":"http://169.254.216.241:9021","dynamicFrameSize":384,"dynamicInputSize":160,"dynamicJpegQuality":0.72,"dynamicMinIntervalMs":750,"dynamicGapMs":0}
+{"version":"1.0.0.48","recognitionMode":"local-yolo","autoStart":true,"yoloDeviceKind":3,"yoloInputSize":320,"yoloSha256":"e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048","cameraDiagnostics":false}

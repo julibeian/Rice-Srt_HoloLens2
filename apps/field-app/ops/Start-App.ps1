@@ -5,13 +5,15 @@ $workspace=Split-Path -Parent (Split-Path -Parent $root)
 $path=Join-Path $root '.state\installed.json'
 $installed=Get-Content -LiteralPath $path -Raw|ConvertFrom-Json -AsHashtable
 if($installed.Identity -ne 'Rice.HoloLens.Field_r5420n6798s24!Field' -or $installed.RemoteLayout -ne 'U:\Users\DefaultAccount\AppData\Local\DevelopmentFiles\RiceHoloLensFieldV1'){throw 'Unexpected installed application identity.'}
-try{
+if($installed.ContainsKey('RecognitionMode') -and $installed.RecognitionMode -eq 'local-yolo'){
+    $installed.NetworkPreflight=@{Required=$false;Reason='on_device_yolo';RecoveryAttempted=$false}
+}else{try{
     $installed.NetworkPreflight=(& (Join-Path $PSScriptRoot 'Ensure-Network.ps1')|ConvertFrom-Json)
 }catch{
     # Offline access to the app still matters; a network diagnostic failure must
     # not prevent the activation attempt or become a repeated Wi-Fi/IP question.
     $installed.NetworkPreflight=@{NetworkReady=$false;Reason='network_check_unavailable';Error=$_.Exception.Message}
-}
+}}
 $launcher=Join-Path $root '.state\launcher\hl-field-launch.exe'
 $hash=(Get-FileHash -LiteralPath $launcher).Hash.Substring(0,8)
 $remote=$installed.RemoteLayout+'\hl-field-launch-'+$hash+'.exe'

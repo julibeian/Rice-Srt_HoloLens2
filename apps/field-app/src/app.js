@@ -1,232 +1,62 @@
 (function(root){
  'use strict';
- var N=root.RiceNative,store=root.RiceRequire('utils/history-store'),locations=root.RiceRequire('utils/location'),locationService=root.RiceRequire('utils/location-service'),D=root.RiceDynamic;
- var state={view:'camera',busy:false,capturing:false,cameraReady:false,result:null,lastJob:null,location:null,locating:false,historyPage:0,detailPage:0,details:false,recordId:null,editingLocation:false,targetPoint:{x:.5,y:.46},targetSize:1,showingOriginal:false,dynamic:{active:false,starting:false,session:null,view:null,last:null,lastRoi:null,stats:null,error:null,model:null,assetMode:false}};
- var Q=root.RiceCaptureQuality,targetSizes=[.4,.6,.85];
- var cameraWork=null,connectionWork=null,connectionTimer=null,map=null,mapLayer=null,mapMarkers=null,deviceMarker=null,accuracyCircle=null,satellite=false,historyRows=[],saveQueue=Promise.resolve(),diagnosticTimer=null,diagnosticWork=false,previewTimer=null,captureErrorUntil=0;
- function el(id){return document.getElementById(id);}
- function text(id,value){el(id).textContent=value||'';}
- function toast(message){wx.showToast({title:message});}
- function errorText(error){var message=error.errMsg||error.message||String(error);if(/name or address could not be resolved|0x80072ee7|12007/i.test(message))return '眼镜网络无法解析识别服务地址，请连接 Wi-Fi；恢复后自动重传';if(/canceled|cancelled/i.test(message))return '网络请求中断，恢复连接后自动重传';return message;}
- function time(value){var d=new Date(value);return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2)+' '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2);}
- function controls(){var locked=state.busy||state.capturing||state.dynamic.starting;el('camera-shutter').disabled=!state.cameraReady||locked;el('album-button').disabled=locked;el('camera-region-size').disabled=locked;el('camera-cancel').hidden=!state.capturing||state.busy;el('upload-retry').disabled=state.busy;text('camera-shutter',state.busy?'识别中…':state.capturing?'优化拍摄中…':'拍照');el('dynamic-toggle').disabled=state.dynamic.starting||!state.cameraReady;}
- function cameraMessage(message){text('camera-message',message);}
- function targetRegion(){var video=el('camera-video');return Q.region(video.videoWidth||1920,video.videoHeight||1080,state.targetPoint,targetSizes[state.targetSize]);}
- function drawTarget(){var frame=el('camera-target'),video=el('camera-video'),box=video.getBoundingClientRect();if(!state.cameraReady||!box.width||!box.height){frame.hidden=true;return;}var fit=Q.fit(video.videoWidth||1920,video.videoHeight||1080,box.width,box.height),rect=targetRegion();frame.style.left=(fit.x+rect.x*fit.width)+'px';frame.style.top=(fit.y+rect.y*fit.height)+'px';frame.style.width=(rect.width*fit.width)+'px';frame.style.height=(rect.height*fit.height)+'px';frame.hidden=false;}
- function view(name){
-  if(name!=='camera'&&state.dynamic.active)stopDynamic('view');
-  state.view=name;document.querySelector('.work-area').setAttribute('data-view',name);
-  el('app').classList.toggle('camera-full',name==='camera');el('app').classList.toggle('photo-full',name==='result');el('app').classList.remove('menu-open');el('menu-toggle').hidden=name!=='camera'&&name!=='result';text('menu-toggle','功能');
-  ['camera','map','history','settings'].forEach(function(key){el('view-'+key).hidden=key!==name;});
-  Array.prototype.forEach.call(document.querySelectorAll('[data-view].rail-button'),function(button){var active=button.getAttribute('data-view')===name;button.className='rail-button'+(active?' active':'');button.setAttribute('aria-pressed',String(active));});
-  if(name==='camera')openCamera();if(name==='map')openMap();if(name==='history')renderHistory();
-  if(name!=='camera'&&name!=='result'){state.cameraReady=false;N.stopCamera();controls();}
-  el('next-photo').hidden=name!=='result';N.log('view_opened',{view:name});updateDynamicUi();
+ var N=root.RiceNative,D=root.RiceDynamic,active=false,starting=false,stopping=false,latest=null,receivedAt=0,lastFrames=0,polling=false,assetMode=false,diagnosticBusy=false,generation=0;
+ function el(name){return document.getElementById(name);}function text(name,value){el(name).textContent=value||'';}
+ function message(value){text('camera-message',value);}
+ function controls(){el('dynamic-toggle').disabled=starting||stopping;el('dynamic-toggle').textContent=starting?'加载模型…':stopping?'停止中…':active?'停止识别':'开始识别';}
+ function clear(){latest=null;el('dynamic-overlay').getContext('2d').clearRect(0,0,el('dynamic-overlay').width,el('dynamic-overlay').height);text('dynamic-confidence','');}
+ function render(){
+  var canvas=el('dynamic-overlay'),surface=assetMode?el('yolo-asset'):el('camera-video'),bounds=surface.getBoundingClientRect(),w=Math.round(bounds.width),h=Math.round(bounds.height);
+  if(!w||!h)return;if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;}var context=canvas.getContext('2d');context.clearRect(0,0,w,h);
+  var age=latest?latest.resultAgeMs+Date.now()-receivedAt:Infinity;
+  if(!active||!D.fresh(latest,age)){if(active&&latest)text('dynamic-hint','等待新结果，旧框已清除');return;}
+  var boxes=D.boxes(latest,w,h);context.lineWidth=3;context.font='bold 21px Segoe UI,Microsoft YaHei';
+  boxes.forEach(function(box){var label=box.label+' '+(box.confidence*100).toFixed(1)+'%';context.strokeStyle='#7eff8a';context.strokeRect(box.x,box.y,box.width,box.height);var tw=context.measureText(label).width+12,y=Math.max(0,box.y-28);context.fillStyle='rgba(4,35,12,.95)';context.fillRect(box.x,y,tw,28);context.fillStyle='#effff0';context.fillText(label,box.x+6,y+22);});
  }
- function openCamera(){
-  if(state.cameraReady){N.resumeCamera().catch(function(){state.cameraReady=false;openCamera();});drawTarget();return;}
-  if(cameraWork||document.hidden)return cameraWork;
-  cameraMessage('正在开启相机…');el('camera-retry').hidden=true;
-  cameraWork=N.startCamera().then(function(capabilities){state.cameraReady=true;drawTarget();cameraMessage('把目标放进框内，点拍照后放下手；点画面可移动框');updateDynamicUi();if(capabilities){var c=capabilities.supported;text('camera-capabilities',(c.focus?'自动对焦可用':'对焦由设备默认控制')+' · '+(c.regionExposure?'目标测光可用':c.exposure?'自动曝光可用':'曝光由设备默认控制')+(capabilities.photoSize?' · '+capabilities.photoSize.width+'×'+capabilities.photoSize.height:'')+' · 稳定检测与框内裁剪');}},function(error){state.cameraReady=false;stopDynamic('camera_error');cameraMessage('相机未能开启：'+errorText(error));el('camera-retry').hidden=false;N.log('camera_error',{message:errorText(error)});}).then(function(){cameraWork=null;controls();});return cameraWork;
+ function show(result){
+  latest=result;receivedAt=Date.now();text('dynamic-label',assetMode?'内置验证图像':result.detections.length?'检出 '+result.detections.length+' 个目标':'未检出目标');
+  text('dynamic-confidence',result.detections.length?(result.detections[0].confidence*100).toFixed(1)+'%':'');
+  text('dynamic-meta','眼镜内 YOLOv8n · 第 '+result.cameraFrames+' 个相机帧 · 推理 '+Math.round(result.inferenceMs)+' ms · '+result.inputSize+'px');
+  text('dynamic-hint',assetMode?'仅验证模型与框显示，不计实物叶片效果':result.detections.length?'持续检测中，请缓慢移动观察':'未检出不等于健康，请调整距离和视角');render();
  }
- function connectionStatus(connected,message){text('service-indicator',connected?'服务已连接':'服务未连接');el('service-indicator').setAttribute('data-connected',String(connected));text('connection-status',message);}
- function connect(){
-  if(connectionWork)return connectionWork;
-  text('connection-status','正在连接识别服务…');
-  connectionWork=N.ensureService().then(function(){connectionStatus(true,N.nativeMode?'识别服务已连接':'界面预览：相机与识别需在眼镜上验证');if(N.isPaired()&&connectionTimer){clearInterval(connectionTimer);connectionTimer=null;}N.log('service_ready',{paired:N.isPaired()});return true;},function(error){connectionStatus(false,errorText(error));N.log('service_error',{message:errorText(error)});return false;}).then(function(value){connectionWork=null;return value;});return connectionWork;
+ async function start(){
+  if(active||starting||stopping)return;var current=++generation;starting=true;controls();message('正在加载眼镜内模型…');
+  try{var model=await N.yoloStart();if(current!==generation||document.hidden){await N.yoloStop();return;}active=true;assetMode=false;el('yolo-asset').hidden=true;el('camera-video').hidden=false;lastFrames=0;clear();text('dynamic-label','模型已就绪');text('dynamic-hint','正在读取相机新帧');text('dynamic-meta','眼镜内 YOLOv8n · '+model.inputSize+'px');message('');await N.log('dynamic_started',{engine:'local-yolo',modelSha256:model.modelSha256,onDevice:true,networkRequired:false});}
+  catch(error){if(current===generation){active=false;message('本地识别未能启动：'+error.message);N.log('dynamic_start_failed',{message:String(error.message||error)});}}
+  finally{if(current===generation){starting=false;controls();}}
  }
- async function pair(){
-  var code=el('pair-code').value.trim();if(!/^\d{8}$/.test(code)){text('connection-status','请输入 8 位设备配对码');return;}
-  el('pair-button').disabled=true;try{await N.pair(code);el('pair-code').value='';await connect();}catch(error){connectionStatus(false,errorText(error));}finally{el('pair-button').disabled=false;}
+ async function stop(reason){
+  if(stopping)return;++generation;active=false;starting=false;stopping=true;controls();clear();assetMode=false;el('yolo-asset').hidden=true;el('camera-video').hidden=false;
+  try{var state=await N.yoloStop();text('dynamic-label','识别已停止');text('dynamic-hint','相机预览保持开启');message('');await N.log('dynamic_stopped',{reason:reason||'user',native:state});}
+  catch(error){message(error.message);N.log('dynamic_stop_pending',{message:error.message});}finally{stopping=false;controls();}
  }
- function positionText(position){return '已定位 · 精度约 '+Math.ceil(position.accuracy||0)+' 米';}
- function locate(){
-  if(state.locating)return state.locationPromise;
-  state.locating=true;text('location-status','正在获取系统位置…');text('map-status','正在获取系统位置…');el('locate-button').disabled=true;
-  state.locationPromise=N.getLocation().then(function(position){state.location=position;text('location-status',positionText(position));text('map-status',positionText(position));if(map){drawDevicePosition();map.setView([position.latitude,position.longitude],position.accuracy>1000?12:17,{animate:false});}return position;},function(error){text('location-status',errorText(error));text('map-status',errorText(error)+'；也可给照片手动标位置');return null;}).then(function(position){state.locating=false;el('locate-button').disabled=false;return position;});return state.locationPromise;
+ async function poll(){
+  if(!active||polling||document.hidden)return;polling=true;
+  try{var result=N.yoloState();if(result.phase==='error')throw new Error(result.stage+': '+result.error);if(result.phase==='stopped')throw new Error('本地模型已释放，请重新开始');
+   if(result.frames>lastFrames){lastFrames=result.frames;show(result);if(result.cameraFrames<=2||result.cameraFrames%5===0||result.source==='diagnostic_asset')await N.log(result.source==='diagnostic_asset'?'yolo_asset_result':'dynamic_frame',result);}
+   if(!assetMode&&!result.busy)N.submitCamera();
+  }catch(error){active=false;clear();message('本地检测失败：'+error.message);await N.log('dynamic_error',{message:error.message});try{await N.yoloStop();}catch(_){}controls();}
+  finally{polling=false;}
  }
- function freshPhotoLocation(job){
-  if(job.origin==='camera'&&Date.now()-job.selectedAt>60000){job.location=locations.unavailable('capture-expired');return;}
-  var pending=job.origin==='camera'?N.getLocation().then(function(position){if(Math.abs(position.acquiredAt-job.selectedAt)>60000)return locations.unavailable('capture-expired');return locations.located({lat:position.latitude,lng:position.longitude},'device',position);}):locationService.readPhotoLocation({path:job.path},wx).then(function(value){return value.location;});
-  pending.then(function(location){job.location=location;if(job.result)job.result=locations.normalizeResult(Object.assign({},job.result,{location:location}));if(state.lastJob===job&&job.result){state.result=job.result;renderResult();}if(job.recordId&&location.status==='located')try{store.setImageLocation(job.recordId,1,location,wx);}catch(_){}},function(){job.location=locations.unavailable('unavailable');});
+ async function asset(name){
+  if(!active)await start();if(!active)throw new Error('本地模型未运行');assetMode=true;
+  var until=Date.now()+15000;while(N.yoloState().busy&&Date.now()<until)await new Promise(function(resolve){setTimeout(resolve,100);});
+  await N.submitAsset(name);el('yolo-asset').hidden=false;el('camera-video').hidden=true;clear();await N.log('yolo_asset_submitted',{asset:name,onDevice:true});
  }
- function parseResult(raw,job){
-  var result=JSON.parse(raw);if(!result||typeof result.predicted_class!=='string'||typeof result.is_valid!=='boolean'||typeof result.confidence!=='number'||!Number.isFinite(result.confidence)||result.confidence<0||result.confidence>1)throw new Error('识别服务返回格式异常，请重试上传');
-  var status=result.is_valid!==true||result.predicted_class==='其他'?'invalid':/健康/.test(result.predicted_class)?'healthy':'disease';
-  return locations.normalizeResult(Object.assign({},result,{displayStatus:status,confidenceText:(result.confidence*100).toFixed(1)+'%',imagePath:job.path,originalImagePath:job.originalPath||null,capture:job.capture||null,imageIndex:1,imageId:job.id,origin:job.origin,selectedAt:job.selectedAt,location:job.location||locations.unavailable('pending')}));
+ async function check(){
+  if(diagnosticBusy)return;diagnosticBusy=true;var command;
+  try{command=await N.readCameraCheck();if(!command)return;
+   if(command.action==='dynamic_start'){if(assetMode){assetMode=false;el('yolo-asset').hidden=true;el('camera-video').hidden=false;clear();}await start();}
+   else if(command.action==='dynamic_stop')await stop('diagnostic');else if(command.action==='dynamic_asset')await asset(String(command.asset||''));
+   await N.log('camera_check_completed',{id:command.id,action:command.action,native:N.yoloState()});
+  }catch(error){await N.log('camera_check_error',{id:command&&command.id||'',message:error.message});}finally{diagnosticBusy=false;}
  }
- function upload(job){return new Promise(function(resolve,reject){N.upload({filePath:job.path,requestId:'field-'+job.id,name:'file',url:'https://rice-srt.cn/hololens-app/api/predict',success:function(response){if(response.statusCode!==200){reject(new Error('上传失败，请重试'));return;}resolve(response.data);},fail:reject});});}
- async function analyse(job){
-  state.busy=true;state.lastJob=job;state.recordId=null;state.details=false;state.result=null;controls();
-  state.showingOriginal=false;el('show-original').hidden=true;
-  try{wx.setStorageSync('rice_pending_upload',{id:job.id,path:job.path,originalPath:job.originalPath||null,capture:job.capture||null,origin:job.origin,selectedAt:job.selectedAt});}catch(error){N.log('pending_save_error',{message:errorText(error)});}
-  text('result-title','正在识别…');text('result-message','照片已拍摄，正在自动上传');el('result-image').src=N.imageUrl(job.path);el('result-image').hidden=false;el('result-confidence').hidden=true;el('upload-retry').hidden=true;el('result-panel').classList.remove('show-details');text('result-location','');text('result-time','');cameraMessage('照片正在上传识别…');
-  el('result-panel').setAttribute('data-status','loading');view('result');
-  try{var raw=await upload(job);job.uploadFailed=false;job.result=parseResult(raw,job);try{wx.removeStorageSync('rice_pending_upload');}catch(_){}state.result=job.result;renderResult();cameraMessage(job.result.displayStatus==='invalid'?'本张未通过识别，可直接再拍一张':'识别完成，可直接再拍一张');
-   if(state.view==='camera')view('result');
-   // Show the answer before copying files or waiting for the location provider.
-   var queued=saveQueue.then(function(){return saveJob(job);});saveQueue=queued.catch(function(error){N.log('history_error',{message:errorText(error)});toast('结果已显示，记录保存失败：'+errorText(error));});
-  }catch(error){job.uploadFailed=true;state.result=null;el('result-panel').setAttribute('data-status','fail');text('result-title','上传未完成');text('result-message',errorText(error));el('upload-retry').hidden=false;cameraMessage('上传未完成，可重试上传或直接拍下一张');if(state.view==='camera')view('result');N.log('analysis_error',{message:errorText(error)});}
-  finally{state.busy=false;controls();}
- }
- async function capture(){
-  if(state.dynamic.active||state.dynamic.starting)return;
-  if(state.capturing)return;
-  if(state.busy){cameraMessage('照片正在自动上传识别，请稍候');return;}
-  if(!state.cameraReady){cameraMessage('正在重新开启相机…');openCamera();return;}
-  state.capturing=true;controls();N.log('capture_requested',{mode:'target-focus-quality-crop'});
-  try{var photo=await N.captureOptimizedPhoto(targetRegion(),cameraMessage);if(!photo)return;var job={id:N.id(),path:photo.path,originalPath:photo.originalPath,capture:photo.capture,origin:'camera',selectedAt:photo.selectedAt||Date.now()};freshPhotoLocation(job);await analyse(job);}
-  catch(error){captureErrorUntil=Date.now()+4000;cameraMessage(error.code==='capture-cancelled'?'已取消拍摄，可重新对准':errorText(error));N.log('camera_error',{message:errorText(error)});}
-  finally{state.busy=false;state.capturing=false;controls();if(!state.cameraReady&&state.view==='camera'&&!document.hidden)openCamera();}
- }
- async function importPhoto(){
-  if(state.dynamic.active||state.dynamic.starting)return;
-  if(state.busy||state.capturing)return;state.busy=true;controls();
-  try{var paths=await N.chooseImages({count:1,sourceType:['album']}),job={id:N.id(),path:paths[0],origin:'album',selectedAt:Date.now()};freshPhotoLocation(job);await analyse(job);}catch(error){if(!/cancel/i.test(errorText(error)))toast(errorText(error));}finally{state.busy=false;controls();}
- }
- async function saveJob(job){
-  var stamp=Math.max(Date.now(),state.lastRecordStamp?state.lastRecordStamp+1:0);state.lastRecordStamp=stamp;
-  var match=/\.(jpg|jpeg|png|webp)$/i.exec(job.path),saved=N.userPath+'/rice_'+stamp+'_0.'+(match?match[1].toLowerCase():'jpg');
-  var savedOriginal=job.originalPath?N.userPath+'/rice_'+stamp+'_source.jpg':null;
-  try{await N.copyFile(job.path,saved);if(savedOriginal)await N.copyFile(job.originalPath,savedOriginal);}catch(error){N.unlink(saved);if(savedOriginal)N.unlink(savedOriginal);throw error;}
-  var result=locations.normalizeResult(Object.assign({},job.result,{imagePath:saved,originalImagePath:savedOriginal,location:job.location||job.result.location}));
-  var status=result.displayStatus,record={id:stamp,time:time(stamp),imageCount:1,thumbnailPath:saved,locationVersion:2,isMapMarked:false,permanentPaths:savedOriginal?[saved,savedOriginal]:[saved],sortedResults:[result],summary:{hasResults:true,isAllHealthy:status==='healthy',hasDisease:status==='disease',diseaseNamesText:status==='disease'?result.predicted_class:'',total:1,diseaseCount:status==='disease'?1:0,healthyCount:status==='healthy'?1:0,invalidCount:status==='invalid'?1:0,failCount:0}};
-  try{store.append(record,wx);}catch(error){N.unlink(saved);if(savedOriginal)N.unlink(savedOriginal);throw error;}
-  job.recordId=stamp;job.result=result;if(state.lastJob===job){state.result=result;state.recordId=stamp;renderResult();}
-  N.unlink(job.path);if(job.originalPath)N.unlink(job.originalPath);job.path=saved;job.originalPath=savedOriginal;if(state.view==='history')renderHistory();N.log('history_saved',{record_id:stamp});
- }
- function renderResult(){
-  var result=state.result;if(!result)return;
-  el('result-panel').setAttribute('data-status',result.displayStatus);text('result-title',result.displayStatus==='invalid'?'请再拍一张':result.predicted_class);text('result-confidence','置信度 '+(result.confidenceText||(result.confidence*100).toFixed(1)+'%'));el('result-confidence').hidden=result.displayStatus==='invalid';
-  text('result-message',result.displayStatus==='invalid'?(result.message||'本张未通过识别'):(result.message||'识别完成'));
-  el('result-image').src=N.imageUrl(state.showingOriginal&&result.originalImagePath?result.originalImagePath:result.imagePath);el('result-image').hidden=false;el('upload-retry').hidden=true;el('show-original').hidden=!result.originalImagePath;text('show-original',state.showingOriginal?'查看识别区域':'查看原图');
-  text('result-location',result.location&&result.location.status==='located'?result.locationBadge+' · 精度约 '+Math.ceil(result.location.accuracy||0)+' 米':result.location&&result.location.reason==='pending'?'位置获取中，不影响识别':'未取得位置，可在地图补充');
-  text('result-time',state.recordId?time(state.recordId).slice(5):'');
- }
- function dynamicConfig(){try{return N.dynamicSettings();}catch(_){return {frameSize:384,inputSize:160,quality:.72,gapMs:0};}}
- function updateDynamicUi(){
-  var active=state.dynamic.active,starting=state.dynamic.starting;
-  el('app').classList.toggle('dynamic-active',active||starting);
-  el('dynamic-toggle').hidden=state.view!=='camera';
-  text('dynamic-toggle',active?'停止动态':starting?'正在启动…':'动态识图');
-  el('dynamic-hud').hidden=!active;
-  if(!active){var canvas=el('dynamic-overlay');canvas.hidden=true;canvas.width=0;canvas.height=0;}
-  controls();if(active)drawDynamicOverlay();
- }
- function drawDynamicOverlay(){
-  var canvas=el('dynamic-overlay'),video=el('camera-video');
-  if(!state.dynamic.active||state.view!=='camera'){canvas.hidden=true;return;}
-  if(state.dynamic.assetMode){canvas.hidden=true;return;}
-  var box=video.getBoundingClientRect();if(!box.width||!box.height){canvas.hidden=true;return;}
-  canvas.hidden=false;var width=Math.round(box.width),height=Math.round(box.height);if(canvas.width!==width||canvas.height!==height){canvas.width=width;canvas.height=height;}
-  var context=canvas.getContext('2d');context.clearRect(0,0,width,height);
-  if(!state.dynamic.last||!state.dynamic.lastRoi||!state.dynamic.last.annotation)return;
-  var fit=Q.fit(video.videoWidth||1920,video.videoHeight||1080,width,height),rects=D.annotationRects(state.dynamic.last.annotation,state.dynamic.lastRoi,fit);if(!rects)return;
-  rects.cells.forEach(function(cell){if(cell.value<.25)return;context.fillStyle='rgba(255,196,0,'+(0.03+cell.value*.13).toFixed(3)+')';context.fillRect(cell.x,cell.y,cell.width,cell.height);});
-  if(rects.box){context.strokeStyle='rgba(255,210,74,.9)';context.lineWidth=2;context.strokeRect(rects.box.x,rects.box.y,rects.box.width,rects.box.height);}
-  if(rects.peak){context.fillStyle='#fff2b0';context.beginPath();context.arc(rects.peak.x,rects.peak.y,5,0,Math.PI*2);context.fill();}
- }
- function renderDynamicHud(result,view,stats){
-  var hud=el('dynamic-hud');hud.hidden=false;hud.setAttribute('data-status',view.status);
-  text('dynamic-label',view.status==='warming'&&view.preview?view.preview+'（确认中）':(view.label||'分析中…'));text('dynamic-confidence',view.status==='invalid'||view.status==='error'||view.confidence===null||view.confidence===undefined?'':(view.confidence*100).toFixed(1)+'%');
-  var model=result&&result.model||{},timing=result&&result.timing||{},parts=['第 '+(stats&&stats.frames||0)+' 帧'];if(stats&&stats.lastRtt)parts.push('延迟 '+Math.round(stats.lastRtt)+' ms');if(timing.inference_ms)parts.push('推理 '+Math.round(timing.inference_ms)+' ms');parts.push(model.version||'模型');if(model.input_size)parts.push(model.input_size+'px');
-  text('dynamic-meta',parts.join(' · '));
-  var hint=view.status==='stable'?'识别中，可缓慢移动取景框观察不同区域':view.status==='uncertain'?'识别不稳定，请稳住并调整距离':view.status==='invalid'?'未识别到水稻叶片，请对准叶片或调整光线':view.status==='stale'?'等待新画面…':'保持取景框对准叶片，正在确认…';
-  text('dynamic-hint',hint);
- }
- function renderDynamicError(error,stats){
-  var hud=el('dynamic-hud');hud.hidden=false;hud.setAttribute('data-status','error');text('dynamic-label','连接中断');text('dynamic-confidence','');text('dynamic-meta','第 '+(stats&&stats.frames||0)+' 帧 · 正在重试');text('dynamic-hint',errorText(error));
- }
- async function startDynamic(){
-  if(state.dynamic.active||state.dynamic.starting)return;
-  if(!N.nativeMode){toast('动态识图需在眼镜上运行');return;}
-  if(!D||!D.createSession){toast('动态组件未加载，请重开应用');return;}
-  if(state.busy||state.capturing){toast('正在拍照，请稍后再试');return;}
-  if(!state.cameraReady){await openCamera();if(!state.cameraReady)return;}
-  state.dynamic.starting=true;state.dynamic.error=null;updateDynamicUi();cameraMessage('正在连接动态识别…');
-  try{
-   var connected=await connect();if(!connected)throw new Error('识别服务未连接');
-   var health=await N.dynamicHealth(),model=health&&health.upstream&&health.upstream.model;
-   if(!model||model.loaded!==true)throw new Error(health&&health.upstream&&health.upstream.error?('云端动态模型不可用：'+health.upstream.error):'云端动态模型未加载');
-   var config=dynamicConfig();
-   state.dynamic.model=model;state.dynamic.last=null;state.dynamic.lastRoi=null;state.dynamic.view=null;state.dynamic.stats=null;state.dynamic.active=true;state.dynamic.starting=false;
-   var session=D.createSession({
-    gapMs:config.gapMs,maxIntervalMs:4000,windowMs:8000,staleMs:4500,
-    capture:async function(){var started=Date.now(),frame=await N.captureDynamicFrame({rect:targetRegion(),size:config.frameSize,quality:config.quality});state.dynamic.captureMs=Date.now()-started;return frame;},
-    analyze:function(frame){state.dynamic.lastRoi=frame.roi;var started=Date.now(),operation=N.dynamicAnalyze({bytes:frame.bytes,hash:frame.hash,frameId:frame.frameId,size:config.inputSize});operation.promise.then(function(){state.dynamic.analyzeMs=Date.now()-started;},function(){state.dynamic.analyzeMs=Date.now()-started;});return operation;},
-    onResult:function(result,view,stats){state.dynamic.last=result;state.dynamic.view=view;state.dynamic.stats=stats;state.dynamic.error=null;renderDynamicHud(result,view,stats);drawDynamicOverlay();var count=stats&&stats.frames||0;if(count<=2||count%5===0){var modelInfo=result.model||{};N.log('dynamic_frame',{frame_id:result.frame_id,predicted_class:result.predicted_class,confidence:result.confidence,is_valid:result.is_valid,rtt_ms:Math.round(stats&&stats.lastRtt||0),capture_ms:state.dynamic.captureMs||0,analyze_ms:state.dynamic.analyzeMs||0,inference_ms:Math.round((result.timing&&result.timing.inference_ms)||0),model:modelInfo.version,input_size:modelInfo.input_size,view:view.status});}},
-    onError:function(error,stats){state.dynamic.error=error;state.dynamic.stats=stats;renderDynamicError(error,stats);N.log('dynamic_error',{message:errorText(error),status:error.status||0,code:error.code||''});},
-    onStop:function(stats){state.dynamic.stats=stats;}
-   });
-   state.dynamic.session=session;session.start();N.log('dynamic_started',{model_version:model.version,frame_size:config.frameSize,input_size:config.inputSize});cameraMessage('动态识图中：移动取景框对准叶片');
-  }catch(error){state.dynamic.active=false;state.dynamic.starting=false;state.dynamic.error=error;cameraMessage('动态识图未能启动：'+errorText(error));toast(errorText(error));N.log('dynamic_start_failed',{message:errorText(error),status:error.status||0});}
-  finally{updateDynamicUi();}
- }
- async function runDynamicAsset(name){
-  if(!N.nativeMode||!N.loadDynamicAsset){toast('测试图像需在眼镜上运行');return;}
-  if(state.dynamic.active)stopDynamic('asset_switch');
-  state.dynamic.starting=true;state.dynamic.error=null;updateDynamicUi();cameraMessage('正在识别内置测试图像…');
-  try{
-   var connected=await connect();if(!connected)throw new Error('识别服务未连接');
-   var health=await N.dynamicHealth(),model=health&&health.upstream&&health.upstream.model;
-   if(!model||model.loaded!==true)throw new Error('云端动态模型不可用');
-   var config=dynamicConfig(),frame=await N.loadDynamicAsset(name);
-   state.dynamic.model=model;state.dynamic.assetMode=true;state.dynamic.lastRoi=frame.roi;state.dynamic.last=null;state.dynamic.view=null;state.dynamic.stats=null;state.dynamic.active=true;state.dynamic.starting=false;
-   var started=Date.now(),operation=N.dynamicAnalyze({bytes:frame.bytes,hash:frame.hash,frameId:frame.frameId,size:config.inputSize}),result=await operation.promise,rtt=Date.now()-started;
-   var view=D.stableView([{at:Date.now(),predicted_class:result.predicted_class,confidence:result.confidence,is_valid:result.is_valid}],Date.now());
-   state.dynamic.last=result;state.dynamic.stats={frames:1,lastRtt:rtt};renderDynamicHud(result,view,state.dynamic.stats);drawDynamicOverlay();
-   N.log('dynamic_asset_result',{asset:name,predicted_class:result.predicted_class,confidence:result.confidence,is_valid:result.is_valid,rtt_ms:rtt,model:result.model&&result.model.version,input_size:result.model&&result.model.input_size});
-  }catch(error){state.dynamic.active=false;state.dynamic.starting=false;state.dynamic.error=error;cameraMessage('测试图像识别失败：'+errorText(error));N.log('dynamic_asset_failed',{message:errorText(error),status:error.status||0});}
-  finally{state.dynamic.starting=false;updateDynamicUi();}
- }
- function stopDynamic(reason){
-  if(!state.dynamic.active&&!state.dynamic.starting)return;
-  var session=state.dynamic.session,stats=session?session.stats():state.dynamic.stats;
-  if(session)try{session.stop();}catch(_){}
-  state.dynamic.session=null;state.dynamic.active=false;state.dynamic.starting=false;state.dynamic.view=null;state.dynamic.assetMode=false;
-  el('dynamic-hud').hidden=true;var canvas=el('dynamic-overlay');canvas.hidden=true;canvas.width=0;canvas.height=0;
-  N.log('dynamic_stopped',{reason:reason||'user',frames:stats&&stats.frames||0,ok:stats&&stats.ok||0,fail:stats&&stats.fail||0});
-  updateDynamicUi();if(state.view==='camera'&&state.cameraReady)cameraMessage('已停止动态识图，可拍照或重新开始');
- }
- function toggleDynamic(){if(state.dynamic.active||state.dynamic.starting)stopDynamic('user');else startDynamic();}
- function renderHistory(){
-  var list=el('history-list');while(list.firstChild)list.removeChild(list.firstChild);
-  try{historyRows=store.load(wx).slice().reverse();}catch(error){text('history-page','读取失败');toast(errorText(error));return;}
-  var size=Math.max(1,Math.min(5,Math.floor((innerHeight-140)/90))),pages=Math.max(1,Math.ceil(historyRows.length/size));state.historyPage=Math.min(state.historyPage,pages-1);
-  if(!historyRows.length){var empty=document.createElement('p');empty.className='history-empty';empty.textContent='拍照识别后自动保存最近 15 条记录';list.appendChild(empty);}
-  historyRows.slice(state.historyPage*size,(state.historyPage+1)*size).forEach(function(record){var button=document.createElement('button'),image=document.createElement('img'),label=document.createElement('span'),title=document.createElement('span'),meta=document.createElement('span');button.className='history-row';image.src=N.imageUrl(record.thumbnailPath);image.alt='识别照片';title.className='history-title';title.textContent=record.summary&&record.summary.diseaseNamesText||record.sortedResults[0]&&record.sortedResults[0].predicted_class||'检测记录';meta.className='muted';meta.textContent=record.time;label.appendChild(title);label.appendChild(meta);button.appendChild(image);button.appendChild(label);button.onclick=function(){state.lastJob=null;state.recordId=record.id;state.result=record.sortedResults[0]||null;state.details=false;state.detailPage=0;renderResult();view('result');};list.appendChild(button);});
-  text('history-page',(state.historyPage+1)+' / '+pages);el('history-previous').disabled=state.historyPage===0;el('history-next').disabled=state.historyPage>=pages-1;
- }
- function safeMap(callback){return root.MSApp&&MSApp.execUnsafeLocalFunction?MSApp.execUnsafeLocalFunction(callback):callback();}
- function setMapLayer(){if(mapLayer)map.removeLayer(mapLayer);mapLayer=L.tileLayer(satellite?'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}':'https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:satellite?'© Esri':'© OpenStreetMap',keepBuffer:0}).addTo(map);var failures=0;mapLayer.on('tileerror',function(){if(++failures===3)text('map-status','底图加载失败，请检查网络；定位和照片坐标仍保留');});}
- function openMap(){
-  if(!root.L){text('map-status','地图组件未加载，请重新打开应用');return;}
-  safeMap(function(){if(!map){var p=state.location;map=L.map(el('field-map'),{zoomControl:true}).setView(p?[p.latitude,p.longitude]:[32.0359,118.7611],p?16:4);setMapLayer();map.on('click',function(event){if(state.editingLocation)saveManualLocation(event.latlng);});}map.invalidateSize();drawDevicePosition();drawRecordMarkers();});
-  if(!state.location&&!state.locating)locate();else if(state.location)text('map-status',positionText(state.location));
- }
- function drawDevicePosition(){if(!map||!state.location)return;var p=state.location;safeMap(function(){if(deviceMarker)map.removeLayer(deviceMarker);if(accuracyCircle)map.removeLayer(accuracyCircle);deviceMarker=L.marker([p.latitude,p.longitude],{icon:L.divIcon({className:'device-dot',iconSize:[20,20]})}).addTo(map).bindPopup('当前位置');accuracyCircle=L.circle([p.latitude,p.longitude],{radius:p.accuracy||0,weight:1,color:'#1577df',fillOpacity:.12}).addTo(map);});}
- function drawRecordMarkers(){if(!map)return;if(mapMarkers)map.removeLayer(mapMarkers);mapMarkers=L.layerGroup().addTo(map);try{store.load(wx).forEach(function(record){locations.recordPoints(record).forEach(function(point){var label=document.createElement('span');label.textContent=point.name+' · '+point.time;L.circleMarker([point.location.lat,point.location.lng],{radius:8,color:point.status==='disease'?'#bb5b23':'#237545',fillOpacity:.9}).addTo(mapMarkers).bindPopup(label).on('click',function(){state.recordId=record.id;state.result=record.sortedResults.find(function(r){return r.imageIndex===point.imageIndex;});state.details=false;renderResult();view('result');});});});}catch(error){toast(errorText(error));}}
- function editMap(){if(!state.recordId||!state.result||!locations.isLocationEligible(state.result)){toast('请先完成一次有效识别或从记录打开照片');return;}state.editingLocation=!state.editingLocation;text('map-edit',state.editingLocation?'取消标位置':'给照片标位置');text('map-status',state.editingLocation?'在地图上点选田块，立即保存到本张照片':'已取消标位置');}
- function saveManualLocation(point){try{var record=store.setImageLocation(state.recordId,state.result.imageIndex,locations.located({lat:point.lat,lng:point.lng},'manual',{acquiredAt:Date.now()}),wx);state.result=record.sortedResults.find(function(r){return r.imageIndex===state.result.imageIndex;});if(state.lastJob&&state.lastJob.recordId===state.recordId){state.lastJob.location=state.result.location;state.lastJob.result=state.result;}state.editingLocation=false;text('map-edit','给照片标位置');text('map-status','照片位置已保存');drawRecordMarkers();renderResult();}catch(error){toast(errorText(error));}}
- Array.prototype.forEach.call(document.querySelectorAll('.rail-button'),function(button){button.onclick=function(){view(button.getAttribute('data-view'));};});
- el('menu-toggle').onclick=function(){var open=!el('app').classList.contains('menu-open');el('app').classList.toggle('menu-open',open);text('menu-toggle',open?'收起':'功能');};
- el('camera-shutter').onclick=capture;el('album-button').onclick=importPhoto;el('camera-retry').onclick=openCamera;el('connect-button').onclick=connect;el('pair-button').onclick=pair;el('dynamic-toggle').onclick=toggleDynamic;
- el('camera-region-size').onclick=function(){if(state.capturing||state.busy||state.dynamic.active||state.dynamic.starting)return;state.targetSize=(state.targetSize+1)%targetSizes.length;text('camera-region-size','范围：'+['小','中','大'][state.targetSize]);drawTarget();};
- el('camera-video').onclick=function(event){if(state.capturing||state.busy||!state.cameraReady)return;var video=el('camera-video'),point=Q.point(event.clientX,event.clientY,video.getBoundingClientRect(),video.videoWidth||1920,video.videoHeight||1080);if(point){state.targetPoint=point;drawTarget();cameraMessage('已移动取景框，点拍照后自动对焦');}};
- el('camera-cancel').onclick=function(){state.cameraReady=false;N.stopCamera();controls();};
- el('show-original').onclick=function(){if(!state.result||!state.result.originalImagePath)return;state.showingOriginal=!state.showingOriginal;renderResult();};
- el('upload-retry').onclick=function(){if(!state.busy&&state.lastJob)analyse(state.lastJob);};el('next-photo').onclick=function(){view('camera');};
- el('history-previous').onclick=function(){state.historyPage--;renderHistory();};el('history-next').onclick=function(){state.historyPage++;renderHistory();};
- el('locate-button').onclick=locate;el('location-retry').onclick=locate;el('location-settings').onclick=function(){N.openSettings().catch(function(error){toast(errorText(error));});};el('map-type').onclick=function(){satellite=!satellite;text('map-type',satellite?'普通图':'卫星图');if(map)safeMap(setMapLayer);};el('map-edit').onclick=editMap;
- root.RiceApp={state:state,view:view,capture:capture,connect:connect,locate:locate,startDynamic:startDynamic,stopDynamic:stopDynamic,waitForSaves:function(){return saveQueue;}};
- window.addEventListener('resize',function(){drawTarget();if(state.view==='history')renderHistory();if(map)map.invalidateSize();drawDynamicOverlay();});
- document.addEventListener('loadedmetadata',function(event){if(event.target.id==='camera-video'){drawTarget();drawDynamicOverlay();}},true);
- document.addEventListener('visibilitychange',function(){if(document.hidden){stopDynamic('hidden');state.cameraReady=false;drawTarget();controls();N.stopCamera();}else{if(state.view==='camera'&&!state.capturing)openCamera();connect();locate();}});
- function monitorNetwork(){N.onNetworkChange(function(){if(N.networkState()==='offline'){connectionStatus(false,'眼镜网络已断开，恢复联网后自动重传照片');return;}connect().then(function(connected){if(connected&&!state.busy&&!state.capturing&&state.lastJob&&state.lastJob.uploadFailed)analyse(state.lastJob);});});}
- window.addEventListener('beforeunload',function(){stopDynamic('unload');N.stopCamera();clearInterval(connectionTimer);clearInterval(diagnosticTimer);clearInterval(previewTimer);});
- function tunePreview(){if(!N.nativeMode||!N.tunePreview||!state.cameraReady||state.busy||state.capturing||state.dynamic.active||state.dynamic.starting||diagnosticWork||document.hidden||state.view!=='camera')return;N.tunePreview(targetRegion()).then(function(value){if(!value||!state.cameraReady||state.capturing||state.dynamic.active||state.view!=='camera')return;var label=el('camera-target').querySelector('span');label.textContent=value.adjusting?'自动调光中':'只识别框内';if(Date.now()>=captureErrorUntil)cameraMessage(value.message+'；点画面可移动框');},function(error){if(state.cameraReady&&!state.capturing&&!state.dynamic.active&&Date.now()>=captureErrorUntil)cameraMessage('自动调节暂不可用：'+errorText(error));});}
- async function checkCameraCommand(){if(diagnosticWork||state.busy||state.capturing||!state.cameraReady||document.hidden)return;diagnosticWork=true;var command;try{command=await N.readCameraCheck();if(!command)return;if(command.target&&Number.isFinite(command.target.x)&&Number.isFinite(command.target.y)){state.targetPoint={x:Math.max(0,Math.min(1,command.target.x)),y:Math.max(0,Math.min(1,command.target.y))};drawTarget();}N.log('camera_check_started',{id:command.id,action:command.action});if(command.action==='controls')await N.diagnoseCamera(targetRegion());else if(command.action==='capture')await capture();else if(command.action==='dynamic_start')await startDynamic();else if(command.action==='dynamic_stop')stopDynamic('diagnostic');else if(command.action==='dynamic_asset')await runDynamicAsset(String(command.asset||''));await N.log('camera_check_completed',{id:command.id,action:command.action,message:el('camera-message').textContent});}catch(error){N.log('camera_check_error',{id:command&&command.id||'',message:errorText(error)});}finally{diagnosticWork=false;}}
- async function start(){try{await N.init();text('version','稻视界 '+N.version()+' · 对焦、稳定拍摄与目标裁剪');var pending=N.pendingCapture();connect();locate();updateDynamicUi();if(pending){freshPhotoLocation(pending);analyse(pending);view('result');N.log('upload_resumed',{origin:pending.origin});}else openCamera();if(!N.isPaired())connectionTimer=setInterval(function(){if(!document.hidden)connect();},10000);root.RiceBoot.phase='ready';N.log('app_ready',{version:N.version(),native:N.nativeMode,paired:N.isPaired(),workflow:'target-focus-quality-crop'});}catch(error){root.RiceBoot.phase='error';cameraMessage('应用未能打开：'+errorText(error));N.log('boot_failed',{message:errorText(error)});}}
- start().then(async function(){await N.log('startup_hooks_started',{hidden:document.hidden});if(N.nativeMode)try{Windows.UI.Core.CoreWindow.getForCurrentThread().activate();await N.log('core_window_activated',{hidden:document.hidden});}catch(error){await N.log('core_window_activation_unavailable',{message:errorText(error),number:error.number||0});}if(root.RiceBoot.completeActivation)root.RiceBoot.completeActivation();await N.log('activation_completion_returned',{hidden:document.hidden});monitorNetwork();previewTimer=setInterval(tunePreview,600);if(N.diagnosticsEnabled&&N.diagnosticsEnabled()){diagnosticTimer=setInterval(checkCameraCommand,500);setTimeout(function(){clearInterval(diagnosticTimer);},1800000);}}).catch(function(error){N.log('boot_failed',{message:errorText(error)});cameraMessage('应用未能完成启动：'+errorText(error));if(root.RiceBoot.completeActivation)try{root.RiceBoot.completeActivation();}catch(_){}});
+ el('dynamic-toggle').addEventListener('click',function(){if(active)stop('user');else start();});
+ el('camera-retry').addEventListener('click',async function(){await stop('camera_restart');try{await N.startCamera();el('camera-retry').hidden=true;await start();}catch(error){message(error.message);}});
+ document.addEventListener('visibilitychange',function(){if(document.hidden&&(active||starting))stop('hidden');});
+ root.addEventListener('resize',render);setInterval(render,200);setInterval(poll,100);
+ (async function(){
+  try{await N.init();text('version','稻视界 '+N.version()+' · 眼镜内检测');await N.startCamera();await N.log('app_ready',{version:N.version(),workflow:'continuous-local-yolo',onDevice:true,networkRequired:false});if(root.RiceBoot){root.RiceBoot.phase='ready';root.RiceBoot.completeActivation();}if(N.diagnosticsEnabled())setInterval(check,500);if(N.autoStart())await start();else{message('相机已就绪，可开始识别');controls();}}
+  catch(error){message('应用未能打开：'+error.message);el('camera-retry').hidden=false;await N.log('boot_failed',{message:error.message});if(root.RiceBoot)root.RiceBoot.completeActivation();}
+ })();
 }(window));
-
