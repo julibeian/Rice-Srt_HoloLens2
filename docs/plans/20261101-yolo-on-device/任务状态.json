@@ -1,0 +1,162 @@
+{
+  "schema": 1,
+  "objective": "删除 ConvNeXt 动态路径，适配 YOLOv8n 六类检测并在 HoloLens 内部署、连续运行",
+  "status": "completed",
+  "baseline_model_sha256": "bc1312d93eccd295b3e1a10070e9e7673d5715c3e3789b33b06a48f8b22dde98",
+  "tasks": [
+    {
+      "id": "Y01",
+      "title": "冻结基线并核对原设备",
+      "status": "completed"
+    },
+    {
+      "id": "Y02",
+      "title": "删除 ConvNeXt 动态路径和回退",
+      "status": "completed"
+    },
+    {
+      "id": "Y03",
+      "title": "适配 ONNX 与 ARM64 本地运行时并核对输出",
+      "status": "completed"
+    },
+    {
+      "id": "Y04",
+      "title": "连续相机帧、YOLO 后处理与持续框显示",
+      "status": "completed"
+    },
+    {
+      "id": "Y05",
+      "title": "构建部署并验证眼镜内实际推理",
+      "status": "completed"
+    },
+    {
+      "id": "Y06",
+      "title": "连续运行、离线、停止清理与证据收口",
+      "status": "completed"
+    }
+  ],
+  "acceptance_cases": [
+    {
+      "id": "AY01",
+      "condition": "无 ConvNeXt 动态/CAM/云帧调用或回退",
+      "status": "passed",
+      "evidence": [
+        "reports/20261101-yolo-on-device/cloud-public-routes.json",
+        "reports/20261101-yolo-on-device/cloud-retirement-retry.txt",
+        "reports/20261101-yolo-on-device/deployment-verification.json"
+      ]
+    },
+    {
+      "id": "AY02",
+      "condition": "640原图至兼容图、320同尺寸参考至兼容图的算子数值一致；缩小输入后的样本预测和生产C预处理/NMS已单独核对",
+      "status": "passed",
+      "evidence": [
+        "reports/20261101-yolo-on-device/model-640.json",
+        "reports/20261101-yolo-on-device/model-320.json",
+        "reports/20261101-yolo-on-device/native-core-parity.json",
+        "reports/20261101-yolo-on-device/size320-samples.json"
+      ]
+    },
+    {
+      "id": "AY03",
+      "condition": "眼镜包内模型与原生 ARM64 运行时实际加载",
+      "status": "passed",
+      "evidence": [
+        "reports/20261101-yolo-on-device/production-package.json",
+        "reports/20261101-yolo-on-device/deployment-verification.json",
+        "reports/20261101-yolo-on-device/final-app-state.json"
+      ]
+    },
+    {
+      "id": "AY04",
+      "condition": "至少30个不同真实相机新帧在眼镜内连续推理",
+      "status": "passed",
+      "evidence": [
+        "reports/20261101-yolo-on-device/continuous47.json",
+        "reports/20261101-yolo-on-device/final-app-state.json",
+        "reports/20261101-yolo-on-device/final-runtime.json"
+      ]
+    },
+    {
+      "id": "AY05",
+      "condition": "持续预览及同一本地引擎阳性框可见",
+      "status": "passed",
+      "evidence": [
+        "reports/20261101-yolo-on-device/positive47.png",
+        "reports/20261101-yolo-on-device/positive47.json",
+        "reports/20261101-yolo-on-device/production48.png"
+      ]
+    },
+    {
+      "id": "AY06",
+      "condition": "无识别网络依赖、停止与资源释放已验证",
+      "status": "passed",
+      "evidence": [
+        "reports/20261101-yolo-on-device/stopped47.json",
+        "reports/20261101-yolo-on-device/resumed47.json",
+        "reports/20261101-yolo-on-device/deployment-verification.json",
+        "reports/20261101-yolo-on-device/checks.json"
+      ],
+      "notes": "Only-webcam production runtime verified; did not disable device-wide Wi-Fi. Stop/restart tested in same-engine diagnostic build; final diagnostic command polling disabled."
+    }
+  ],
+  "limitations": [
+    "没有实物叶片，真实叶片、多光照与准确率验收继续未完成",
+    "历史模型病害混淆保留，不以框显示或连续帧替代质量验证",
+    "320降低计算量但小目标召回变化未测；无量化或训练",
+    "当前实测约0.6秒/次推理，非视频逐帧检测；独立帧YOLO没有跟踪或运动预测",
+    "短时连续运行通过，不把旧云端30分钟稳定记录转用于本地模型"
+  ],
+  "evidence": [
+    "reports/20261101-yolo-on-device/baseline/files.json",
+    "apps/field-app/.state/yolo/model-manifest.json",
+    "apps/field-app/.state/yolo-observations/yolo-op12-20261101-1942/result.json",
+    "apps/field-app/.state/packages/20261101-195613-1.0.0.46/package-evidence.json",
+    "reports/20261101-yolo-on-device/first-local-app.json",
+    "reports/20261101-yolo-on-device/positive46.png",
+    "reports/20261101-yolo-on-device/final-app-state.json",
+    "reports/20261101-yolo-on-device/final-runtime.json",
+    "reports/20261101-yolo-on-device/final-installed.json",
+    "reports/20261101-yolo-on-device/deployment-verification.json",
+    "reports/20261101-yolo-on-device/production-package.json",
+    "reports/20261101-yolo-on-device/model-320.json",
+    "reports/20261101-yolo-on-device/model-640.json",
+    "reports/20261101-yolo-on-device/native-core-parity.json",
+    "reports/20261101-yolo-on-device/final-usb-status.json",
+    "reports/20261101-yolo-on-device/audio-inspect.json",
+    "reports/20261101-yolo-on-device/input-inspect.json"
+  ],
+  "change_log": [
+    {
+      "date": "2026-11-01",
+      "change": "接受用户替换路线目标，建立眼镜内 YOLO 部署步骤与独立验收；USB 桥当前原设备 connected，其他运行状态继续核验。"
+    },
+    {
+      "date": "2026-11-01",
+      "change": "YOLO opset12/IR7 adaptation passes six numerical parity cases with zero error; native ARM64 probe and app1.0.0.46 loaded on original HoloLens. Actual65 PV frames and diagnostic weevil85.7% with visible box verified. GPU640 inference about2.1s; old app cloud calls removed. Cloud retirement attempt rolled back on health check, investigate service permissions; tests/stop/final production remain."
+    },
+    {
+      "date": "2026-11-01",
+      "change": "Cloud retirement retry passed after release traversal permissions fixed; internal/public obsolete endpoints404 and legacy health200. Production1.0.0.48 GPU320 loaded on original device with12file hashes checked, no app network capability, diagnostics disabled. Stop/resources release, restart55camera frames, weevil87.5% visible box, node22/python7/core4/discovery checks passed. RootREADME unchanged; real-leaf accuracy not_run."
+    }
+  ],
+  "completed_at": "2026-11-01T20:37:07.449356+08:00",
+  "completion_scope": "ConvNeXt dynamic channel retired; YOLO native adaptation and glasses deployment verified. Field accuracy and multi-light leaf acceptance are outside this completed deployment and remain not_run.",
+  "production": {
+    "version": "1.0.0.48",
+    "input_size": 320,
+    "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+    "runtime_session": "716f7f33eb9e8d258c5d8d0112c68e46",
+    "process_id": 16696,
+    "camera_frames_observed": 530,
+    "diagnostics_enabled": false
+  },
+  "field_acceptance": {
+    "real_leaf": "not_run",
+    "bright_light": "not_run",
+    "dark_light": "not_run",
+    "mixed_light": "not_run",
+    "accuracy_with_ground_truth": "not_run",
+    "small_target_recall_after_320_resize": "not_run"
+  }
+}

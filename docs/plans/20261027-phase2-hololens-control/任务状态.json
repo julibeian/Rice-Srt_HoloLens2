@@ -7,7 +7,7 @@
   "entry_file": "执行入口.md",
   "status": "in_progress",
   "next_task": "T07",
-  "current_device_state": "2026-10-31T15:32:00+08:00: original device connected over USB NCM (169.254.112.215); SSH fingerprint and pinned portal verified, LowPowerState=false, 1s sample223952bytes/17frames. Fast reconnect implemented: the verified endpoint is cached in usb-terminal/.state/endpoint.json and used before SDK discovery. Measured cached reconnect860-877ms versus4.2-4.7s full discovery; cold bridge start with a warm cache3.5s wall (10.7s before); connect returns in0.67s when the channel is already up. Status now reports ConnectionMethod and LastConnectMs; the first power-lease tick after a new session is deferred one keepalive cycle (45s lease retained) and the lease is active with an advancing ack. No device input, credential, audio, restart or scale change;25fps and all acceptance targets remain incomplete; README user-maintained and Windows DPI deferred.",
+  "current_device_state": "2026-11-01T21:51:46.748062+08:00: original USB device identity and pinned portal authenticated. PC control 0.3.4 backend started named 300s lease and real controller at21:45:12; own stream DELETE200 at21:46:29, same lease restored Default(0) at21:46:30, independent portal mode0 at21:47:41. GUI PID44256 reopened with75 entries and fresh roughly20-22fps frames, readonly. USB power policy remains enabled with current ack; power HTTP200 but PowerStateKnown=false, so current power flag unknown. Windows mouse acceptance not run: activation failed and host lock screen observed; one Home API accepted without visible menu confirmation. Other phase2 goals and historical version-bound results remain incomplete and unchanged. See reports/20261101-pc-control-repair/修复记录.md.",
   "implementation_started": true,
   "task_status_values": [
     "not_started",
@@ -792,10 +792,12 @@
         "reports/phase2-full-control/t07-device-recheck-20261030-202717/known-address-check.json",
         "reports/phase2-full-control/t07-device-recheck-20261030-202717/prepared-package-check.json",
         "reports/phase2-full-control/t07-device-recheck-20261030-202717/goal-block-audit.json",
-        "reports/phase2-full-control/t07-device-recheck-20261030-202717/final-guard.json"
+        "reports/phase2-full-control/t07-device-recheck-20261030-202717/final-guard.json",
+        "reports/20261101-pc-control-repair/修复记录.md",
+        "reports/20261101-pc-control-repair/verification.json"
       ],
       "blocked_reason": null,
-      "updated_at": "2026-10-31T15:22:00+08:00",
+      "updated_at": "2026-11-01T21:51:46.748062+08:00",
       "notes": "Desktop0.3.3 adds a shared deadline for both output pipes and owned script-process exit. Frozen0.3.2 fault reproduced beyond45000ms: still waiting at47025ms with child alive; test stopped only that owned child. Actual new RunScript times out45039ms and confirms own process exit, records script_timeout and no replay. Nine local pipe/process cases including inherited writers and a real Windows message loop pass; existing pointer/frame-pool320/journal/power13/layout7 checks and46field/discovery checks pass. Three actual0.3.3 readonly device operations verify bridge/portal/power, no input or video. Desktop0.3.2 DPI fix remains; its six actual OS100/125/150 local mappings and older trusted clicks are version-bound; full0.3.3 device regression pending. CPU23.35 versus45.05 core percent belongs0.3.1 only. USB outage12:34:41-13:56:07 prevents inferring continuous-USB keepawake failure from later low_power; reconnect wake is still unsuccessful. Final16:52 original identity/pinned portal,LowPowerState=true,mode0,advancing USB power ack/enabled policy. No new presence,reboot,MRC or audio changes.25fps,1-2Mbps,full device DPI,four-interface,long-run,unworn keepawake and physical replug remain incomplete. Completion audit17:09: previous goal turn was progress (0.3.3 actual deadline fix), but the same valid-video blocker persisted across3turns. Goal scope and all original targets retained. Current medium40bytes/ffprobe1,identity/pinning verified,mode0,USB lease enabled and ack advanced. No active measurement job to wait on; meaningful next live work requires restored device frames. Stable pointer tracking uses ROI, initial unknown-position calibration may still search whole frame; retain this qualification. Old zero-stabilization source comparison20.67fps already exists; do not call it wholly untried. Resumed after user-repaired sleep/start; current frames and awake verified. Current0.3.3 backend100/100 ordered trusted selections:P50692.63ms,P95819.99ms,max869.65ms, own stream closed200/named lease restoredmode0 at20:36.1800.97s no-input observation passed its scope:31samples,39042decodedframes,mean20.984fps,zero sleep/restart/health errors,five processes stable. Four actual UI frames and med/high source parameters reviewed, no current full GUI/DPI acceptance. PowerShell/native/raw-TLS source remainsabout21fps. Timer inspect33ms waits47.49ms;45s worker-only1ms multimedia request balanced and15.625ms restored, actual stream21.54fps stillbelow25. Do not add persistent/global timing tweaks or treat IsSupported=true as capture implementation.25fps/1-2Mbps/all GUI/four-interface selections/2h interaction/physical replug remain open. User defers Windows desktop DPI and owns all README updates. Final readonly21:39 original awake/mode0;21:41all playback roles silent. Timing source before/during/after21.036/21.536/21.102fps; own request balanced, fresh Inspect15.625ms and33ms waits47.79ms. No timer request remains active. README files unchanged by this agent after human ownership instruction. 2026-10-30 continuation: original-device SDK discovery and NCM adapters are empty; bridge PID10088 is live waiting_for_device. Current device power/mode/video are unverified, no restart/input/desktop DPI changes. Historical isolated simulation-view0 is423 clean decoded frames1440x936,21.357fps; separate view1 decoding fails and has no FPS, additionalView fresh protected requestHTTP500 retained. JS prototype1.0.0.0 actual preflight failed before capture; replaced by native WinRT bridge in independent ScreenProbe1.0.0.1, not the desktop product. ARM64 package schema/PE/metadata pass; same-source x64 actual DLL ABI28 assertions and frontend/statistics12 checks pass without picker/UI/capture. New package is not installed or runtime-verified on the device. Keep25fps and all original end-to-end requirements open; next verify identity/awake frames, install/launch new probe and obtain real source selection, frames and cleanup before considering product integration. Native cancellation continuation20:16: actual worker with a fake completed picker reproduced GetResults called after Stop. ScreenProbe1.0.0.2 now checks Stop before result/setup stages, requests cancel once, observes terminal status for up to2s, never closes a pending async operation, preserves cancellation/close HRESULTs and blocks new picker requests when cleanup is unknown. Inspect preserves unknown outcomes. Component protocol2 prevents stale DLL use; empty frames and unverified cleanup cannot pass measurement. Same-source actual x64 DLL ABI28 assertions, native worker9 asynchronous cases and frontend/statistics16 checks pass without real picker/capture/input. ARM64 Appx built, not installed or tested on HoloLens. At20:16 bridge PID10088 alive but SDK/NCM empty, device power/mode/portal/video unverified. Original25fps/bitrate/DPI/four-interface/2h targets and README ownership unchanged. Connection block audit20:37: three consecutive goal turns19:52/20:16/20:27 have the same absent-device condition; PnP20:29, known-address network-unreachable20:33 and fresh SDK/hidden-adapter guard20:37 confirm it. Prior turn made concrete native cancellation progress; no own live measurement/deployment job remains to wait on. Existing README/config entries checked, prepared1.0.0.2 sources/layout/package unchanged. All remaining critical evidence needs real device access; no surrogate FPS/CPU/DPI acceptance. Full goal retained, task now blocked pending restored original-device connectivity.",
       "previous_blocked_reason": "2026-10-30 connection blocker confirmed across three consecutive goal turns: original paired HoloLens absent from SDK/NCM; current PnP and hidden adapters empty, existing address169.254.112.215 returned network unreachable0x80072743. Bridge PID10088 was live waiting with no active operation. Offline native1.0.0.2 work was prepared and verified; live deployment, capture/performance, GUI and long-run acceptance required restored access to the original device. Power/mode/portal/video were unknown at that time; it was not labelled as proven sleep or replay input/restart."
     },
@@ -1659,10 +1661,40 @@
       "at": "2026-10-31T15:32:00+08:00",
       "change": "Connection latency work after the user measured9m21s for the connect turn. The USB link itself came up23s after the NCM device appeared and most of the reported time was agent verification, so reconnect now reuses a verified endpoint instead of paying SDK discovery. Added usb-terminal/.state/endpoint.json, written only after the SSH fingerprint matches config.json; Find-HlDevice probes that address on TCP22 (800ms) and skips discovery, falling back to full SDK discovery at most every10s. The bridge reports ConnectionMethod and LastConnectMs, defers the first 45s power-lease renewal by one keepalive tick so status is published immediately, and Start-HoloLensBridge launches the owned bridge directly (watchdog adopts it by PID) instead of waiting seconds for Task Scheduler. Measured: cached reconnect860-877ms versus4.2-4.7s discovery; cold bridge start with a warm cache3.5s wall versus10.7s before; connect returns0.67s when already up. Added tests/HoloLens.FastConnect.Tests.ps1 and manual sections; no new fingerprint accepted, no device input or restart.",
       "previous_device_state": "2026-10-31T15:22:00+08:00: connected on the cached USB endpoint with the power lease active;25fps and all acceptance targets unchanged."
+    },
+    {
+      "at": "2026-11-01T21:51:46.748062+08:00",
+      "change": "Fixed apps-layout control regression: illegal slash in lease RunId and unnormalized adapter executable comparison. Added preflight, preserved start errors, same-run restoration UI and tests; built0.3.4, updated shortcuts, actual backend start/stop and mode0 verified. GUI relaunched readonly. Local suite and discovery pass; Windows clicking blocked by host lock, Home visible effect unverified. Full phase2 targets retained.",
+      "previous_device_state": "2026-10-31T15:32:00+08:00: original device connected over USB NCM (169.254.112.215); SSH fingerprint and pinned portal verified, LowPowerState=false, 1s sample223952bytes/17frames. Fast reconnect implemented: the verified endpoint is cached in usb-terminal/.state/endpoint.json and used before SDK discovery. Measured cached reconnect860-877ms versus4.2-4.7s full discovery; cold bridge start with a warm cache3.5s wall (10.7s before); connect returns in0.67s when the channel is already up. Status now reports ConnectionMethod and LastConnectMs; the first power-lease tick after a new session is deferred one keepalive cycle (45s lease retained) and the lease is active with an advancing ack. No device input, credential, audio, restart or scale change;25fps and all acceptance targets remain incomplete; README user-maintained and Windows DPI deferred."
     }
   ],
   "active_user_constraints": [
+    "2026-11-01：用户明确否决静态拍照加识别反馈路线，以后不再推进或建议单次静态拍照→识别→结果反馈的产品流程，也不将完善该流程作为动态识图的前置任务。旧静态应用、源码、测试和验收只作历史资料，除非用户明确改变决定，不得据此恢复路线；识别工作围绕连续动态识图推进。见根目录 AGENTS.md。",
     "Device playback audio must remain muted at 0 percent, per user request on 2026-10-27. Do not unmute during tests.",
     " User on2026-10-29 requests background work first and Windows DPI later. README files are henceforth maintained personally by the user; agent maintains code, task state and separate acceptance records."
-  ]
+  ],
+  "current_recognition_route": {
+    "observed_at": "2026-11-01T20:37:07.449356+08:00",
+    "plan": "docs/plans/20261101-yolo-on-device/执行入口.md",
+    "report": "reports/20261101-yolo-on-device/部署报告.md",
+    "version": "1.0.0.48",
+    "route": "continuous local six-class YOLOv8n320 / WinMLGPU / ARM64",
+    "retired": [
+      "ConvNeXt dynamic classification",
+      "CAM",
+      "cloud dynamic frame uploads",
+      "USB recognition fallback"
+    ],
+    "static_photo_feedback": "rejected_by_user",
+    "field_leaf_accuracy": "not_run",
+    "does_not_complete_phase2_control_goal": true
+  },
+  "latest_pc_control_repair": {
+    "observed_at": "2026-11-01T21:51:46.748062+08:00",
+    "version": "0.3.4.0",
+    "status": "completed_for_reported_start_failure",
+    "report": "reports/20261101-pc-control-repair/修复记录.md",
+    "verification": "reports/20261101-pc-control-repair/verification.json",
+    "does_not_complete_phase2_goal": true
+  }
 }

@@ -2,79 +2,138 @@
   "schema": 1,
   "plan": "20261031-dynamic-recognition",
   "objective": "部署阿里云端动态模型权重，开发眼镜动态识图软件，打通两端链路，测试并优化",
-  "updated_at": "2026-10-31T21:12:00+08:00",
-  "current_checkpoint": "四项任务完成：云端权重部署、眼镜动态识图、直连链路、测试与优化均已验证；A-D10 跨休眠/真实叶片为扩展项未完成",
+  "updated_at": "2026-11-01T20:37:07+08:00",
+  "current_checkpoint": "2026-11-01: ConvNeXt dynamic/CAM/cloud-frame route retired; old task and acceptance entries are historical only. Current glasses app1.0.0.48 runs bundled six-class YOLOv8n with320input on device. Never resume old dynamic deployment or static-photo product route.",
+  "active_user_constraints": [
+    "2026-11-01：用户明确否决静态拍照加识别反馈路线，以后不再推进或建议单次静态拍照→识别→结果反馈的产品流程，也不将完善该流程作为动态识图的前置任务。旧静态应用、源码、测试和验收只作历史资料，除非用户明确改变决定，不得据此恢复路线；识别工作围绕连续动态识图推进。见根目录 AGENTS.md。"
+  ],
   "tasks": [
     {
       "id": "D01",
       "title": "实现阿里云动态帧推理模块",
       "status": "completed",
-      "artifacts": ["apps/field-app/server/dynamic.py", "apps/field-app/server/cam.py"],
-      "acceptance": ["A-D01", "A-D02"],
+      "artifacts": [
+        "apps/field-app/server/dynamic.py",
+        "apps/field-app/server/cam.py"
+      ],
+      "acceptance": [
+        "A-D01",
+        "A-D02"
+      ],
       "notes": "复用 app_v2 已加载权重；默认 160 输入；CAM 与预测共用一次前向；帧号幂等；无图像留存"
     },
     {
       "id": "D02",
       "title": "部署动态模型清单与云端服务",
       "status": "completed",
-      "artifacts": ["apps/field-app/server/deploy.sh", "apps/field-app/server/patch_dynamic.py", "/opt/rice_disease/configs/dynamic-model.json"],
-      "acceptance": ["A-D01", "A-D07"],
+      "artifacts": [
+        "apps/field-app/server/deploy.sh",
+        "apps/field-app/server/patch_dynamic.py",
+        "/opt/rice_disease/configs/dynamic-model.json"
+      ],
+      "acceptance": [
+        "A-D01",
+        "A-D07"
+      ],
       "notes": "清单 v2-1ae2e8678431；权重 SHA256 1ae2e867…；类别哈希 be2689d4…；发布 20261031T102752Z-660375"
     },
     {
       "id": "D03",
       "title": "扩展网关动态帧通道",
       "status": "completed",
-      "artifacts": ["apps/field-app/server/server.py"],
-      "acceptance": ["A-D03"],
+      "artifacts": [
+        "apps/field-app/server/server.py"
+      ],
+      "acceptance": [
+        "A-D03"
+      ],
       "notes": "设备鉴权、1.5 MB 上限、帧号与哈希绑定、单飞、429/504 映射、指标；网关版本 1.1.0"
     },
     {
       "id": "D04",
       "title": "实现眼镜动态识图模式",
       "status": "completed",
-      "artifacts": ["apps/field-app/src/dynamic.js", "apps/field-app/src/native.js", "apps/field-app/src/app.js", "apps/field-app/src/index.html", "apps/field-app/src/shell.css"],
-      "acceptance": ["A-D04"],
+      "artifacts": [
+        "apps/field-app/src/dynamic.js",
+        "apps/field-app/src/native.js",
+        "apps/field-app/src/app.js",
+        "apps/field-app/src/index.html",
+        "apps/field-app/src/shell.css"
+      ],
+      "acceptance": [
+        "A-D04"
+      ],
       "notes": "连续取帧、节流、平滑、HUD 与关注区域叠加、停止恢复、诊断动作；静态模式不变"
     },
     {
       "id": "D05",
       "title": "补充云端、网关与前端测试",
       "status": "completed",
-      "artifacts": ["apps/field-app/tests/"],
-      "acceptance": ["A-D01", "A-D03", "A-D04", "A-D06"],
+      "artifacts": [
+        "apps/field-app/tests/"
+      ],
+      "acceptance": [
+        "A-D01",
+        "A-D03",
+        "A-D04",
+        "A-D06"
+      ],
       "notes": "Node 56 项、Python 21 项通过；含动态逻辑、原生上传、网关、CAM、USB 中继"
     },
     {
       "id": "D06",
       "title": "构建并部署眼镜应用",
       "status": "completed",
-      "artifacts": ["apps/field-app/.state/packages/20261031-184914-1.0.0.28"],
-      "acceptance": ["A-D04", "A-D06"],
+      "artifacts": [
+        "apps/field-app/.state/packages/20261031-184914-1.0.0.28"
+      ],
+      "acceptance": [
+        "A-D04",
+        "A-D06"
+      ],
       "notes": "1.0.0.23 直连构建；1.0.0.25–1.0.0.28 为 USB 中继诊断构建；当前安装 1.0.0.28"
     },
     {
       "id": "D07",
       "title": "真机动态识图与链路验收",
       "status": "completed",
-      "artifacts": ["reports/20261031-dynamic-recognition/"],
-      "acceptance": ["A-D04", "A-D05", "A-D09", "A-D11", "A-D13"],
+      "artifacts": [
+        "reports/20261031-dynamic-recognition/"
+      ],
+      "acceptance": [
+        "A-D04",
+        "A-D05",
+        "A-D09",
+        "A-D11",
+        "A-D13"
+      ],
       "notes": "30 分钟长稳 1615 帧 0 失败；断链恢复；20:58 换网后直连通过，1.0.0.44 直连专用包动态 36 帧/0 失败、静态成功；1.0.0.45 生产包直连选择"
     },
     {
       "id": "D08",
       "title": "性能优化与复现记录",
       "status": "completed",
-      "artifacts": ["reports/20261031-dynamic-recognition/input-size-benchmark.json"],
-      "acceptance": ["A-D05"],
+      "artifacts": [
+        "reports/20261031-dynamic-recognition/input-size-benchmark.json"
+      ],
+      "acceptance": [
+        "A-D05"
+      ],
       "notes": "默认 160 输入；CAM 阈值与透明度调优；动态循环 gap 0，30 分钟 1615 帧 0 失败、平均 1.07 s；输入尺寸/推理优化与复现记录完成；A-D10 跨休眠/真实叶片为扩展项未完成"
     },
     {
       "id": "D09",
       "title": "自动直连/USB 中继回退",
       "status": "completed",
-      "artifacts": ["apps/field-app/src/native.js", "apps/field-app/src/config.json", "apps/field-app/ops/Start-UsbRelay.ps1", "apps/field-app/ops/Stop-UsbRelay.ps1"],
-      "acceptance": ["A-D12"],
+      "artifacts": [
+        "apps/field-app/src/native.js",
+        "apps/field-app/src/config.json",
+        "apps/field-app/ops/Start-UsbRelay.ps1",
+        "apps/field-app/ops/Stop-UsbRelay.ps1"
+      ],
+      "acceptance": [
+        "A-D12"
+      ],
       "notes": "直连 /health 2.5 s 探测失败后走链路本地中继；请求中途网络失败切源重试（含同一上传请求）；选择缓存 60 s；1.0.0.40 真机验证 relay 选择、31 帧动态与静态回归；1.0.0.42 增加上传自动重试并通过静态回归；1.0.0.43 生产包已构建"
     }
   ],
@@ -83,45 +142,64 @@
       "id": "A-D01",
       "condition": "云端 /dynamic/health 返回模型版本、权重 SHA256、类别、输入尺寸；错误密钥被拒绝",
       "status": "passed",
-      "evidence": ["reports/20261031-dynamic-recognition/cloud-dynamic-health.json", "reports/20261031-dynamic-recognition/cloud-manifest.json"]
+      "evidence": [
+        "reports/20261031-dynamic-recognition/cloud-dynamic-health.json",
+        "reports/20261031-dynamic-recognition/cloud-manifest.json"
+      ]
     },
     {
       "id": "A-D02",
       "condition": "动态帧返回类别/置信度/top3/CAM/耗时；静态 /predict 回归不变",
       "status": "passed",
-      "evidence": ["reports/20261031-dynamic-recognition/cloud-dynamic-frame-smoke.json"]
+      "evidence": [
+        "reports/20261031-dynamic-recognition/cloud-dynamic-frame-smoke.json"
+      ]
     },
     {
       "id": "A-D03",
       "condition": "网关动态帧需设备会话；哈希/帧号不符被拒绝；同帧重试幂等；并发 429",
       "status": "passed",
-      "evidence": ["reports/20261031-dynamic-recognition/cloud-python-tests.txt"]
+      "evidence": [
+        "reports/20261031-dynamic-recognition/cloud-python-tests.txt"
+      ]
     },
     {
       "id": "A-D04",
       "condition": "真机连续 ≥20 帧显示动态结果和标注，停止后恢复静态按钮",
       "status": "passed",
-      "evidence": ["reports/20261031-dynamic-recognition/device-1.0.0.25-dynamic-app-state.json", "reports/20261031-dynamic-recognition/screenshots/dynamic-invalid-20261031-184600.png"],
+      "evidence": [
+        "reports/20261031-dynamic-recognition/device-1.0.0.25-dynamic-app-state.json",
+        "reports/20261031-dynamic-recognition/screenshots/dynamic-invalid-20261031-184600.png"
+      ],
       "notes": "经 USB 中继路径通过；直连路径见 A-D09，未通"
     },
     {
       "id": "A-D05",
       "condition": "记录端到端延迟、分析帧率、连续运行稳定性和优化前后对比",
       "status": "passed",
-      "evidence": ["reports/20261031-dynamic-recognition/cloud-dynamic-frame-smoke.json", "reports/20261031-dynamic-recognition/input-size-benchmark.json", "reports/20261031-dynamic-recognition/README.md"],
+      "evidence": [
+        "reports/20261031-dynamic-recognition/cloud-dynamic-frame-smoke.json",
+        "reports/20261031-dynamic-recognition/input-size-benchmark.json",
+        "reports/20261031-dynamic-recognition/README.md"
+      ],
       "notes": "真机端到端 0.95–1.25 s，1.0.0.31 164 帧/约 250 s、0 失败、P50 808 ms；长稳和 2 小时未做"
     },
     {
       "id": "A-D06",
       "condition": "静态拍照、上传、结果和历史在动态版本上回归通过",
       "status": "passed",
-      "evidence": ["reports/20261031-dynamic-recognition/device-1.0.0.28-app-state.json"]
+      "evidence": [
+        "reports/20261031-dynamic-recognition/device-1.0.0.28-app-state.json"
+      ]
     },
     {
       "id": "A-D07",
       "condition": "云端部署带权重哈希校验、健康检查和失败回滚证据",
       "status": "passed",
-      "evidence": ["reports/20261031-dynamic-recognition/cloud-manifest.json", "reports/20261031-dynamic-recognition/cloud-dynamic-health.json"],
+      "evidence": [
+        "reports/20261031-dynamic-recognition/cloud-manifest.json",
+        "reports/20261031-dynamic-recognition/cloud-dynamic-health.json"
+      ],
       "notes": "备份 /var/lib/rice-hololens-app/backups/20261031T102752Z-660375；未实际触发回滚"
     },
     {
@@ -135,35 +213,50 @@
       "id": "A-D09",
       "condition": "眼镜直接 HTTPS 到阿里云（不经 PC 中继）",
       "status": "passed",
-      "evidence": ["reports/20261031-dynamic-recognition/device-direct-https-ok-20261031-205827.json", "reports/20261031-dynamic-recognition/device-direct-network-preflight-1.0.0.44.json", "reports/20261031-dynamic-recognition/device-1.0.0.44-direct-only-app-state.json", "reports/20261031-dynamic-recognition/device-1.0.0.44-direct-only-static-app-state.json"],
+      "evidence": [
+        "reports/20261031-dynamic-recognition/device-direct-https-ok-20261031-205827.json",
+        "reports/20261031-dynamic-recognition/device-direct-network-preflight-1.0.0.44.json",
+        "reports/20261031-dynamic-recognition/device-1.0.0.44-direct-only-app-state.json",
+        "reports/20261031-dynamic-recognition/device-1.0.0.44-direct-only-static-app-state.json"
+      ],
       "notes": "20:58 换网后设备 HTTPS 200；1.0.0.44 直连专用包动态 36 帧/0 失败、静态 295,101 字节 prediction/history；1.0.0.45 生产包 transport_selected=https://rice-srt.cn。历史 443 阻断记录保留"
     },
     {
       "id": "A-D10",
       "condition": "跨休眠自动唤醒与真实叶片/多光照",
       "status": "not_run",
-      "evidence": ["reports/20261031-dynamic-recognition/device-sleepwake-20261031-2010.json"],
+      "evidence": [
+        "reports/20261031-dynamic-recognition/device-sleepwake-20261031-2010.json"
+      ],
       "notes": "30 分钟长稳见 A-D13；2010 跨休眠实验 wake_unverified：30.4 s 进入睡眠候选，桥重启 3.0 s 后 301.6 s 无视频，受控重启恢复；2040/2045 复跑未进入睡眠（sleepCandidate=false，视频持续 37 帧），不能计通过；可用性监督器 Save-Attempt 已修复，-Once 健康 15 帧；真实叶片/多光照仍未做"
     },
     {
       "id": "A-D11",
       "condition": "USB 中继中断后动态模式退避、重试并在中继恢复后自动继续，不伪造结果",
       "status": "passed",
-      "evidence": ["reports/20261031-dynamic-recognition/device-1.0.0.31-recovery-app-state.json"],
+      "evidence": [
+        "reports/20261031-dynamic-recognition/device-1.0.0.31-recovery-app-state.json"
+      ],
       "notes": "3 次 dynamic_error 后重启中继，11:21:43 起恢复新帧；停止统计 frames=38, ok=38, fail=3"
     },
     {
       "id": "A-D13",
       "condition": "30 分钟以上连续动态运行，无失败、无重启",
       "status": "passed",
-      "evidence": ["reports/20261031-dynamic-recognition/device-1.0.0.33-30min-app-state.json"],
+      "evidence": [
+        "reports/20261031-dynamic-recognition/device-1.0.0.33-30min-app-state.json"
+      ],
       "notes": "1.0.0.33，19:24:30–19:53:14，约 1724 s；frames=1615, ok=1615, fail=0；网关窗口 P50 806.48 ms、P95 867.93 ms"
     },
     {
       "id": "A-D12",
       "condition": "同一应用包在直连不可用时自动选择 USB 中继，直连可用时优先直连；网络切换不伪造结果",
       "status": "passed",
-      "evidence": ["reports/20261031-dynamic-recognition/device-1.0.0.40-fallback-startup.json", "reports/20261031-dynamic-recognition/device-1.0.0.40-fallback-app-state.json", "reports/20261031-dynamic-recognition/device-1.0.0.42-fallback-static-app-state.json"],
+      "evidence": [
+        "reports/20261031-dynamic-recognition/device-1.0.0.40-fallback-startup.json",
+        "reports/20261031-dynamic-recognition/device-1.0.0.40-fallback-app-state.json",
+        "reports/20261031-dynamic-recognition/device-1.0.0.42-fallback-static-app-state.json"
+      ],
       "notes": "1.0.0.40 启动记录 transport_selected=relay、service_ready；动态 31 帧 0 失败；1.0.0.42 静态 309,317 字节 prediction/history 成功并含上传失败自动切中继。直连可用时优先直连由单元测试覆盖"
     }
   ],
@@ -223,6 +316,13 @@
     {
       "at": "2026-10-31T21:12:00+08:00",
       "change": "四项任务收口：云端动态权重、眼镜动态识图、直连链路、测试优化均完成并留证；A-D10 跨休眠/真实叶片保持扩展未完成，不影响本次目标。当前安装 1.0.0.45 生产包（直连+回退）。"
+    },
+    {
+      "date": "2026-11-01",
+      "change": "Superseded by verified local YOLO deployment; old cloud dynamic mount and gateway routes removed with backup. Keep previous results as dated history, not current routes or current-model acceptance."
     }
-  ]
+  ],
+  "status": "superseded",
+  "superseded_at": "2026-11-01T20:37:07.449356+08:00",
+  "superseded_by": "docs/plans/20261101-yolo-on-device/执行入口.md"
 }
