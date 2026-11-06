@@ -1,0 +1,42 @@
+[
+  {
+    "source": "apps/field-app/src/native.js",
+    "sha256": "7F9861ED439B26E3239D36BC667DA1020BA6A8765557A77DF12B0E5DA1B454FC",
+    "archive": "source/application-as-run/native.js"
+  },
+  {
+    "source": "apps/field-app/src/app.js",
+    "sha256": "EE64AC0BC86029AD0366CBA7BA33C4A240556A3FEB3CBA8DA12FDA130E6140CF",
+    "archive": "source/application-as-run/app.js"
+  },
+  {
+    "source": "apps/field-app/src/camera-controls.js",
+    "sha256": "346E9B4766F1E06DA09AE968A6ABB28F1BC9D6C480B283A4445797CE8763AC57",
+    "archive": "source/application-as-run/camera-controls.js"
+  },
+  {
+    "source": "apps/field-app/src/dynamic.js",
+    "sha256": "5D41312F51E691CE3B64B71739C40FD028EE56A62402AF66AAB69AC838F52526",
+    "archive": "source/application-as-run/dynamic.js"
+  },
+  {
+    "source": "apps/field-app/src/config.json",
+    "sha256": "974918D7219E70320FB593AB61E90634EFD84B110FE6E9C9D4A48BD4050140B7",
+    "archive": "source/application-as-run/config.json"
+  },
+  {
+    "source": "apps/field-app/ops/Build-App.ps1",
+    "sha256": "0992C0F07C471E8F978BAE296EA3C6D47865E4FC3E42DC20182A9C3CB7E6EEF0",
+    "archive": "source/application-as-run/Build-App.ps1"
+  },
+  {
+    "source": "apps/field-app/ops/Run-CameraResourceMatrix.ps1",
+    "sha256": "1E1CDBAC9D940B9132FEE7FACEAD4D27DB03DBE7375310872FD4CEA45BB7F182",
+    "archive": "source/application-as-run/Run-CameraResourceMatrix.ps1"
+  },
+  {
+    "source": "apps/field-app/ops/Measure-YoloResources.ps1",
+    "sha256": "EB00425ED0E6FE8B494E93D4810EB1CC12FAFE0D98647BDDAAE9C28FFE3ECC27",
+    "archive": "source/application-as-run/Measure-YoloResources.ps1"
+  }
+]

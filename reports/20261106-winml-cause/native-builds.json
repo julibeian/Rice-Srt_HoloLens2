@@ -1,0 +1,22 @@
+[
+  {
+    "Architecture": "arm64",
+    "WinmdSha256": "35E02BBFE27EFB0832BD84408BEB0A39C9FBAE8DABB27D4C6C279DB3BDD40561",
+    "ReuseTensors": true,
+    "InputSize": 320,
+    "Winmd": "E:\\微信小程序开发软件\\hololens-terminal\\apps\\field-app\\.state\\yolo-native\\arm64\\20261106-152513-76b753\\Rice.HoloLens.Yolo.winmd",
+    "Folder": "E:\\微信小程序开发软件\\hololens-terminal\\apps\\field-app\\.state\\yolo-native\\arm64\\20261106-152513-76b753",
+    "DllSha256": "C82AD98DF0DA4C5FC6780C0EBC43502AA5E43D7C5409D7805E1D30B8F267CED9",
+    "Dll": "E:\\微信小程序开发软件\\hololens-terminal\\apps\\field-app\\.state\\yolo-native\\arm64\\20261106-152513-76b753\\Rice.HoloLens.Yolo.dll"
+  },
+  {
+    "Winmd": "E:\\微信小程序开发软件\\hololens-terminal\\apps\\field-app\\.state\\yolo-native\\arm64\\20261106-150255-f09227\\Rice.HoloLens.Yolo.winmd",
+    "Folder": "E:\\微信小程序开发软件\\hololens-terminal\\apps\\field-app\\.state\\yolo-native\\arm64\\20261106-150255-f09227",
+    "Architecture": "arm64",
+    "WinmdSha256": "0C3DF9A69A585370FC955A30C48BE7969FCC3C4F82873D5397A7B9FD77D7D7A0",
+    "Dll": "E:\\微信小程序开发软件\\hololens-terminal\\apps\\field-app\\.state\\yolo-native\\arm64\\20261106-150255-f09227\\Rice.HoloLens.Yolo.dll",
+    "DllSha256": "AE864881DE50C7F88EED3585D635A62135070FE79189150D64EA93D14E242CB7",
+    "ReuseTensors": true,
+    "InputSize": 320
+  }
+]

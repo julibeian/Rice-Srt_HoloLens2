@@ -1,0 +1,12 @@
+{
+  "Worker": "U:\\Users\\DefaultAccount\\AppData\\Local\\DevelopmentFiles\\RiceHoloLensFieldV1\\gpu-probe-4FCED777E192.exe",
+  "Output": "U:\\Users\\DefaultAccount\\AppData\\Local\\DevelopmentFiles\\RiceHoloLensFieldV1\\gpu-process-gpu-first.jsonl",
+  "WorkerSha256": "4FCED777E19271168CEE854881FDF561ADCADB172A7CAF9F79FB76DCC2E3963B",
+  "At": "2026-11-06T14:53:49.0450860+08:00",
+  "ReplayAllowed": false,
+  "Attempted": true,
+  "RunId": "process-gpu-first",
+  "Device": "HOLOLENS-I0IHKJ",
+  "Seconds": 25,
+  "Fingerprint": "53:64:BE:AA:A5:F8:32:FE:99:F3:92:F1:A0:22:D1:E3:1A:68:0E:6A"
+}

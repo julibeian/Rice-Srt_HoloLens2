@@ -1,0 +1,84 @@
+{
+  "At": "2026-11-06T11:03:41.1817017+08:00",
+  "Device": "HOLOLENS-I0IHKJ",
+  "Version": "1.0.0.48",
+  "Identity": "Rice.HoloLens.Field_r5420n6798s24!Field",
+  "RuntimeSession": "c705f6b0fbd0d488f3139eee21a3f8a2",
+  "ProcessId": 6120,
+  "ModelSha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+  "InputSize": 320,
+  "CameraFrames": 450,
+  "CameraDiagnosticSession": null,
+  "RecognitionMode": "local-yolo",
+  "Capabilities": [
+    "webcam"
+  ],
+  "NetworkCapability": false,
+  "CspConnectNone": true,
+  "VerifiedFiles": [
+    {
+      "Sha256": "FF711BD9E70DBC6105BC0ECEDD283DDBA5FBDD0F15CE4D9E21BE6DA9A3294CA0",
+      "Name": "AppxManifest.xml",
+      "MatchesBuild": true
+    },
+    {
+      "Sha256": "A42CBA1B9A93FAFE22178EC9A9F4F534F0C43491197063AC57E3517AB02C2B6B",
+      "Name": "config.json",
+      "MatchesBuild": true
+    },
+    {
+      "Sha256": "E6B6D2F6BAAAE3B7970F1A4E425F2C2347A90FE6AAB34C3DA0AED738FCF1B048",
+      "Name": "model.onnx",
+      "MatchesBuild": true
+    },
+    {
+      "Sha256": "D8D45363DC40D0FCF63687003A29B03616CA674047BE53DAA092380C1E7D6A19",
+      "Name": "model-manifest.json",
+      "MatchesBuild": true
+    },
+    {
+      "Sha256": "6D9E91E1BC27244E406F858C6F1498400F61A606A2923D00A113FFFECB4D04FF",
+      "Name": "Rice.HoloLens.Yolo.dll",
+      "MatchesBuild": true
+    },
+    {
+      "Sha256": "5F1FC58B30DACC1245F2D01C82791B3C0A11848F7DB8EC3AC67B4E83F5E9BD97",
+      "Name": "Rice.HoloLens.Yolo.winmd",
+      "MatchesBuild": true
+    },
+    {
+      "Sha256": "665D007E218295EA9AC3A865618F52273236566DF4AAF5151D873D25C9054BAF",
+      "Name": "index-1-0-0-48.html",
+      "MatchesBuild": true
+    },
+    {
+      "Sha256": "A5504DF553662C5981606812569CDC1EEE4882D4C86B686F622230D290FA63BF",
+      "Name": "boot-a5504df55366.js",
+      "MatchesBuild": true
+    },
+    {
+      "Sha256": "556F679FF5092F0C524A9B2582095E9EFF415A592D6698093552EE07EBDF9AB0",
+      "Name": "camera-controls-556f679ff509.js",
+      "MatchesBuild": true
+    },
+    {
+      "Sha256": "5D41312F51E691CE3B64B71739C40FD028EE56A62402AF66AAB69AC838F52526",
+      "Name": "dynamic-5d41312f51e6.js",
+      "MatchesBuild": true
+    },
+    {
+      "Sha256": "6F457C48168D8C9EB40B168D3410A78F0CFF4CE02851257197E434E1475228E5",
+      "Name": "native-6f457c48168d.js",
+      "MatchesBuild": true
+    },
+    {
+      "Sha256": "00D25E5A233B73D5FC81094918C9AA72EFA57B3E773BA8DF7BB132F0F3D9A5D2",
+      "Name": "app-00d25e5a233b.js",
+      "MatchesBuild": true
+    }
+  ],
+  "RuntimeEvidence": "E:\\微信小程序开发软件\\hololens-terminal\\apps\\field-app\\.state\\diagnostics\\diagnostic-6c9542483c23467a93400707e669bc82",
+  "Evidence": "E:\\微信小程序开发软件\\hololens-terminal\\apps\\field-app\\.state\\yolo-deployment-checks\\yolo-resources-restored-20261106-final",
+  "Passed": true,
+  "NetworkTest": "Running production app requests only webcam; no network capability and connect-src none. Device-wide network was not disabled."
+}

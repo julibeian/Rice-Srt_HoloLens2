@@ -1,0 +1,225 @@
+{
+  "schema": 1,
+  "run_id": "matrix-startup-20261105",
+  "status": "recorded",
+  "pid": 14180,
+  "started_at": "2026-11-05T20:18:48.3837647+08:00",
+  "completed_trials": 30,
+  "trials": [
+    {
+      "finished_at": "2026-11-05T20:21:45.1852078+08:00",
+      "run_id": "matrix-startup-20261105-p1-c01-896x504-15",
+      "status": "recorded",
+      "configuration": "896x504@15",
+      "pass": 1
+    },
+    {
+      "finished_at": "2026-11-05T20:24:37.5466481+08:00",
+      "run_id": "matrix-startup-20261105-p1-c02-896x504-30",
+      "status": "recorded",
+      "configuration": "896x504@30",
+      "pass": 1
+    },
+    {
+      "finished_at": "2026-11-05T20:27:28.1804500+08:00",
+      "run_id": "matrix-startup-20261105-p1-c03-1280x720-15",
+      "status": "recorded",
+      "configuration": "1280x720@15",
+      "pass": 1
+    },
+    {
+      "finished_at": "2026-11-05T20:30:18.9368423+08:00",
+      "run_id": "matrix-startup-20261105-p1-c04-1280x720-30",
+      "status": "recorded",
+      "configuration": "1280x720@30",
+      "pass": 1
+    },
+    {
+      "finished_at": "2026-11-05T20:33:08.2051991+08:00",
+      "run_id": "matrix-startup-20261105-p1-c05-1504x846-15",
+      "status": "recorded",
+      "configuration": "1504x846@15",
+      "pass": 1
+    },
+    {
+      "finished_at": "2026-11-05T20:35:57.7239236+08:00",
+      "run_id": "matrix-startup-20261105-p1-c06-1504x846-30",
+      "status": "recorded",
+      "configuration": "1504x846@30",
+      "pass": 1
+    },
+    {
+      "finished_at": "2026-11-05T20:38:48.2345307+08:00",
+      "run_id": "matrix-startup-20261105-p1-c07-1920x1080-15",
+      "status": "recorded",
+      "configuration": "1920x1080@15",
+      "pass": 1
+    },
+    {
+      "finished_at": "2026-11-05T20:41:38.4870933+08:00",
+      "run_id": "matrix-startup-20261105-p1-c08-1920x1080-30",
+      "status": "recorded",
+      "configuration": "1920x1080@30",
+      "pass": 1
+    },
+    {
+      "finished_at": "2026-11-05T20:44:27.9284767+08:00",
+      "run_id": "matrix-startup-20261105-p1-c09-2284x1284-15",
+      "status": "recorded",
+      "configuration": "2284x1284@15",
+      "pass": 1
+    },
+    {
+      "finished_at": "2026-11-05T20:47:21.0227681+08:00",
+      "run_id": "matrix-startup-20261105-p1-c10-2284x1284-30",
+      "status": "recorded",
+      "configuration": "2284x1284@30",
+      "pass": 1
+    },
+    {
+      "finished_at": "2026-11-05T20:50:13.3857391+08:00",
+      "run_id": "matrix-startup-20261105-p2-c10-2284x1284-30",
+      "status": "recorded",
+      "configuration": "2284x1284@30",
+      "pass": 2
+    },
+    {
+      "finished_at": "2026-11-05T20:53:05.6977090+08:00",
+      "run_id": "matrix-startup-20261105-p2-c09-2284x1284-15",
+      "status": "recorded",
+      "configuration": "2284x1284@15",
+      "pass": 2
+    },
+    {
+      "finished_at": "2026-11-05T20:55:59.4296972+08:00",
+      "run_id": "matrix-startup-20261105-p2-c08-1920x1080-30",
+      "status": "recorded",
+      "configuration": "1920x1080@30",
+      "pass": 2
+    },
+    {
+      "finished_at": "2026-11-05T20:58:52.6812679+08:00",
+      "run_id": "matrix-startup-20261105-p2-c07-1920x1080-15",
+      "status": "recorded",
+      "configuration": "1920x1080@15",
+      "pass": 2
+    },
+    {
+      "finished_at": "2026-11-05T21:01:44.5249322+08:00",
+      "run_id": "matrix-startup-20261105-p2-c06-1504x846-30",
+      "status": "recorded",
+      "configuration": "1504x846@30",
+      "pass": 2
+    },
+    {
+      "finished_at": "2026-11-05T21:04:37.0011899+08:00",
+      "run_id": "matrix-startup-20261105-p2-c05-1504x846-15",
+      "status": "recorded",
+      "configuration": "1504x846@15",
+      "pass": 2
+    },
+    {
+      "finished_at": "2026-11-05T21:07:29.2594805+08:00",
+      "run_id": "matrix-startup-20261105-p2-c04-1280x720-30",
+      "status": "recorded",
+      "configuration": "1280x720@30",
+      "pass": 2
+    },
+    {
+      "finished_at": "2026-11-05T21:10:20.6514904+08:00",
+      "run_id": "matrix-startup-20261105-p2-c03-1280x720-15",
+      "status": "recorded",
+      "configuration": "1280x720@15",
+      "pass": 2
+    },
+    {
+      "finished_at": "2026-11-05T21:13:12.6739917+08:00",
+      "run_id": "matrix-startup-20261105-p2-c02-896x504-30",
+      "status": "recorded",
+      "configuration": "896x504@30",
+      "pass": 2
+    },
+    {
+      "finished_at": "2026-11-05T21:16:04.4259041+08:00",
+      "run_id": "matrix-startup-20261105-p2-c01-896x504-15",
+      "status": "recorded",
+      "configuration": "896x504@15",
+      "pass": 2
+    },
+    {
+      "finished_at": "2026-11-05T21:18:57.3338675+08:00",
+      "run_id": "matrix-startup-20261105-p3-c01-896x504-15",
+      "status": "recorded",
+      "configuration": "896x504@15",
+      "pass": 3
+    },
+    {
+      "finished_at": "2026-11-05T21:21:50.2981367+08:00",
+      "run_id": "matrix-startup-20261105-p3-c02-896x504-30",
+      "status": "recorded",
+      "configuration": "896x504@30",
+      "pass": 3
+    },
+    {
+      "finished_at": "2026-11-05T21:24:46.3359860+08:00",
+      "run_id": "matrix-startup-20261105-p3-c03-1280x720-15",
+      "status": "recorded",
+      "configuration": "1280x720@15",
+      "pass": 3
+    },
+    {
+      "finished_at": "2026-11-05T21:27:43.2377726+08:00",
+      "run_id": "matrix-startup-20261105-p3-c04-1280x720-30",
+      "status": "recorded",
+      "configuration": "1280x720@30",
+      "pass": 3
+    },
+    {
+      "finished_at": "2026-11-05T21:30:39.3170125+08:00",
+      "run_id": "matrix-startup-20261105-p3-c05-1504x846-15",
+      "status": "recorded",
+      "configuration": "1504x846@15",
+      "pass": 3
+    },
+    {
+      "finished_at": "2026-11-05T21:33:35.6857250+08:00",
+      "run_id": "matrix-startup-20261105-p3-c06-1504x846-30",
+      "status": "recorded",
+      "configuration": "1504x846@30",
+      "pass": 3
+    },
+    {
+      "finished_at": "2026-11-05T21:36:29.5625193+08:00",
+      "run_id": "matrix-startup-20261105-p3-c07-1920x1080-15",
+      "status": "recorded",
+      "configuration": "1920x1080@15",
+      "pass": 3
+    },
+    {
+      "finished_at": "2026-11-05T21:39:27.8353175+08:00",
+      "run_id": "matrix-startup-20261105-p3-c08-1920x1080-30",
+      "status": "recorded",
+      "configuration": "1920x1080@30",
+      "pass": 3
+    },
+    {
+      "finished_at": "2026-11-05T21:42:24.6681532+08:00",
+      "run_id": "matrix-startup-20261105-p3-c09-2284x1284-15",
+      "status": "recorded",
+      "configuration": "2284x1284@15",
+      "pass": 3
+    },
+    {
+      "finished_at": "2026-11-05T21:45:25.4690269+08:00",
+      "run_id": "matrix-startup-20261105-p3-c10-2284x1284-30",
+      "status": "recorded",
+      "configuration": "2284x1284@30",
+      "pass": 3
+    }
+  ],
+  "method": "Start each trial with an exact on-device camera capture configuration; diagnostics/assets disabled; original model/native DLL reused",
+  "updated_at": "2026-11-05T21:45:25.4696438+08:00",
+  "current_trial": "matrix-startup-20261105-p3-c10-2284x1284-30",
+  "current_configuration": "2284x1284@30",
+  "finished_at": "2026-11-05T21:45:25.4696010+08:00"
+}

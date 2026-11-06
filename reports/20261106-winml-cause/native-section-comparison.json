@@ -1,0 +1,47 @@
+{
+  "normalized_sections_identical": true,
+  "raw_sections_identical": false,
+  "excluded_field": "IMAGE_EXPORT_DIRECTORY.TimeDateStamp and IMAGE_DEBUG_DIRECTORY.TimeDateStamp",
+  "export_timestamps": [
+    4294967295,
+    4294967295
+  ],
+  "section_hashes": [
+    {
+      ".text": "347f747648506acad30e155ad0ddc1d7c694b85c4e07d26903f29659d33c24eb",
+      ".rdata": "949b160c9444e42295ddfc18c994d3f8d9c3bfb21c6effc978b7393f840c0ce2",
+      ".data": "621bf4b2a09a6d5e1fa5b5563233cb5d666907ee78025f127170403783733d6d",
+      ".pdata": "514da0645570ae707316f5e201a14ee01628c28abca8926485a4706d91c23c95",
+      ".reloc": "370ba9c598b95929f4b49ad7bd026508f8b7f7cca5bc85e2e5c063002ba00ed0"
+    },
+    {
+      ".text": "347f747648506acad30e155ad0ddc1d7c694b85c4e07d26903f29659d33c24eb",
+      ".rdata": "949b160c9444e42295ddfc18c994d3f8d9c3bfb21c6effc978b7393f840c0ce2",
+      ".data": "621bf4b2a09a6d5e1fa5b5563233cb5d666907ee78025f127170403783733d6d",
+      ".pdata": "514da0645570ae707316f5e201a14ee01628c28abca8926485a4706d91c23c95",
+      ".reloc": "370ba9c598b95929f4b49ad7bd026508f8b7f7cca5bc85e2e5c063002ba00ed0"
+    }
+  ],
+  "builds": [
+    {
+      "Architecture": "arm64",
+      "WinmdSha256": "35E02BBFE27EFB0832BD84408BEB0A39C9FBAE8DABB27D4C6C279DB3BDD40561",
+      "ReuseTensors": true,
+      "InputSize": 320,
+      "Winmd": "E:\\\u5fae\u4fe1\u5c0f\u7a0b\u5e8f\u5f00\u53d1\u8f6f\u4ef6\\hololens-terminal\\apps\\field-app\\.state\\yolo-native\\arm64\\20261106-152513-76b753\\Rice.HoloLens.Yolo.winmd",
+      "Folder": "E:\\\u5fae\u4fe1\u5c0f\u7a0b\u5e8f\u5f00\u53d1\u8f6f\u4ef6\\hololens-terminal\\apps\\field-app\\.state\\yolo-native\\arm64\\20261106-152513-76b753",
+      "DllSha256": "C82AD98DF0DA4C5FC6780C0EBC43502AA5E43D7C5409D7805E1D30B8F267CED9",
+      "Dll": "E:\\\u5fae\u4fe1\u5c0f\u7a0b\u5e8f\u5f00\u53d1\u8f6f\u4ef6\\hololens-terminal\\apps\\field-app\\.state\\yolo-native\\arm64\\20261106-152513-76b753\\Rice.HoloLens.Yolo.dll"
+    },
+    {
+      "Winmd": "E:\\\u5fae\u4fe1\u5c0f\u7a0b\u5e8f\u5f00\u53d1\u8f6f\u4ef6\\hololens-terminal\\apps\\field-app\\.state\\yolo-native\\arm64\\20261106-150255-f09227\\Rice.HoloLens.Yolo.winmd",
+      "Folder": "E:\\\u5fae\u4fe1\u5c0f\u7a0b\u5e8f\u5f00\u53d1\u8f6f\u4ef6\\hololens-terminal\\apps\\field-app\\.state\\yolo-native\\arm64\\20261106-150255-f09227",
+      "Architecture": "arm64",
+      "WinmdSha256": "0C3DF9A69A585370FC955A30C48BE7969FCC3C4F82873D5397A7B9FD77D7D7A0",
+      "Dll": "E:\\\u5fae\u4fe1\u5c0f\u7a0b\u5e8f\u5f00\u53d1\u8f6f\u4ef6\\hololens-terminal\\apps\\field-app\\.state\\yolo-native\\arm64\\20261106-150255-f09227\\Rice.HoloLens.Yolo.dll",
+      "DllSha256": "AE864881DE50C7F88EED3585D635A62135070FE79189150D64EA93D14E242CB7",
+      "ReuseTensors": true,
+      "InputSize": 320
+    }
+  ]
+}

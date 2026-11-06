@@ -1,0 +1,6 @@
+{
+  "Output": "",
+  "ExitCode": 0,
+  "Arguments": "LaunchForDebug U:\\Users\\DefaultAccount\\AppData\\Local\\DevelopmentFiles\\RiceHoloLensFieldV1\\gpu-probe-091E41A810B6.exe \"U:\\Users\\DefaultAccount\\AppData\\Local\\DevelopmentFiles\\RiceHoloLensFieldV1\\gpu-cooling-load-cycle.jsonl 380\" Rice.HoloLens.Field_r5420n6798s24!Field",
+  "Executable": "C:\\Windows\\System32\\DevToolsLauncher.exe"
+}

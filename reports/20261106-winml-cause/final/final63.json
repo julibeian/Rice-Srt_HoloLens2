@@ -1,0 +1,92 @@
+{
+  "at": "2026-11-06T16:45:21.3521958+08:00",
+  "run_id": "final63",
+  "device": "HOLOLENS-I0IHKJ",
+  "fingerprint": "53:64:BE:AA:A5:F8:32:FE:99:F3:92:F1:A0:22:D1:E3:1A:68:0E:6A",
+  "public_key": "0CEA3FB1C62C350BC18D0833AC2F65544F8243AAA650243F0EFEA00CD4A4B737",
+  "mode": {
+    "body": {
+      "mode": 0
+    },
+    "status": 200
+  },
+  "mrc": {
+    "body": {
+      "IsRecording": false
+    },
+    "status": 200
+  },
+  "power": {
+    "body": {
+      "LowPowerState": false,
+      "LowPowerStateAvailable": true
+    },
+    "status": 200
+  },
+  "battery": {
+    "body": {
+      "AcOnline": 1,
+      "BatteryPresent": 1,
+      "Charging": 1,
+      "DefaultAlert1": 221,
+      "DefaultAlert2": 398,
+      "EstimatedTime": 4294967295,
+      "MaximumCapacity": 4419,
+      "RemainingCapacity": 1723
+    },
+    "status": 200
+  },
+  "thermal": {
+    "body": {
+      "CurrentStage": 0
+    },
+    "status": 200
+  },
+  "mitigation": {
+    "body": {
+      "Battery": {
+        "IsSuppressed": 0,
+        "Level": 0,
+        "Mask": 64,
+        "ThermalScore": 100
+      },
+      "CPU": {
+        "IsSuppressed": 0,
+        "Level": 0,
+        "Mask": 1,
+        "ThermalScore": 100
+      },
+      "DRAM": {
+        "IsSuppressed": 0,
+        "Level": 0,
+        "Mask": 32,
+        "ThermalScore": 100
+      },
+      "Display": {
+        "IsSuppressed": 0,
+        "Level": 0,
+        "Mask": 8,
+        "ThermalScore": 100
+      },
+      "GPU": {
+        "IsSuppressed": 0,
+        "Level": 0,
+        "Mask": 2,
+        "ThermalScore": 100
+      },
+      "Network": {
+        "IsSuppressed": 0,
+        "Level": 0,
+        "Mask": 4,
+        "ThermalScore": 100
+      },
+      "PhotoVideoCamera": {
+        "IsSuppressed": 0,
+        "Level": 0,
+        "Mask": 16,
+        "ThermalScore": 100
+      }
+    },
+    "status": 200
+  }
+}

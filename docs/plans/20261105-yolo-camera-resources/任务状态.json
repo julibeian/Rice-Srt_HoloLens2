@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "objective": "连接现有 HoloLens，先采样当前 YOLO，再递增真实相机分辨率和帧率做多轮资源占用测试并保存证据",
+  "status": "completed",
+  "started_at": "2026-11-05T19:36:00+08:00",
+  "baseline_version": "1.0.0.48",
+  "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+  "model_input_size": 320,
+  "tasks": [
+    {
+      "id": "R01",
+      "title": "连接、原包核验和原版负载采样",
+      "status": "completed"
+    },
+    {
+      "id": "R02",
+      "title": "相机能力枚举、真实参数和实际帧率测量",
+      "status": "completed"
+    },
+    {
+      "id": "R03",
+      "title": "递增尺寸与帧率的多轮实验",
+      "status": "completed"
+    },
+    {
+      "id": "R04",
+      "title": "原始记录复算、报告、图表和恢复原配置",
+      "status": "completed"
+    }
+  ],
+  "constraints": [
+    "仅原设备和原模型",
+    "连续真实 PV 帧，不用内置图像代替",
+    "根 README 不编辑",
+    "不以推理耗时替代 CPU/GPU 占用",
+    "不将资源测试当作病害准确率验收",
+    "不推送或发布"
+  ],
+  "evidence": [
+    "reports/20261105-yolo-camera-resources/采样报告.md",
+    "reports/20261105-yolo-camera-resources/configuration-summary.csv",
+    "reports/20261105-yolo-camera-resources/round-summary.csv",
+    "reports/20261105-yolo-camera-resources/raw-manifest.json",
+    "reports/20261105-yolo-camera-resources/completion-audit.json",
+    "reports/20261105-yolo-camera-resources/interrupted-closing-summary.json",
+    "reports/20261105-yolo-camera-resources/restored-verification.json"
+  ],
+  "camera_profiles": {
+    "maximum_preview": {
+      "height": 1284,
+      "width": 2284
+    },
+    "frame_rates": [
+      15,
+      30
+    ],
+    "matrix_sizes": [
+      [
+        896,
+        504
+      ],
+      [
+        1280,
+        720
+      ],
+      [
+        1504,
+        846
+      ],
+      [
+        1920,
+        1080
+      ],
+      [
+        2284,
+        1284
+      ]
+    ]
+  },
+  "current_matrix": {
+    "plan_path": "reports/20261105-yolo-camera-resources/matrix-startup-20261105-plan.json",
+    "completed_trials": 30,
+    "planned_trials": 30,
+    "method": "Real PV camera at exact startup resolution/fps; no diagnostic assets or cloud inference",
+    "status_path": "reports/20261105-yolo-camera-resources/matrix-startup-20261105-status.json",
+    "status": "recorded",
+    "finished_at": "2026-11-05T21:45:25.4696010+08:00"
+  },
+  "user_clarification": "只测眼镜自身相机开启后的真实摄影负载；电脑仅作为USB管理与日志读取端，不能用电脑播放图片代替相机摄影。",
+  "operator_note": "First live command change was consumed without a verified setting change and did not enter sampling. It is retained as a failed attempt. The matrix now uses exact on-device startup capture properties with a fresh app process for every trial.",
+  "confirmed_test_scope": "用户已明确选择：YOLO 使用眼镜相机连续取景。不是另开 HoloLens 自带相机录制视频。",
+  "completed_at": "2026-11-06T11:12:14.6913951+08:00",
+  "closing_control": {
+    "verification": "reports/20261105-yolo-camera-resources/restored-verification.json",
+    "canonical_run_id": "baseline48-restored-resume-20261106",
+    "same_session_as_matrix": false,
+    "manifest": "reports/20261105-yolo-camera-resources/closing-control.json",
+    "status": "recorded",
+    "original_interrupted_run": "baseline48-restored",
+    "rounds": 3
+  }
+}

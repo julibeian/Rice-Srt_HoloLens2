@@ -1,0 +1,12 @@
+{
+  "ReplayAllowed": false,
+  "WorkerSha256": "F7867694706624BCD0C7BF47EA4836DF27296CAD24919EBE61EB9D274F6FB556",
+  "At": "2026-11-06T15:31:28.1754663+08:00",
+  "Seconds": 600,
+  "Fingerprint": "53:64:BE:AA:A5:F8:32:FE:99:F3:92:F1:A0:22:D1:E3:1A:68:0E:6A",
+  "Device": "HOLOLENS-I0IHKJ",
+  "Attempted": true,
+  "Output": "U:\\Users\\DefaultAccount\\AppData\\Local\\DevelopmentFiles\\RiceHoloLensFieldV1\\gpu-production57-ten-minutes.jsonl",
+  "RunId": "production57-ten-minutes",
+  "Worker": "U:\\Users\\DefaultAccount\\AppData\\Local\\DevelopmentFiles\\RiceHoloLensFieldV1\\gpu-probe-F78676947066.exe"
+}

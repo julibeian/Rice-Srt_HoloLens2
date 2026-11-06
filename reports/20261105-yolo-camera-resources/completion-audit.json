@@ -1,0 +1,270 @@
+{
+  "schema": 1,
+  "complete": true,
+  "checks": {
+    "original_package_hash": true,
+    "original_model_native_identity": true,
+    "matrix_finished": true,
+    "all_thirty_trial_ids": true,
+    "interrupted_closing_history_preserved": true,
+    "thirty_independently_verified_trials": true,
+    "unmodified_initial_three_rounds": true,
+    "restored_original_three_rounds": true,
+    "production_restoration_verified": true,
+    "restored_files_match_original_appx": true,
+    "root_readme_unchanged": true
+  },
+  "verified_matrix_trials": 30,
+  "failed_audits": [],
+  "trial_details": [
+    {
+      "run_id": "matrix-startup-20261105-p1-c01-896x504-15",
+      "verified": true,
+      "samples": 120,
+      "session": "32e247a2e5868734609f28aeb3b89b21",
+      "max_video_counter_stall_s": 2.9987290999999914,
+      "max_model_counter_stall_s": 2.9987290999999914
+    },
+    {
+      "run_id": "matrix-startup-20261105-p1-c02-896x504-30",
+      "verified": true,
+      "samples": 120,
+      "session": "5d8c12e2c5d78ab5ca269480eac62d7e",
+      "max_video_counter_stall_s": 0,
+      "max_model_counter_stall_s": 1.0187276999999995
+    },
+    {
+      "run_id": "matrix-startup-20261105-p1-c03-1280x720-15",
+      "verified": true,
+      "samples": 120,
+      "session": "adda81337dc59e139ed43ac0431fbe1e",
+      "max_video_counter_stall_s": 0,
+      "max_model_counter_stall_s": 1.0168607000000023
+    },
+    {
+      "run_id": "matrix-startup-20261105-p1-c04-1280x720-30",
+      "verified": true,
+      "samples": 120,
+      "session": "a16bdd1e13bc7f284bb7eeb932b646ce",
+      "max_video_counter_stall_s": 1.0006699999999995,
+      "max_model_counter_stall_s": 1.0188557000000031
+    },
+    {
+      "run_id": "matrix-startup-20261105-p1-c05-1504x846-15",
+      "verified": true,
+      "samples": 120,
+      "session": "ddf68bdd4add0f08115081fba54ede46",
+      "max_video_counter_stall_s": 0.9995292999999776,
+      "max_model_counter_stall_s": 1.0070173999999952
+    },
+    {
+      "run_id": "matrix-startup-20261105-p1-c06-1504x846-30",
+      "verified": true,
+      "samples": 120,
+      "session": "bbbc36a800b365fb7a78ca173a66a9f3",
+      "max_video_counter_stall_s": 0,
+      "max_model_counter_stall_s": 1.0142276999999993
+    },
+    {
+      "run_id": "matrix-startup-20261105-p1-c07-1920x1080-15",
+      "verified": true,
+      "samples": 120,
+      "session": "fe5557d420c7e492be23c0cbc48f50bc",
+      "max_video_counter_stall_s": 1.007422500000004,
+      "max_model_counter_stall_s": 1.0143698000000043
+    },
+    {
+      "run_id": "matrix-startup-20261105-p1-c08-1920x1080-30",
+      "verified": true,
+      "samples": 120,
+      "session": "479c603dbf398f812054f76a18840614",
+      "max_video_counter_stall_s": 0,
+      "max_model_counter_stall_s": 1.0141756000000086
+    },
+    {
+      "run_id": "matrix-startup-20261105-p1-c09-2284x1284-15",
+      "verified": true,
+      "samples": 120,
+      "session": "0213b7fed8cf53593fa752c7bd6335a9",
+      "max_video_counter_stall_s": 2.9939483999999936,
+      "max_model_counter_stall_s": 1.013404599999987
+    },
+    {
+      "run_id": "matrix-startup-20261105-p1-c10-2284x1284-30",
+      "verified": true,
+      "samples": 120,
+      "session": "02321be00869a9ebcacc0a4d493afbe4",
+      "max_video_counter_stall_s": 0,
+      "max_model_counter_stall_s": 1.9959137999999825
+    },
+    {
+      "run_id": "matrix-startup-20261105-p2-c01-896x504-15",
+      "verified": true,
+      "samples": 120,
+      "session": "b208b36aea0cb2b6a0ae51129fb2deeb",
+      "max_video_counter_stall_s": 0.9964177999999997,
+      "max_model_counter_stall_s": 1.0154840999999948
+    },
+    {
+      "run_id": "matrix-startup-20261105-p2-c02-896x504-30",
+      "verified": true,
+      "samples": 120,
+      "session": "ce2285baa13ad5b9ece964e67cb185a5",
+      "max_video_counter_stall_s": 0,
+      "max_model_counter_stall_s": 1.0169251999999886
+    },
+    {
+      "run_id": "matrix-startup-20261105-p2-c03-1280x720-15",
+      "verified": true,
+      "samples": 120,
+      "session": "ca42e423d72777ab07d76f7229a2489e",
+      "max_video_counter_stall_s": 0,
+      "max_model_counter_stall_s": 1.016800400000001
+    },
+    {
+      "run_id": "matrix-startup-20261105-p2-c04-1280x720-30",
+      "verified": true,
+      "samples": 120,
+      "session": "24072954f01153796435797d90a4b23c",
+      "max_video_counter_stall_s": 0,
+      "max_model_counter_stall_s": 2.012307000000007
+    },
+    {
+      "run_id": "matrix-startup-20261105-p2-c05-1504x846-15",
+      "verified": true,
+      "samples": 120,
+      "session": "b7d6bd1e94f452b76877776e0e3f8e62",
+      "max_video_counter_stall_s": 0,
+      "max_model_counter_stall_s": 2.0047945000000027
+    },
+    {
+      "run_id": "matrix-startup-20261105-p2-c06-1504x846-30",
+      "verified": true,
+      "samples": 120,
+      "session": "bbd8c22ca49e6f4b71eff552edba49cd",
+      "max_video_counter_stall_s": 0,
+      "max_model_counter_stall_s": 2.014421299999981
+    },
+    {
+      "run_id": "matrix-startup-20261105-p2-c07-1920x1080-15",
+      "verified": true,
+      "samples": 120,
+      "session": "17ab2337e39b84dc5804aee71a4bd34f",
+      "max_video_counter_stall_s": 0.9963517999999993,
+      "max_model_counter_stall_s": 1.9865037999999977
+    },
+    {
+      "run_id": "matrix-startup-20261105-p2-c08-1920x1080-30",
+      "verified": true,
+      "samples": 120,
+      "session": "28f2fd6a576f2d7d98b74eec96af57c2",
+      "max_video_counter_stall_s": 0,
+      "max_model_counter_stall_s": 2.0081578999999934
+    },
+    {
+      "run_id": "matrix-startup-20261105-p2-c09-2284x1284-15",
+      "verified": true,
+      "samples": 120,
+      "session": "b131d0d7408d08b1a07035b04ed2be28",
+      "max_video_counter_stall_s": 11.010116100000005,
+      "max_model_counter_stall_s": 1.977045399999998
+    },
+    {
+      "run_id": "matrix-startup-20261105-p2-c10-2284x1284-30",
+      "verified": true,
+      "samples": 120,
+      "session": "47152efe47e592059ec0fbc6a2cdbd44",
+      "max_video_counter_stall_s": 0.9992811999999986,
+      "max_model_counter_stall_s": 2.007725999999991
+    },
+    {
+      "run_id": "matrix-startup-20261105-p3-c01-896x504-15",
+      "verified": true,
+      "samples": 120,
+      "session": "0d1dfb690d99d208863161028377a23c",
+      "max_video_counter_stall_s": 1.0003241000000003,
+      "max_model_counter_stall_s": 1.0162934999999997
+    },
+    {
+      "run_id": "matrix-startup-20261105-p3-c02-896x504-30",
+      "verified": true,
+      "samples": 120,
+      "session": "7668ec5724405ff663f4e950337690bc",
+      "max_video_counter_stall_s": 0,
+      "max_model_counter_stall_s": 1.0216001000000006
+    },
+    {
+      "run_id": "matrix-startup-20261105-p3-c03-1280x720-15",
+      "verified": true,
+      "samples": 120,
+      "session": "cbed8963fa13115fc4d075dfe31f105a",
+      "max_video_counter_stall_s": 0,
+      "max_model_counter_stall_s": 2.006421200000002
+    },
+    {
+      "run_id": "matrix-startup-20261105-p3-c04-1280x720-30",
+      "verified": true,
+      "samples": 120,
+      "session": "6d0f0c8f9578a942ddb0b6967e8b3e84",
+      "max_video_counter_stall_s": 0,
+      "max_model_counter_stall_s": 2.014538799999997
+    },
+    {
+      "run_id": "matrix-startup-20261105-p3-c05-1504x846-15",
+      "verified": true,
+      "samples": 120,
+      "session": "3576079fbc44894c73633e5d30c8f84d",
+      "max_video_counter_stall_s": 0,
+      "max_model_counter_stall_s": 2.004648000000003
+    },
+    {
+      "run_id": "matrix-startup-20261105-p3-c06-1504x846-30",
+      "verified": true,
+      "samples": 120,
+      "session": "d9e8234d4ced6d12471c1450981cc1b7",
+      "max_video_counter_stall_s": 0,
+      "max_model_counter_stall_s": 2.017820399999991
+    },
+    {
+      "run_id": "matrix-startup-20261105-p3-c07-1920x1080-15",
+      "verified": true,
+      "samples": 120,
+      "session": "542da7ea9b614643d72afd134f73276f",
+      "max_video_counter_stall_s": 8.005657200000002,
+      "max_model_counter_stall_s": 9.017075200000008
+    },
+    {
+      "run_id": "matrix-startup-20261105-p3-c08-1920x1080-30",
+      "verified": true,
+      "samples": 120,
+      "session": "a08f206e0d9b94b7a4a28711c24676bd",
+      "max_video_counter_stall_s": 1.0133051000000037,
+      "max_model_counter_stall_s": 3.006316400000003
+    },
+    {
+      "run_id": "matrix-startup-20261105-p3-c09-2284x1284-15",
+      "verified": true,
+      "samples": 120,
+      "session": "e31b010bfaea55a3770a92e6c30e4b09",
+      "max_video_counter_stall_s": 1.001550100000017,
+      "max_model_counter_stall_s": 3.0123716000000016
+    },
+    {
+      "run_id": "matrix-startup-20261105-p3-c10-2284x1284-30",
+      "verified": true,
+      "samples": 120,
+      "session": "9dc4a6d3c15f9f5fa9c1b002783f3ffb",
+      "max_video_counter_stall_s": 8.0006439,
+      "max_model_counter_stall_s": 8.0006439
+    }
+  ],
+  "performance_findings": [
+    {
+      "run_id": "matrix-startup-20261105-p2-c09-2284x1284-15",
+      "video_counter_stall_s": 11.010116100000005,
+      "model_counter_stall_s": 1.977045399999998,
+      "interpretation": "Observed performance outcome retained, not discarded. HTML presentation counter is not a sensor ingress counter."
+    }
+  ],
+  "scope": "Physical PV camera in YOLO app; all three repeats at all ten configurations; unchanged model/native binaries; original package restored and sampled again."
+}

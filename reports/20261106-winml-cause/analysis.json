@@ -1,0 +1,1241 @@
+{
+  "schema": 1,
+  "runs": [
+    {
+      "run_id": "ab60-original-1",
+      "status": "recorded",
+      "samples": 120,
+      "first_at": "2026-11-06T16:33:57.8290827+08:00",
+      "last_at": "2026-11-06T16:35:56.8312722+08:00",
+      "seconds": 119.00219,
+      "runtime_session": "81348967464f2bfaf5437d63ee2435b7",
+      "process_id": 10924,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [],
+      "fresh_results": 11,
+      "frame_delta": 50,
+      "detections_per_second": 0.4201603348644256,
+      "inference_mean_ms": 2235.8740000000003,
+      "inference_median_ms": 2250.101,
+      "inference_min_ms": 2077.944,
+      "inference_max_ms": 2366.896,
+      "preprocess_mean_ms": 6.586818181818182,
+      "binding_mean_ms": null,
+      "output_mean_ms": null,
+      "cpu_mean": 33.09166666666667,
+      "gpu0_mean": 98.31058745,
+      "distinct_input_signatures": 11,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": []
+    },
+    {
+      "run_id": "ab61-improved-1",
+      "status": "recorded",
+      "samples": 120,
+      "first_at": "2026-11-06T16:36:43.5074122+08:00",
+      "last_at": "2026-11-06T16:38:42.5042586+08:00",
+      "seconds": 118.996846,
+      "runtime_session": "117f0cc63ff86c2d4052e4973a419885",
+      "process_id": 10380,
+      "model_sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+      "camera_keys": [],
+      "fresh_results": 14,
+      "frame_delta": 65,
+      "detections_per_second": 0.5462329648636234,
+      "inference_mean_ms": 1766.7417142857144,
+      "inference_median_ms": 1775.3605,
+      "inference_min_ms": 1650.132,
+      "inference_max_ms": 1831.436,
+      "preprocess_mean_ms": 6.883214285714286,
+      "binding_mean_ms": 0.24814285714285714,
+      "output_mean_ms": 0.009071428571428572,
+      "cpu_mean": 33.125,
+      "gpu0_mean": 98.21294129166667,
+      "distinct_input_signatures": 14,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": []
+    },
+    {
+      "run_id": "ab62-original-2",
+      "status": "recorded",
+      "samples": 120,
+      "first_at": "2026-11-06T16:39:29.0710626+08:00",
+      "last_at": "2026-11-06T16:41:28.0857583+08:00",
+      "seconds": 119.014696,
+      "runtime_session": "829ac32e95e0864adb21d18c236b2b67",
+      "process_id": 12604,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [],
+      "fresh_results": 12,
+      "frame_delta": 55,
+      "detections_per_second": 0.4621278031076095,
+      "inference_mean_ms": 2206.2968333333333,
+      "inference_median_ms": 2192.747,
+      "inference_min_ms": 2118.782,
+      "inference_max_ms": 2323.868,
+      "preprocess_mean_ms": 7.502833333333333,
+      "binding_mean_ms": null,
+      "output_mean_ms": null,
+      "cpu_mean": 33.44166666666667,
+      "gpu0_mean": 98.41158298333333,
+      "distinct_input_signatures": 12,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": []
+    },
+    {
+      "run_id": "ab63-improved-2",
+      "status": "recorded",
+      "samples": 120,
+      "first_at": "2026-11-06T16:42:14.0461161+08:00",
+      "last_at": "2026-11-06T16:44:13.0429603+08:00",
+      "seconds": 118.996844,
+      "runtime_session": "cdae302747c3cff0d44d3b709fa25c3a",
+      "process_id": 13036,
+      "model_sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+      "camera_keys": [],
+      "fresh_results": 13,
+      "frame_delta": 60,
+      "detections_per_second": 0.5042150529639257,
+      "inference_mean_ms": 1795.779,
+      "inference_median_ms": 1826.824,
+      "inference_min_ms": 1335.267,
+      "inference_max_ms": 1953.647,
+      "preprocess_mean_ms": 7.122076923076923,
+      "binding_mean_ms": 0.1849230769230769,
+      "output_mean_ms": 0.017923076923076924,
+      "cpu_mean": 33.86666666666667,
+      "gpu0_mean": 98.151735775,
+      "distinct_input_signatures": 13,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": []
+    },
+    {
+      "run_id": "fp16-cached52-before",
+      "status": "recorded",
+      "samples": 90,
+      "first_at": "2026-11-06T15:14:58.0517042+08:00",
+      "last_at": "2026-11-06T15:16:27.0598706+08:00",
+      "seconds": 89.008166,
+      "runtime_session": "556f2ab4214b862d792feee59b5ea339",
+      "process_id": 14796,
+      "model_sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 79,
+      "frame_delta": 99,
+      "detections_per_second": 1.1122574978120547,
+      "inference_mean_ms": 790.836582278481,
+      "inference_median_ms": 794.69,
+      "inference_min_ms": 700.905,
+      "inference_max_ms": 832.957,
+      "preprocess_mean_ms": 6.386658227848101,
+      "binding_mean_ms": 0.22432911392405064,
+      "output_mean_ms": 0.00549367088607595,
+      "cpu_mean": 35.62222222222222,
+      "gpu0_mean": 93.78103131111111,
+      "distinct_input_signatures": 79,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 10.010317480308492
+    },
+    {
+      "run_id": "fp16-cached56-after",
+      "status": "recorded",
+      "samples": 120,
+      "first_at": "2026-11-06T15:24:21.9606683+08:00",
+      "last_at": "2026-11-06T15:26:20.9456065+08:00",
+      "seconds": 118.984938,
+      "runtime_session": "f3486e390ff89e278f44c524eb0eabbc",
+      "process_id": 7400,
+      "model_sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 97,
+      "frame_delta": 135,
+      "detections_per_second": 1.134597389125,
+      "inference_mean_ms": 762.3607216494845,
+      "inference_median_ms": 763.835,
+      "inference_min_ms": 642.448,
+      "inference_max_ms": 809.564,
+      "preprocess_mean_ms": 6.6037216494845365,
+      "binding_mean_ms": 0.2044123711340206,
+      "output_mean_ms": 0.005051546391752577,
+      "cpu_mean": 35.11666666666667,
+      "gpu0_mean": 93.44488466666667,
+      "distinct_input_signatures": 97,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 10.371060579112964
+    },
+    {
+      "run_id": "fp16-reuse51-default-01",
+      "status": "recorded",
+      "samples": 120,
+      "first_at": "2026-11-06T15:09:16.7101575+08:00",
+      "last_at": "2026-11-06T15:11:15.7187452+08:00",
+      "seconds": 119.008588,
+      "runtime_session": "5211e6521c7c928b5b0b2c82408319b4",
+      "process_id": 14256,
+      "model_sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 95,
+      "frame_delta": 109,
+      "detections_per_second": 0.9159002878010787,
+      "inference_mean_ms": 970.9066947368422,
+      "inference_median_ms": 973.666,
+      "inference_min_ms": 724.428,
+      "inference_max_ms": 1038.303,
+      "preprocess_mean_ms": 6.8964,
+      "binding_mean_ms": 0.3623157894736842,
+      "output_mean_ms": 0.005168421052631579,
+      "cpu_mean": 37.61666666666667,
+      "gpu0_mean": 95.56532726666667,
+      "distinct_input_signatures": 95,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 7.764145558974281
+    },
+    {
+      "run_id": "fp32-cached54-control",
+      "status": "recorded",
+      "samples": 90,
+      "first_at": "2026-11-06T15:17:09.9115882+08:00",
+      "last_at": "2026-11-06T15:18:38.9123653+08:00",
+      "seconds": 89.000777,
+      "runtime_session": "e01df23c21f68b7f0df088859bb09846",
+      "process_id": 18028,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 25,
+      "frame_delta": 85,
+      "detections_per_second": 0.955047841885695,
+      "inference_mean_ms": 921.8697999999999,
+      "inference_median_ms": 919.451,
+      "inference_min_ms": 878.367,
+      "inference_max_ms": 991.968,
+      "preprocess_mean_ms": 6.7344,
+      "binding_mean_ms": 0.20199999999999999,
+      "output_mean_ms": 0.00492,
+      "cpu_mean": 35.31111111111111,
+      "gpu0_mean": 94.62470495555556,
+      "distinct_input_signatures": 25,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 10.471818689852562
+    },
+    {
+      "run_id": "gpu-contention-mode0-a",
+      "status": "recorded",
+      "samples": 30,
+      "first_at": "2026-11-06T15:04:19.2551366+08:00",
+      "last_at": "2026-11-06T15:04:48.2581374+08:00",
+      "seconds": 29.003001,
+      "runtime_session": "7385ea7d05ed475b35a7967a93ec05d9",
+      "process_id": 12896,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 23,
+      "frame_delta": 23,
+      "detections_per_second": 0.7930213842353762,
+      "inference_mean_ms": 1138.242695652174,
+      "inference_median_ms": 1136.995,
+      "inference_min_ms": 1079.26,
+      "inference_max_ms": 1192.527,
+      "preprocess_mean_ms": 6.805217391304348,
+      "binding_mean_ms": 0.47756521739130436,
+      "output_mean_ms": 0.004826086956521739,
+      "cpu_mean": 33.86666666666667,
+      "gpu0_mean": 96.31619093333333,
+      "distinct_input_signatures": 23,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 5.964899977074786
+    },
+    {
+      "run_id": "gpu-contention-mode0-a2",
+      "status": "recorded",
+      "samples": 30,
+      "first_at": "2026-11-06T15:05:41.7826261+08:00",
+      "last_at": "2026-11-06T15:06:10.7977952+08:00",
+      "seconds": 29.015169,
+      "runtime_session": "7385ea7d05ed475b35a7967a93ec05d9",
+      "process_id": 12896,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 17,
+      "frame_delta": 22,
+      "detections_per_second": 0.7582240861667909,
+      "inference_mean_ms": 1193.1554705882352,
+      "inference_median_ms": 1178.472,
+      "inference_min_ms": 1112.171,
+      "inference_max_ms": 1571.805,
+      "preprocess_mean_ms": 7.074588235294118,
+      "binding_mean_ms": 0.20623529411764704,
+      "output_mean_ms": 0.005058823529411765,
+      "cpu_mean": 34.8,
+      "gpu0_mean": 95.95720776666667,
+      "distinct_input_signatures": 17,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 7.134199356205714
+    },
+    {
+      "run_id": "gpu-contention-mode1-b",
+      "status": "recorded",
+      "samples": 30,
+      "first_at": "2026-11-06T15:05:01.7694919+08:00",
+      "last_at": "2026-11-06T15:05:30.7753835+08:00",
+      "seconds": 29.005892,
+      "runtime_session": "7385ea7d05ed475b35a7967a93ec05d9",
+      "process_id": 12896,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 21,
+      "frame_delta": 45,
+      "detections_per_second": 1.5514089344330455,
+      "inference_mean_ms": 550.449,
+      "inference_median_ms": 544.488,
+      "inference_min_ms": 530.069,
+      "inference_max_ms": 582.233,
+      "preprocess_mean_ms": 7.1841904761904765,
+      "binding_mean_ms": 0.19057142857142856,
+      "output_mean_ms": 0.005380952380952381,
+      "cpu_mean": 24.3,
+      "gpu0_mean": 87.5554104,
+      "distinct_input_signatures": 21,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 19.16851927877274
+    },
+    {
+      "run_id": "heartbeat58-1-log",
+      "status": "recorded",
+      "samples": 75,
+      "first_at": "2026-11-06T15:48:57.2364378+08:00",
+      "last_at": "2026-11-06T15:50:11.2414606+08:00",
+      "seconds": 74.005023,
+      "runtime_session": "401c77288ce0282194d70cb8b0717ecb",
+      "process_id": 14852,
+      "model_sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 62,
+      "frame_delta": 64,
+      "detections_per_second": 0.8648061632248936,
+      "inference_mean_ms": 1001.9663870967742,
+      "inference_median_ms": 1000.6965,
+      "inference_min_ms": 948.432,
+      "inference_max_ms": 1062.333,
+      "preprocess_mean_ms": 6.637564516129032,
+      "binding_mean_ms": 0.19020967741935482,
+      "output_mean_ms": 0.005193548387096774,
+      "cpu_mean": 35.013333333333335,
+      "gpu0_mean": 95.20892834666667,
+      "distinct_input_signatures": 62,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 6.053643142574256
+    },
+    {
+      "run_id": "heartbeat58-2-off",
+      "status": "recorded",
+      "samples": 75,
+      "first_at": "2026-11-06T15:50:29.1439127+08:00",
+      "last_at": "2026-11-06T15:51:43.1450582+08:00",
+      "seconds": 74.001146,
+      "runtime_session": "401c77288ce0282194d70cb8b0717ecb",
+      "process_id": 14852,
+      "model_sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 14,
+      "frame_delta": 65,
+      "detections_per_second": 0.8783647755941508,
+      "inference_mean_ms": 999.6555714285714,
+      "inference_median_ms": 1000.641,
+      "inference_min_ms": 942.274,
+      "inference_max_ms": 1034.716,
+      "preprocess_mean_ms": 7.094214285714286,
+      "binding_mean_ms": 0.18414285714285714,
+      "output_mean_ms": 0.008142857142857143,
+      "cpu_mean": 35.666666666666664,
+      "gpu0_mean": 95.87685181333333,
+      "distinct_input_signatures": 14,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 5.729640997721845
+    },
+    {
+      "run_id": "heartbeat58-3-counter",
+      "status": "recorded",
+      "samples": 75,
+      "first_at": "2026-11-06T15:52:00.9424097+08:00",
+      "last_at": "2026-11-06T15:53:14.9478995+08:00",
+      "seconds": 74.00549,
+      "runtime_session": "401c77288ce0282194d70cb8b0717ecb",
+      "process_id": 14852,
+      "model_sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 12,
+      "frame_delta": 65,
+      "detections_per_second": 0.8783132170329526,
+      "inference_mean_ms": 994.4310833333333,
+      "inference_median_ms": 1004.3515,
+      "inference_min_ms": 940.938,
+      "inference_max_ms": 1036.252,
+      "preprocess_mean_ms": 6.359416666666666,
+      "binding_mean_ms": 0.18491666666666667,
+      "output_mean_ms": 0.008166666666666666,
+      "cpu_mean": 35.333333333333336,
+      "gpu0_mean": 95.72862356,
+      "distinct_input_signatures": 12,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 5.459054456635583
+    },
+    {
+      "run_id": "heartbeat58-4-log",
+      "status": "recorded",
+      "samples": 75,
+      "first_at": "2026-11-06T15:53:32.9846296+08:00",
+      "last_at": "2026-11-06T15:54:46.9757151+08:00",
+      "seconds": 73.991086,
+      "runtime_session": "401c77288ce0282194d70cb8b0717ecb",
+      "process_id": 14852,
+      "model_sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 67,
+      "frame_delta": 66,
+      "detections_per_second": 0.8919993416504254,
+      "inference_mean_ms": 1012.704223880597,
+      "inference_median_ms": 1012.576,
+      "inference_min_ms": 953.658,
+      "inference_max_ms": 1065.612,
+      "preprocess_mean_ms": 6.357746268656716,
+      "binding_mean_ms": 0.3641791044776119,
+      "output_mean_ms": 0.005119402985074627,
+      "cpu_mean": 34.306666666666665,
+      "gpu0_mean": 95.95673504,
+      "distinct_input_signatures": 67,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 5.973692560749818
+    },
+    {
+      "run_id": "instrumented-legacy-01",
+      "status": "recorded",
+      "samples": 120,
+      "first_at": "2026-11-06T14:48:04.4305451+08:00",
+      "last_at": "2026-11-06T14:50:03.4366536+08:00",
+      "seconds": 119.006108,
+      "runtime_session": "4e1498aa4ef18b2dbbc3f76bf66f3ef5",
+      "process_id": 18144,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 94,
+      "frame_delta": 121,
+      "detections_per_second": 1.016754534985717,
+      "inference_mean_ms": 956.3660744680851,
+      "inference_median_ms": 1103.522,
+      "inference_min_ms": 401.025,
+      "inference_max_ms": 1595.619,
+      "preprocess_mean_ms": 6.538691489361702,
+      "binding_mean_ms": 1.9565106382978723,
+      "output_mean_ms": 0.14251063829787233,
+      "cpu_mean": 38.175,
+      "gpu0_mean": 92.509226025,
+      "distinct_input_signatures": 94,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 13.822819917781027
+    },
+    {
+      "run_id": "mode0-return-1",
+      "status": "recorded",
+      "samples": 45,
+      "first_at": "2026-11-06T14:52:04.7244394+08:00",
+      "last_at": "2026-11-06T14:52:48.7276043+08:00",
+      "seconds": 44.003165,
+      "runtime_session": "4e1498aa4ef18b2dbbc3f76bf66f3ef5",
+      "process_id": 18144,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 30,
+      "frame_delta": 33,
+      "detections_per_second": 0.7499460550167243,
+      "inference_mean_ms": 1214.4919333333332,
+      "inference_median_ms": 1213.809,
+      "inference_min_ms": 1170.777,
+      "inference_max_ms": 1279.27,
+      "preprocess_mean_ms": 7.664633333333334,
+      "binding_mean_ms": 1.8737,
+      "output_mean_ms": 0.07753333333333333,
+      "cpu_mean": 33.84444444444444,
+      "gpu0_mean": 96.50247644444444,
+      "distinct_input_signatures": 30,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 7.317655445920765
+    },
+    {
+      "run_id": "mode0-return-2",
+      "status": "recorded",
+      "samples": 45,
+      "first_at": "2026-11-06T14:54:02.1900044+08:00",
+      "last_at": "2026-11-06T14:54:46.1868831+08:00",
+      "seconds": 43.996879,
+      "runtime_session": "4e1498aa4ef18b2dbbc3f76bf66f3ef5",
+      "process_id": 18144,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 35,
+      "frame_delta": 35,
+      "detections_per_second": 0.7955109724942081,
+      "inference_mean_ms": 1153.3593142857144,
+      "inference_median_ms": 1181.688,
+      "inference_min_ms": 843.658,
+      "inference_max_ms": 1224.68,
+      "preprocess_mean_ms": 7.115571428571428,
+      "binding_mean_ms": 1.5276571428571428,
+      "output_mean_ms": 0.14568571428571428,
+      "cpu_mean": 33.91111111111111,
+      "gpu0_mean": 96.22550982222222,
+      "distinct_input_signatures": 35,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 7.045954327805843
+    },
+    {
+      "run_id": "mode1-only-1",
+      "status": "recorded",
+      "samples": 45,
+      "first_at": "2026-11-06T14:51:05.1740024+08:00",
+      "last_at": "2026-11-06T14:51:49.1761821+08:00",
+      "seconds": 44.00218,
+      "runtime_session": "4e1498aa4ef18b2dbbc3f76bf66f3ef5",
+      "process_id": 18144,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 43,
+      "frame_delta": 69,
+      "detections_per_second": 1.5681041257501331,
+      "inference_mean_ms": 542.6446976744186,
+      "inference_median_ms": 542.814,
+      "inference_min_ms": 473.912,
+      "inference_max_ms": 598.088,
+      "preprocess_mean_ms": 7.135093023255814,
+      "binding_mean_ms": 1.247,
+      "output_mean_ms": 0.07230232558139535,
+      "cpu_mean": 24.933333333333334,
+      "gpu0_mean": 87.93487971111111,
+      "distinct_input_signatures": 43,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 18.36272657400156
+    },
+    {
+      "run_id": "mode1-only-2",
+      "status": "recorded",
+      "samples": 45,
+      "first_at": "2026-11-06T14:53:01.4787484+08:00",
+      "last_at": "2026-11-06T14:53:45.4667263+08:00",
+      "seconds": 43.987978,
+      "runtime_session": "4e1498aa4ef18b2dbbc3f76bf66f3ef5",
+      "process_id": 18144,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 40,
+      "frame_delta": 69,
+      "detections_per_second": 1.5686104053248369,
+      "inference_mean_ms": 550.440925,
+      "inference_median_ms": 552.1715,
+      "inference_min_ms": 499.182,
+      "inference_max_ms": 593.707,
+      "preprocess_mean_ms": 6.2665,
+      "binding_mean_ms": 1.1879250000000001,
+      "output_mean_ms": 0.0701,
+      "cpu_mean": 24.57777777777778,
+      "gpu0_mean": 88.0372834,
+      "distinct_input_signatures": 40,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 19.096126673519752
+    },
+    {
+      "run_id": "original-after-cool-01",
+      "status": "recorded",
+      "samples": 180,
+      "first_at": "2026-11-06T14:43:23.1464138+08:00",
+      "last_at": "2026-11-06T14:46:22.1577285+08:00",
+      "seconds": 179.011315,
+      "runtime_session": "1d9a04efeb3fbea9a7e1051a5c8c7cbc",
+      "process_id": 9544,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [],
+      "fresh_results": 29,
+      "frame_delta": 138,
+      "detections_per_second": 0.7709009902530463,
+      "inference_mean_ms": 1159.8053103448276,
+      "inference_median_ms": 1174.352,
+      "inference_min_ms": 818.411,
+      "inference_max_ms": 1228.362,
+      "preprocess_mean_ms": 6.076620689655172,
+      "binding_mean_ms": null,
+      "output_mean_ms": null,
+      "cpu_mean": 34.52777777777778,
+      "gpu0_mean": 96.05197593888889,
+      "distinct_input_signatures": 29,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": []
+    },
+    {
+      "run_id": "original-long-running",
+      "status": "interrupted",
+      "samples": 4,
+      "first_at": "2026-11-06T14:27:33.0933203+08:00",
+      "last_at": "2026-11-06T14:27:36.0923139+08:00",
+      "seconds": 2.998993,
+      "runtime_session": "c705f6b0fbd0d488f3139eee21a3f8a2",
+      "process_id": 6120,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [],
+      "fresh_results": 2,
+      "frame_delta": 5,
+      "detections_per_second": 1.6672262989610178,
+      "inference_mean_ms": 1213.1105,
+      "inference_median_ms": 1213.1105,
+      "inference_min_ms": 1193.701,
+      "inference_max_ms": 1232.52,
+      "preprocess_mean_ms": 7.0175,
+      "binding_mean_ms": null,
+      "output_mean_ms": null,
+      "cpu_mean": 33.25,
+      "gpu0_mean": 94.9853115,
+      "distinct_input_signatures": 2,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": []
+    },
+    {
+      "run_id": "original-restart-01",
+      "status": "recorded",
+      "samples": 90,
+      "first_at": "2026-11-06T14:37:49.1342059+08:00",
+      "last_at": "2026-11-06T14:39:18.1292020+08:00",
+      "seconds": 88.994997,
+      "runtime_session": "3e1c1d864ac922308e2c78304f09559b",
+      "process_id": 20840,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [],
+      "fresh_results": 15,
+      "frame_delta": 70,
+      "detections_per_second": 0.786561069269995,
+      "inference_mean_ms": 1154.3140666666666,
+      "inference_median_ms": 1169.535,
+      "inference_min_ms": 820.432,
+      "inference_max_ms": 1233.813,
+      "preprocess_mean_ms": 7.2294,
+      "binding_mean_ms": null,
+      "output_mean_ms": null,
+      "cpu_mean": 35.455555555555556,
+      "gpu0_mean": 96.27161024444445,
+      "distinct_input_signatures": 15,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": []
+    },
+    {
+      "run_id": "original-steady-01",
+      "status": "recorded",
+      "samples": 90,
+      "first_at": "2026-11-06T14:35:31.8690816+08:00",
+      "last_at": "2026-11-06T14:37:00.8683861+08:00",
+      "seconds": 88.999305,
+      "runtime_session": "c705f6b0fbd0d488f3139eee21a3f8a2",
+      "process_id": 6120,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [],
+      "fresh_results": 14,
+      "frame_delta": 70,
+      "detections_per_second": 0.7865229958818217,
+      "inference_mean_ms": 1182.787857142857,
+      "inference_median_ms": 1208.202,
+      "inference_min_ms": 805.776,
+      "inference_max_ms": 1286.409,
+      "preprocess_mean_ms": 8.23557142857143,
+      "binding_mean_ms": null,
+      "output_mean_ms": null,
+      "cpu_mean": 33.78888888888889,
+      "gpu0_mean": 96.5243325,
+      "distinct_input_signatures": 14,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": []
+    },
+    {
+      "run_id": "production57-no-hardware-probe",
+      "status": "recorded",
+      "samples": 180,
+      "first_at": "2026-11-06T15:42:59.2304655+08:00",
+      "last_at": "2026-11-06T15:45:58.2305910+08:00",
+      "seconds": 179.000126,
+      "runtime_session": "695cd7124584367cce3a3fd810a71cbc",
+      "process_id": 17740,
+      "model_sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+      "camera_keys": [],
+      "fresh_results": 32,
+      "frame_delta": 160,
+      "detections_per_second": 0.8938541194099495,
+      "inference_mean_ms": 1005.7671875,
+      "inference_median_ms": 1003.3455,
+      "inference_min_ms": 938.439,
+      "inference_max_ms": 1064.348,
+      "preprocess_mean_ms": 7.856375,
+      "binding_mean_ms": 0.47103125,
+      "output_mean_ms": 0.0049375,
+      "cpu_mean": 35.294444444444444,
+      "gpu0_mean": 95.98254625,
+      "distinct_input_signatures": 32,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": []
+    },
+    {
+      "run_id": "production57-ten-minutes",
+      "status": "recorded",
+      "samples": 600,
+      "first_at": "2026-11-06T15:31:56.5314921+08:00",
+      "last_at": "2026-11-06T15:41:55.5251247+08:00",
+      "seconds": 598.993632,
+      "runtime_session": "695cd7124584367cce3a3fd810a71cbc",
+      "process_id": 17740,
+      "model_sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+      "camera_keys": [],
+      "fresh_results": 97,
+      "frame_delta": 520,
+      "detections_per_second": 0.8681227515954626,
+      "inference_mean_ms": 1013.7337731958763,
+      "inference_median_ms": 1015.107,
+      "inference_min_ms": 721.79,
+      "inference_max_ms": 1075.3,
+      "preprocess_mean_ms": 7.550288659793814,
+      "binding_mean_ms": 0.21893814432989692,
+      "output_mean_ms": 0.005298969072164948,
+      "cpu_mean": 33.53,
+      "gpu0_mean": 96.026377475,
+      "distinct_input_signatures": 97,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": []
+    },
+    {
+      "run_id": "production59-after-reset",
+      "status": "recorded",
+      "samples": 600,
+      "first_at": "2026-11-06T16:10:38.9191690+08:00",
+      "last_at": "2026-11-06T16:20:37.9167581+08:00",
+      "seconds": 598.997589,
+      "runtime_session": "600964902979daff04ae3841c753797f",
+      "process_id": 3804,
+      "model_sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+      "camera_keys": [],
+      "fresh_results": 83,
+      "frame_delta": 425,
+      "detections_per_second": 0.7095187156087202,
+      "inference_mean_ms": 1292.98321686747,
+      "inference_median_ms": 1311.027,
+      "inference_min_ms": 862.097,
+      "inference_max_ms": 1397.093,
+      "preprocess_mean_ms": 7.5043855421686745,
+      "binding_mean_ms": 0.433289156626506,
+      "output_mean_ms": 0.005626506024096385,
+      "cpu_mean": 35.09,
+      "gpu0_mean": 96.89285676333333,
+      "distinct_input_signatures": 83,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": []
+    },
+    {
+      "run_id": "production59-before-reset",
+      "status": "recorded",
+      "samples": 90,
+      "first_at": "2026-11-06T16:01:17.8072965+08:00",
+      "last_at": "2026-11-06T16:02:46.8098878+08:00",
+      "seconds": 89.002591,
+      "runtime_session": "e53f512f9557d9a6c3aae04c7bb28c80",
+      "process_id": 30332,
+      "model_sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+      "camera_keys": [],
+      "fresh_results": 16,
+      "frame_delta": 80,
+      "detections_per_second": 0.8988502368431049,
+      "inference_mean_ms": 1008.2458750000001,
+      "inference_median_ms": 1021.012,
+      "inference_min_ms": 793.635,
+      "inference_max_ms": 1043.928,
+      "preprocess_mean_ms": 6.5403125,
+      "binding_mean_ms": 0.2101875,
+      "output_mean_ms": 0.007125,
+      "cpu_mean": 33.022222222222226,
+      "gpu0_mean": 96.05887832222223,
+      "distinct_input_signatures": 16,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": []
+    },
+    {
+      "run_id": "reload56-continuous",
+      "status": "recorded",
+      "samples": 40,
+      "first_at": "2026-11-06T15:28:03.3435055+08:00",
+      "last_at": "2026-11-06T15:28:42.3541426+08:00",
+      "seconds": 39.010637,
+      "runtime_session": "f3486e390ff89e278f44c524eb0eabbc",
+      "process_id": 7400,
+      "model_sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 37,
+      "frame_delta": 45,
+      "detections_per_second": 1.1535315355142752,
+      "inference_mean_ms": 749.8687297297297,
+      "inference_median_ms": 754.257,
+      "inference_min_ms": 689.671,
+      "inference_max_ms": 776.11,
+      "preprocess_mean_ms": 6.362270270270271,
+      "binding_mean_ms": 0.25872972972972974,
+      "output_mean_ms": 0.00527027027027027,
+      "cpu_mean": 34.45,
+      "gpu0_mean": 93.376135975,
+      "distinct_input_signatures": 37,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 9.971639273667845
+    },
+    {
+      "run_id": "reuse50-default-01",
+      "status": "recorded",
+      "samples": 90,
+      "first_at": "2026-11-06T15:01:10.2223192+08:00",
+      "last_at": "2026-11-06T15:02:39.2256793+08:00",
+      "seconds": 89.00336,
+      "runtime_session": "7385ea7d05ed475b35a7967a93ec05d9",
+      "process_id": 12896,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [
+        "896x504@30"
+      ],
+      "fresh_results": 70,
+      "frame_delta": 72,
+      "detections_per_second": 0.8089582235996484,
+      "inference_mean_ms": 1120.1911142857143,
+      "inference_median_ms": 1117.3265,
+      "inference_min_ms": 1053.117,
+      "inference_max_ms": 1189.057,
+      "preprocess_mean_ms": 7.196885714285714,
+      "binding_mean_ms": 0.36301428571428573,
+      "output_mean_ms": 0.004985714285714286,
+      "cpu_mean": 36.733333333333334,
+      "gpu0_mean": 95.97332273333333,
+      "distinct_input_signatures": 70,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": [],
+      "preview_presented_fps": 6.336839418197245
+    }
+  ],
+  "process_gpu_comparison": [
+    {
+      "run_id": "gpu-contention-mode0-a",
+      "hardware_samples": 18,
+      "app_share_of_gpu_busy": 0.33895797319996157,
+      "approximate_app_busy_percent": 32.64714086510318,
+      "approximate_other_busy_percent": 63.66905006823015,
+      "frequencies_hz": [
+        342000000
+      ],
+      "global_delta_raw": 169975801,
+      "app_delta_raw": 57614653,
+      "caveat": "Phase alignment uses launch time with 5s interior margins. Percentages combine phase-average systemperf with process counter share. DWM access denied; other GPU work is not assigned to a named process."
+    },
+    {
+      "run_id": "gpu-contention-mode0-a2",
+      "hardware_samples": 18,
+      "app_share_of_gpu_busy": 0.3340815457727524,
+      "approximate_app_busy_percent": 32.057532298725164,
+      "approximate_other_busy_percent": 63.899675467941506,
+      "frequencies_hz": [
+        342000000
+      ],
+      "global_delta_raw": 168777823,
+      "app_delta_raw": 56385556,
+      "caveat": "Phase alignment uses launch time with 5s interior margins. Percentages combine phase-average systemperf with process counter share. DWM access denied; other GPU work is not assigned to a named process."
+    },
+    {
+      "run_id": "gpu-contention-mode1-b",
+      "hardware_samples": 18,
+      "app_share_of_gpu_busy": 0.7491039153845889,
+      "approximate_app_busy_percent": 65.58810074374455,
+      "approximate_other_busy_percent": 21.96730965625545,
+      "frequencies_hz": [
+        342000000
+      ],
+      "global_delta_raw": 153791559,
+      "app_delta_raw": 115205859,
+      "caveat": "Phase alignment uses launch time with 5s interior margins. Percentages combine phase-average systemperf with process counter share. DWM access denied; other GPU work is not assigned to a named process."
+    }
+  ],
+  "interpretation": "Unique latest-result samples, not every-frame latency logs. Completed-frame rates use first/last counters and PC observation time. No historical causal attribution beyond the tested controls."
+}

@@ -7,6 +7,10 @@ if(-not $PackageDirectory){$PackageDirectory=[IO.File]::ReadAllText((Join-Path $
 $proof=Get-Content -LiteralPath (Join-Path $PackageDirectory 'package-evidence.json') -Raw|ConvertFrom-Json
 if((Get-FileHash -LiteralPath $proof.Package).Hash -ne $proof.Sha256){throw 'Package hash changed.'}
 if($RemoteDirectory -notmatch '^RiceHoloLensField[A-Za-z0-9_-]{1,40}$'){throw 'Invalid app deployment directory.'}
+if($RemoteDirectory -eq 'RiceHoloLensFieldV1' -and (Test-Path -LiteralPath (Join-Path $root '.state\installed.json'))){
+ $previous=Get-Content -Raw -LiteralPath (Join-Path $root '.state\installed.json')|ConvertFrom-Json
+ if($previous.Identity -ceq $proof.Identity -and [version]$proof.Version -lt [version]$previous.Version){throw ('Package downgrade rejected before stopping or copying files. Rebuild the intended contents with a version above '+$previous.Version+'.')}
+}
 if($RemoteDirectory -eq 'RiceHoloLensFieldV1' -and (Test-Path -LiteralPath (Join-Path $root '.state\installed.json'))){& (Join-Path $PSScriptRoot 'Stop-App.ps1')|Out-Null}
 $info=Invoke-HlBridge @{action='info'}
 $sdk=Join-Path $script:HlConfig.SdkDirectory 'WinAppDeployCmd.exe'

@@ -1,0 +1,454 @@
+{
+  "run_id": "baseline48-restored",
+  "run_status": "failed",
+  "completed_rounds": 2,
+  "attempted_rounds": 3,
+  "error": [
+    "Required performance/app endpoint failed; partial data preserved"
+  ],
+  "rounds": [
+    {
+      "valid": true,
+      "sample_count": 120,
+      "observed_seconds": 118.9978367,
+      "cpu_pct": {
+        "n": 120,
+        "mean": 32.75833333333333,
+        "min": 25.0,
+        "max": 43.0,
+        "p50": 32.0,
+        "p95": 37.0
+      },
+      "gpu_engines_pct": {
+        "0": {
+          "n": 120,
+          "mean": 97.51009505,
+          "min": 92.633703,
+          "max": 100.0,
+          "p50": 97.725025,
+          "p95": 99.599198
+        },
+        "1": {
+          "n": 120,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "2": {
+          "n": 120,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "3": {
+          "n": 120,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "4": {
+          "n": 120,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "5": {
+          "n": 120,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "6": {
+          "n": 120,
+          "mean": 0.07111421666666666,
+          "min": 0.0,
+          "max": 4.154303,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "7": {
+          "n": 120,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        }
+      },
+      "ram_used_mib": {
+        "n": 120,
+        "mean": 3458.6866536458333,
+        "min": 3440.85546875,
+        "max": 3586.46875,
+        "p50": 3457.31640625,
+        "p95": 3480.17578125
+      },
+      "gpu_shared_mib": {
+        "n": 120,
+        "mean": 608.0171223958333,
+        "min": 605.4140625,
+        "max": 728.30078125,
+        "p50": 605.7421875,
+        "p95": 611.41796875
+      },
+      "camera_inference_delta": 70,
+      "detector_fps": 0.5882459878365167,
+      "fewer_than_30_inferences": false,
+      "observed_result_count": 15,
+      "inference_ms_observed_results": {
+        "n": 15,
+        "mean": 1595.1942666666666,
+        "min": 1526.008,
+        "max": 1636.494,
+        "p50": 1597.196,
+        "p95": 1636.494
+      },
+      "preprocess_ms_observed_results": {
+        "n": 15,
+        "mean": 5.809,
+        "min": 5.16,
+        "max": 7.986,
+        "p50": 5.486,
+        "p95": 7.986
+      },
+      "submit_to_result_ms_observed_results": {
+        "n": 15,
+        "mean": 1604.2,
+        "min": 1531.0,
+        "max": 1657.0,
+        "p50": 1610.0,
+        "p95": 1657.0
+      },
+      "thermal_stages": [
+        0
+      ],
+      "preview": {
+        "available": false,
+        "reason": "original build has no video counter telemetry"
+      },
+      "battery_capacity_ratio_pct": {
+        "n": 120,
+        "mean": 12.74980886850153,
+        "min": 12.01834862385321,
+        "max": 13.004587155963304,
+        "p50": 13.004587155963304,
+        "p95": 13.004587155963304
+      },
+      "external_power_states": [
+        1
+      ],
+      "charging_states": [
+        1
+      ],
+      "source_sizes": [
+        [
+          896,
+          504
+        ]
+      ],
+      "sample_request_ms": {
+        "n": 120,
+        "mean": 42.46541666666584,
+        "min": 29.965199999991455,
+        "max": 92.24909999999727,
+        "p50": 39.71510000000126,
+        "p95": 58.50149999999849
+      },
+      "caveat": "Inference latency statistics use unique observed results, not an all-frame trace. CPU is complete-device load. GPU engines are separate, never summed. Low inference counts are retained performance outcomes of a timed resource trial, not a model deployment gate.",
+      "round": 1
+    },
+    {
+      "valid": true,
+      "sample_count": 120,
+      "observed_seconds": 118.9942071,
+      "cpu_pct": {
+        "n": 120,
+        "mean": 32.86666666666667,
+        "min": 28.0,
+        "max": 40.0,
+        "p50": 33.0,
+        "p95": 37.0
+      },
+      "gpu_engines_pct": {
+        "0": {
+          "n": 120,
+          "mean": 97.41326638333334,
+          "min": 91.742195,
+          "max": 100.0,
+          "p50": 97.7,
+          "p95": 99.409449
+        },
+        "1": {
+          "n": 120,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "2": {
+          "n": 120,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "3": {
+          "n": 120,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "4": {
+          "n": 120,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "5": {
+          "n": 120,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "6": {
+          "n": 120,
+          "mean": 0.07159428333333333,
+          "min": 0.0,
+          "max": 4.166667,
+          "p50": 0.0,
+          "p95": 0.0
+        },
+        "7": {
+          "n": 120,
+          "mean": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p50": 0.0,
+          "p95": 0.0
+        }
+      },
+      "ram_used_mib": {
+        "n": 120,
+        "mean": 3450.6193684895834,
+        "min": 3439.734375,
+        "max": 3577.765625,
+        "p50": 3447.953125,
+        "p95": 3460.88671875
+      },
+      "gpu_shared_mib": {
+        "n": 120,
+        "mean": 607.4561848958333,
+        "min": 604.94921875,
+        "max": 734.109375,
+        "p50": 605.19921875,
+        "p95": 610.8828125
+      },
+      "camera_inference_delta": 75,
+      "detector_fps": 0.6302827829002778,
+      "fewer_than_30_inferences": false,
+      "observed_result_count": 16,
+      "inference_ms_observed_results": {
+        "n": 16,
+        "mean": 1560.2074375,
+        "min": 1494.005,
+        "max": 1636.026,
+        "p50": 1555.468,
+        "p95": 1636.026
+      },
+      "preprocess_ms_observed_results": {
+        "n": 16,
+        "mean": 6.6874375,
+        "min": 5.081,
+        "max": 14.209,
+        "p50": 5.654,
+        "p95": 14.209
+      },
+      "submit_to_result_ms_observed_results": {
+        "n": 16,
+        "mean": 1571.3125,
+        "min": 1516.0,
+        "max": 1641.0,
+        "p50": 1578.0,
+        "p95": 1641.0
+      },
+      "thermal_stages": [
+        0
+      ],
+      "preview": {
+        "available": false,
+        "reason": "original build has no video counter telemetry"
+      },
+      "battery_capacity_ratio_pct": {
+        "n": 120,
+        "mean": 11.387614678899082,
+        "min": 11.009174311926605,
+        "max": 12.01834862385321,
+        "p50": 11.009174311926605,
+        "p95": 12.01834862385321
+      },
+      "external_power_states": [
+        1
+      ],
+      "charging_states": [
+        1
+      ],
+      "source_sizes": [
+        [
+          896,
+          504
+        ]
+      ],
+      "sample_request_ms": {
+        "n": 120,
+        "mean": 41.37605083333395,
+        "min": 29.855899999995017,
+        "max": 111.43580000000657,
+        "p50": 38.03740000000107,
+        "p95": 57.27350000000297
+      },
+      "caveat": "Inference latency statistics use unique observed results, not an all-frame trace. CPU is complete-device load. GPU engines are separate, never summed. Low inference counts are retained performance outcomes of a timed resource trial, not a model deployment gate.",
+      "round": 2
+    }
+  ],
+  "partial_rounds": [
+    {
+      "round": 3,
+      "complete": false,
+      "valid_measured_samples": 104,
+      "last_record": {
+        "index": 124,
+        "round": 3,
+        "at": "2026-11-05T21:52:52.1082811+08:00",
+        "elapsed_ms": 124014.0367,
+        "measurement": true,
+        "systemperf": {
+          "status": null,
+          "error": "Exception calling \"GetResult\" with \"0\" argument(s): \"向一个无法连接的网络尝试了一个套接字操作。 (169.254.112.215:443)\"",
+          "duration_ms": 10.6708
+        },
+        "app": {
+          "status": null,
+          "error": "Exception calling \"GetResult\" with \"0\" argument(s): \"向一个无法连接的网络尝试了一个套接字操作。 (169.254.112.215:443)\"",
+          "duration_ms": 1.1804
+        },
+        "health": {
+          "at": "2026-11-05T21:52:48.1516716+08:00",
+          "power": {
+            "status": 200,
+            "body": {
+              "LowPowerState": false,
+              "LowPowerStateAvailable": true
+            },
+            "duration_ms": 2.9138
+          },
+          "thermal": {
+            "status": 200,
+            "body": {
+              "CurrentStage": 0
+            },
+            "duration_ms": 2.4919
+          },
+          "mitigation": {
+            "status": 200,
+            "body": {
+              "Battery": {
+                "IsSuppressed": 0,
+                "Level": 0,
+                "Mask": 64,
+                "ThermalScore": 100
+              },
+              "CPU": {
+                "IsSuppressed": 0,
+                "Level": 0,
+                "Mask": 1,
+                "ThermalScore": 100
+              },
+              "DRAM": {
+                "IsSuppressed": 0,
+                "Level": 0,
+                "Mask": 32,
+                "ThermalScore": 100
+              },
+              "Display": {
+                "IsSuppressed": 0,
+                "Level": 0,
+                "Mask": 8,
+                "ThermalScore": 100
+              },
+              "GPU": {
+                "IsSuppressed": 0,
+                "Level": 0,
+                "Mask": 2,
+                "ThermalScore": 100
+              },
+              "Network": {
+                "IsSuppressed": 0,
+                "Level": 0,
+                "Mask": 4,
+                "ThermalScore": 100
+              },
+              "PhotoVideoCamera": {
+                "IsSuppressed": 0,
+                "Level": 0,
+                "Mask": 16,
+                "ThermalScore": 100
+              }
+            },
+            "duration_ms": 3.6117
+          },
+          "battery": {
+            "status": 200,
+            "body": {
+              "AcOnline": 1,
+              "BatteryPresent": 1,
+              "Charging": 1,
+              "DefaultAlert1": 218,
+              "DefaultAlert2": 392,
+              "EstimatedTime": 4294967295,
+              "MaximumCapacity": 4360,
+              "RemainingCapacity": 437
+            },
+            "duration_ms": 2.7595
+          }
+        },
+        "completed_elapsed_ms": 124026.8593,
+        "overrun_ms": 0
+      }
+    }
+  ],
+  "manifest": [
+    {
+      "file": "raw/baseline48-restored/round-01.jsonl",
+      "bytes": 1204859,
+      "sha256": "cc4edac5e80f25b655c0c78348d77da7b021f64e9702b5b6c7e8227b6db26b65"
+    },
+    {
+      "file": "raw/baseline48-restored/round-02.jsonl",
+      "bytes": 1209558,
+      "sha256": "ac70ec5d602107d1c058232d5849b8e3919863bfd5e89f2c60c427da42e9806a"
+    },
+    {
+      "file": "raw/baseline48-restored/round-03.jsonl",
+      "bytes": 1074389,
+      "sha256": "4e2ce11a6f7d61d8175b44862ec34a3cd223292d618654e21f9ff794150dcfb4"
+    }
+  ]
+}

@@ -16,6 +16,9 @@
 #define __x_Windows_CStorage_CStreams_CIBuffer __x_ABI_CWindows_CStorage_CStreams_CIBuffer
 #include "YoloNative.h"
 #include "YoloCore.h"
+#ifndef YOLO_REUSE_TENSORS
+#define YOLO_REUSE_TENSORS 0
+#endif
 
 void*memcpy(void*d,const void*s,size_t n){unsigned char*a=d;const unsigned char*b=s;while(n--)*a++=*b++;return d;}
 void*memset(void*d,int v,size_t n){unsigned char*a=d;while(n--)*a++=(unsigned char)v;return d;}
@@ -33,6 +36,7 @@ static const GUID iid_detector={0x7e0645c1,0x3d55,0x4e34,{0x99,0xbb,0x41,0x66,0x
 static const GUID iid_buffer_access={0x905a0fef,0xbc53,0x11df,{0x8c,0x49,0x00,0x1e,0x4f,0xc6,0x86,0xda}};
 static const GUID iid_tensor={0xf2282d82,0xaa02,0x42c8,{0xa0,0xc8,0xdf,0x1e,0xfc,0x96,0x76,0xe1}};
 static const GUID iid_closable={0x30d5a829,0x7fa4,0x4026,{0x83,0xbb,0xd7,0x5b,0xae,0x4e,0xa9,0x9e}};
+static const GUID iid_tensor_native={0x52f547ef,0x5b03,0x49b5,{0x82,0xd6,0x56,0x5f,0x1e,0xe0,0xdd,0x49}};
 typedef __x_Rice_CHoloLens_CYolo_CIDetector Detector;
 typedef __x_ABI_CWindows_CAI_CMachineLearning_CILearningModelStatics ModelFactory;
 typedef __x_ABI_CWindows_CAI_CMachineLearning_CILearningModel Model;
@@ -48,7 +52,10 @@ typedef __x_ABI_CWindows_CAI_CMachineLearning_CILearningModelDevice Device;
 typedef struct BufferAccess BufferAccess;
 typedef struct{HRESULT(STDMETHODCALLTYPE*QueryInterface)(BufferAccess*,REFIID,void**);ULONG(STDMETHODCALLTYPE*AddRef)(BufferAccess*);ULONG(STDMETHODCALLTYPE*Release)(BufferAccess*);HRESULT(STDMETHODCALLTYPE*Buffer)(BufferAccess*,BYTE**);} BufferAccessVtbl;
 struct BufferAccess{const BufferAccessVtbl*lpVtbl;};
-typedef struct{WCHAR phase[32],stage[48],error[600],path[1024],hash[65];HRESULT hr;BOOL loaded,busy,diagnostic;UINT32 device,frames,camera_frames,asset_frames,rejected,boxes_count;INT32 width,height;DOUBLE source_time,preprocess_ms,inference_ms;ULONGLONG started,submitted,finished,signature;YoloBox boxes[YOLO_DETECTIONS];} State;
+typedef struct TensorAccess TensorAccess;
+typedef struct{HRESULT(STDMETHODCALLTYPE*QueryInterface)(TensorAccess*,REFIID,void**);ULONG(STDMETHODCALLTYPE*AddRef)(TensorAccess*);ULONG(STDMETHODCALLTYPE*Release)(TensorAccess*);HRESULT(STDMETHODCALLTYPE*GetBuffer)(TensorAccess*,BYTE**,UINT32*);} TensorAccessVtbl;
+struct TensorAccess{const TensorAccessVtbl*lpVtbl;};
+typedef struct{WCHAR phase[32],stage[48],error[600],path[1024],hash[65];HRESULT hr;BOOL loaded,busy,diagnostic;UINT32 device,frames,camera_frames,asset_frames,rejected,boxes_count,thread_error;INT32 width,height;DOUBLE source_time,preprocess_ms,inference_ms,binding_ms,output_ms,postprocess_ms,thread_ms;ULONGLONG started,submitted,finished,signature;YoloBox boxes[YOLO_DETECTIONS];} State;
 static State state={.phase=L"stopped",.stage=L"not_started"};
 static SRWLOCK guard=SRWLOCK_INIT;
 static HANDLE worker_thread=NULL,work_event=NULL;
@@ -57,6 +64,7 @@ static BYTE*pixels=NULL;static UINT32 pixel_capacity=0;
 static struct{INT32 width,height;DOUBLE time;BOOL diagnostic;ULONGLONG submitted;} pending;
 static DOUBLE last_camera_time=-1;
 static const WCHAR*labels[6]={L"稻纵卷叶螟",L"稻水象甲",L"稻叶蝉",L"白叶枯病",L"胡麻斑病",L"稻瘟病"};
+static ULONGLONG thread_time(DWORD*error){FILETIME created,exited,kernel,user;if(!GetThreadTimes(GetCurrentThread(),&created,&exited,&kernel,&user)){*error=GetLastError();return 0;}*error=0;return ((ULONGLONG)kernel.dwHighDateTime<<32)+kernel.dwLowDateTime+((ULONGLONG)user.dwHighDateTime<<32)+user.dwLowDateTime;}
 static void close_object(void*p){if(!p)return;IUnknown*u=p;__x_ABI_CWindows_CFoundation_CIClosable*c=NULL;if(SUCCEEDED(u->lpVtbl->QueryInterface(u,&iid_closable,(void**)&c))){c->lpVtbl->Close(c);RELEASE(c);}}
 static void set_error(const WCHAR*stage,HRESULT hr){
  IRestrictedErrorInfo*err=NULL;BSTR desc=NULL,detail=NULL,cap=NULL;HRESULT ignored=0;
@@ -81,7 +89,8 @@ static HRESULT verify_model(const WCHAR*path,const WCHAR*expected){
 static DWORD WINAPI run_worker(void*unused){
  (void)unused;HRESULT ro=RoInitialize(RO_INIT_MULTITHREADED),hr=ro;const WCHAR*stage=L"ro_initialize";
  ModelFactory*mf=NULL;Model*model=NULL;SessionFactory*sf=NULL;Session*session=NULL;BindingFactory*bf=NULL;Binding*binding=NULL;TensorFactory*tf=NULL;DeviceFactory*df=NULL;Device*device=NULL;
- Tensor*input=NULL,*output=NULL;Result*result=NULL;__FIMapView_2_HSTRING_IInspectable*outputs=NULL;IInspectable*value=NULL;__FIVectorView_1_float*values=NULL;
+ Tensor*input=NULL,*output=NULL,*bound_output=NULL;TensorAccess*input_access=NULL,*output_access=NULL;Result*result=NULL;__FIMapView_2_HSTRING_IInspectable*outputs=NULL;IInspectable*value=NULL;__FIVectorView_1_float*values=NULL;
+ BYTE*input_data=NULL,*output_data=NULL;
  float*tensor=NULL,*raw=NULL;YoloBox*candidates=NULL,*boxes=NULL;HSTRING path=NULL,input_name=NULL,output_name=NULL,correlation=NULL;
  #define STEP(name,call) do{stage=L##name;hr=(call);if(FAILED(hr))goto cleanup;}while(0)
  if(FAILED(ro))goto cleanup;
@@ -95,34 +104,48 @@ static DWORD WINAPI run_worker(void*unused){
  STEP("binding_factory",factory(L"Windows.AI.MachineLearning.LearningModelBinding",L"{c95f7a7a-e788-475e-8917-23aa381faf0b}",(void**)&bf));
  STEP("binding_create",bf->lpVtbl->CreateFromSession(bf,session,&binding));
  STEP("tensor_factory",factory(L"Windows.AI.MachineLearning.TensorFloat",L"{24610bc1-5e44-5713-b281-8f4ad4d555e8}",(void**)&tf));
- tensor=HeapAlloc(GetProcessHeap(),0,3*YOLO_SIDE*YOLO_SIDE*sizeof(float));raw=HeapAlloc(GetProcessHeap(),0,YOLO_OUTPUTS*sizeof(float));candidates=HeapAlloc(GetProcessHeap(),0,YOLO_CANDIDATES*sizeof(YoloBox));boxes=HeapAlloc(GetProcessHeap(),0,YOLO_DETECTIONS*sizeof(YoloBox));
+ tensor=HeapAlloc(GetProcessHeap(),HEAP_ZERO_MEMORY,3*YOLO_SIDE*YOLO_SIDE*sizeof(float));raw=HeapAlloc(GetProcessHeap(),HEAP_ZERO_MEMORY,YOLO_OUTPUTS*sizeof(float));candidates=HeapAlloc(GetProcessHeap(),0,YOLO_CANDIDATES*sizeof(YoloBox));boxes=HeapAlloc(GetProcessHeap(),0,YOLO_DETECTIONS*sizeof(YoloBox));
  if(!tensor||!raw||!candidates||!boxes){hr=E_OUTOFMEMORY;goto cleanup;}
  input_name=hs(L"images");output_name=hs(L"output0");correlation=hs(L"yolo-local-frame");
+ if(YOLO_REUSE_TENSORS){
+  INT64 input_shape[4]={1,3,YOLO_SIDE,YOLO_SIDE},output_shape[3]={1,10,YOLO_ANCHORS};UINT32 capacity=0;
+  STEP("input_allocate",tf->lpVtbl->CreateFromShapeArrayAndDataArray(tf,4,input_shape,3*YOLO_SIDE*YOLO_SIDE,tensor,&input));
+  STEP("input_native",input->lpVtbl->QueryInterface(input,&iid_tensor_native,(void**)&input_access));
+  STEP("input_buffer",input_access->lpVtbl->GetBuffer(input_access,&input_data,&capacity));if(capacity<3*YOLO_SIDE*YOLO_SIDE*sizeof(float)){hr=E_UNEXPECTED;goto cleanup;}
+  STEP("output_allocate",tf->lpVtbl->CreateFromShapeArrayAndDataArray(tf,3,output_shape,YOLO_OUTPUTS,raw,&bound_output));
+  STEP("output_native",bound_output->lpVtbl->QueryInterface(bound_output,&iid_tensor_native,(void**)&output_access));
+  STEP("output_bind",binding->lpVtbl->Bind(binding,output_name,(IInspectable*)bound_output));
+ }
  AcquireSRWLockExclusive(&guard);state.loaded=TRUE;state.hr=S_OK;wcopy(state.phase,32,L"running");wcopy(state.stage,48,L"ready");ReleaseSRWLockExclusive(&guard);
  while(!InterlockedCompareExchange(&stop_requested,0,0)){
   DWORD waited=WaitForSingleObject(work_event,1000);if(InterlockedCompareExchange(&stop_requested,0,0))break;
   AcquireSRWLockShared(&guard);BOOL busy=state.busy,diagnostic=pending.diagnostic;int width=pending.width,height=pending.height;DOUBLE source_time=pending.time;ULONGLONG submitted=pending.submitted,last_activity=state.submitted;ReleaseSRWLockShared(&guard);
   if(waited!=WAIT_OBJECT_0){if(GetTickCount64()-last_activity>30000)break;continue;}if(!busy)continue;
-  LARGE_INTEGER freq,start,finish;QueryPerformanceFrequency(&freq);QueryPerformanceCounter(&start);
-  y_letterbox(pixels,width,height,tensor);QueryPerformanceCounter(&finish);double preprocessing=(double)(finish.QuadPart-start.QuadPart)*1000/freq.QuadPart;
+  LARGE_INTEGER freq,start,finish,binding_start,output_start,decode_start;QueryPerformanceFrequency(&freq);QueryPerformanceCounter(&start);
+  y_letterbox(pixels,width,height,YOLO_REUSE_TENSORS?(float*)input_data:tensor);QueryPerformanceCounter(&finish);double preprocessing=(double)(finish.QuadPart-start.QuadPart)*1000/freq.QuadPart;
   UINT64 signature=1469598103934665603ull;for(UINT32 i=0;i<(UINT32)(width*height*4);i+=97){signature^=pixels[i];signature*=1099511628211ull;}
-  INT64 shape[4]={1,3,YOLO_SIDE,YOLO_SIDE};STEP("binding_clear",binding->lpVtbl->Clear(binding));RELEASE(input);
-  STEP("tensor_create",tf->lpVtbl->CreateFromShapeArrayAndDataArray(tf,4,shape,3*YOLO_SIDE*YOLO_SIDE,tensor,&input));
+  QueryPerformanceCounter(&binding_start);
+  if(!YOLO_REUSE_TENSORS){INT64 shape[4]={1,3,YOLO_SIDE,YOLO_SIDE};STEP("binding_clear",binding->lpVtbl->Clear(binding));RELEASE(input);
+  STEP("tensor_create",tf->lpVtbl->CreateFromShapeArrayAndDataArray(tf,4,shape,3*YOLO_SIDE*YOLO_SIDE,tensor,&input));}
   STEP("bind",binding->lpVtbl->Bind(binding,input_name,(IInspectable*)input));QueryPerformanceCounter(&start);
-  STEP("evaluate",session->lpVtbl->Evaluate(session,binding,correlation,&result));QueryPerformanceCounter(&finish);double inference=(double)(finish.QuadPart-start.QuadPart)*1000/freq.QuadPart;
+  double binding_ms=(double)(start.QuadPart-binding_start.QuadPart)*1000/freq.QuadPart;DWORD thread_error_start=0,thread_error_end=0;ULONGLONG thread_start=thread_time(&thread_error_start);
+  STEP("evaluate",session->lpVtbl->Evaluate(session,binding,correlation,&result));ULONGLONG thread_end=thread_time(&thread_error_end);QueryPerformanceCounter(&finish);double inference=(double)(finish.QuadPart-start.QuadPart)*1000/freq.QuadPart;
+  QueryPerformanceCounter(&output_start);
   boolean ok=FALSE;STEP("result_status",result->lpVtbl->get_Succeeded(result,&ok));if(!ok){INT32 error=0;result->lpVtbl->get_ErrorStatus(result,&error);hr=error<0?error:E_FAIL;stage=L"evaluate_status";goto cleanup;}
-  STEP("result_outputs",result->lpVtbl->get_Outputs(result,&outputs));STEP("output_lookup",outputs->lpVtbl->Lookup(outputs,output_name,&value));STEP("output_tensor",value->lpVtbl->QueryInterface(value,&iid_tensor,(void**)&output));STEP("output_view",output->lpVtbl->GetAsVectorView(output,&values));
+  if(YOLO_REUSE_TENSORS){UINT32 capacity=0;STEP("output_buffer",output_access->lpVtbl->GetBuffer(output_access,&output_data,&capacity));if(capacity!=YOLO_OUTPUTS*sizeof(float)){hr=E_UNEXPECTED;goto cleanup;}}
+  else {STEP("result_outputs",result->lpVtbl->get_Outputs(result,&outputs));STEP("output_lookup",outputs->lpVtbl->Lookup(outputs,output_name,&value));STEP("output_tensor",value->lpVtbl->QueryInterface(value,&iid_tensor,(void**)&output));STEP("output_view",output->lpVtbl->GetAsVectorView(output,&values));
   UINT32 size=0,actual=0;STEP("output_count",values->lpVtbl->get_Size(values,&size));if(size!=YOLO_OUTPUTS){hr=E_UNEXPECTED;goto cleanup;}
-  STEP("output_data",values->lpVtbl->GetMany(values,0,YOLO_OUTPUTS,raw,&actual));if(actual!=YOLO_OUTPUTS){hr=E_UNEXPECTED;goto cleanup;}
-  int count=y_decode(raw,width,height,.4f,.45f,candidates,boxes);
+  STEP("output_data",values->lpVtbl->GetMany(values,0,YOLO_OUTPUTS,raw,&actual));if(actual!=YOLO_OUTPUTS){hr=E_UNEXPECTED;goto cleanup;}}
+  QueryPerformanceCounter(&decode_start);
+  int count=y_decode(YOLO_REUSE_TENSORS?(float*)output_data:raw,width,height,.4f,.45f,candidates,boxes);QueryPerformanceCounter(&finish);
   RELEASE(values);RELEASE(output);RELEASE(value);RELEASE(outputs);RELEASE(result);
   AcquireSRWLockExclusive(&guard);
-  if(!InterlockedCompareExchange(&stop_requested,0,0)){state.frames++;if(diagnostic)state.asset_frames++;else state.camera_frames++;state.width=width;state.height=height;state.source_time=source_time;state.diagnostic=diagnostic;state.preprocess_ms=preprocessing;state.inference_ms=inference;state.finished=GetTickCount64();state.submitted=submitted;state.signature=signature;state.boxes_count=count;memcpy(state.boxes,boxes,count*sizeof(YoloBox));wcopy(state.stage,48,L"frame_complete");}
-  state.busy=FALSE;ReleaseSRWLockExclusive(&guard);
+  if(!InterlockedCompareExchange(&stop_requested,0,0)){state.frames++;if(diagnostic)state.asset_frames++;else state.camera_frames++;state.width=width;state.height=height;state.source_time=source_time;state.diagnostic=diagnostic;state.preprocess_ms=preprocessing;state.inference_ms=inference;state.binding_ms=binding_ms;state.output_ms=(double)(decode_start.QuadPart-output_start.QuadPart)*1000/freq.QuadPart;state.postprocess_ms=(double)(finish.QuadPart-decode_start.QuadPart)*1000/freq.QuadPart;state.thread_ms=(double)(thread_end-thread_start)/10000;state.finished=GetTickCount64();state.submitted=submitted;state.signature=signature;state.boxes_count=count;memcpy(state.boxes,boxes,count*sizeof(YoloBox));wcopy(state.stage,48,L"frame_complete");}
+  state.thread_error=thread_error_start?thread_error_start:thread_error_end;state.busy=FALSE;ReleaseSRWLockExclusive(&guard);
  }
  cleanup:
  if(FAILED(hr))set_error(stage,hr);
- RELEASE(values);RELEASE(output);RELEASE(value);RELEASE(outputs);RELEASE(result);RELEASE(input);RELEASE(tf);close_object(binding);RELEASE(binding);RELEASE(bf);close_object(session);RELEASE(session);RELEASE(sf);RELEASE(device);RELEASE(df);close_object(model);RELEASE(model);RELEASE(mf);
+ RELEASE(values);RELEASE(output);RELEASE(value);RELEASE(outputs);RELEASE(result);RELEASE(output_access);RELEASE(input_access);RELEASE(bound_output);RELEASE(input);RELEASE(tf);close_object(binding);RELEASE(binding);RELEASE(bf);close_object(session);RELEASE(session);RELEASE(sf);RELEASE(device);RELEASE(df);close_object(model);RELEASE(model);RELEASE(mf);
  if(path)WindowsDeleteString(path);if(input_name)WindowsDeleteString(input_name);if(output_name)WindowsDeleteString(output_name);if(correlation)WindowsDeleteString(correlation);
  if(tensor)HeapFree(GetProcessHeap(),0,tensor);if(raw)HeapFree(GetProcessHeap(),0,raw);if(candidates)HeapFree(GetProcessHeap(),0,candidates);if(boxes)HeapFree(GetProcessHeap(),0,boxes);
  AcquireSRWLockExclusive(&guard);if(pixels){HeapFree(GetProcessHeap(),0,pixels);pixels=NULL;pixel_capacity=0;}state.loaded=FALSE;state.busy=FALSE;if(SUCCEEDED(hr)){wcopy(state.phase,32,L"stopped");wcopy(state.stage,48,L"resources_released");}ReleaseSRWLockExclusive(&guard);
@@ -165,7 +188,8 @@ static HRESULT STDMETHODCALLTYPE d_state(Detector*self,HSTRING*out){
  (void)self;if(!out)return E_POINTER;State*copy=HeapAlloc(GetProcessHeap(),0,sizeof(State));char*buffer=HeapAlloc(GetProcessHeap(),0,32768);if(!copy||!buffer){if(copy)HeapFree(GetProcessHeap(),0,copy);if(buffer)HeapFree(GetProcessHeap(),0,buffer);return E_OUTOFMEMORY;}
  AcquireSRWLockShared(&guard);memcpy(copy,&state,sizeof(State));ReleaseSRWLockShared(&guard);Json j={buffer,0,32768};
  js(&j,"{\"protocol\":1,\"onDevice\":true,\"networkRequests\":0,\"runtime\":\"Windows.AI.MachineLearning\",\"phase\":");jq(&j,copy->phase);js(&j,",\"stage\":");jq(&j,copy->stage);js(&j,",\"error\":");jq(&j,copy->error);js(&j,",\"hr\":");ju(&j,(UINT32)copy->hr);js(&j,",\"modelLoaded\":");js(&j,copy->loaded?"true":"false");js(&j,",\"workerActive\":");js(&j,InterlockedCompareExchange(&active,0,0)?"true":"false");js(&j,",\"busy\":");js(&j,copy->busy?"true":"false");js(&j,",\"modelSha256\":");jq(&j,copy->hash);js(&j,",\"model\":\"YOLOv8n-6\",\"inputSize\":");ju(&j,YOLO_SIDE);js(&j,",\"deviceKind\":");ju(&j,copy->device);js(&j,",\"processId\":");ju(&j,GetCurrentProcessId());js(&j,",\"frames\":");ju(&j,copy->frames);js(&j,",\"cameraFrames\":");ju(&j,copy->camera_frames);js(&j,",\"assetFrames\":");ju(&j,copy->asset_frames);js(&j,",\"rejected\":");ju(&j,copy->rejected);js(&j,",\"frameTime\":");jn(&j,copy->source_time);js(&j,",\"source\":");js(&j,copy->diagnostic?"\"diagnostic_asset\"":"\"camera\"");js(&j,",\"sourceWidth\":");ju(&j,copy->width);js(&j,",\"sourceHeight\":");ju(&j,copy->height);js(&j,",\"preprocessMs\":");jn(&j,copy->preprocess_ms);js(&j,",\"inferenceMs\":");jn(&j,copy->inference_ms);js(&j,",\"resultAgeMs\":");ju(&j,copy->finished?GetTickCount64()-copy->finished:0);js(&j,",\"captureToResultMs\":");ju(&j,copy->finished>=copy->submitted?copy->finished-copy->submitted:0);js(&j,",\"inputSignature\":\"");ju(&j,copy->signature);js(&j,"\",\"detections\":[");
- for(UINT32 i=0;i<copy->boxes_count;i++){YoloBox*b=&copy->boxes[i];if(i)js(&j,",");js(&j,"{\"classId\":");ju(&j,b->class_id);js(&j,",\"label\":");jq(&j,labels[b->class_id]);js(&j,",\"confidence\":");jn(&j,b->score);js(&j,",\"box\":[");jn(&j,b->x1);js(&j,",");jn(&j,b->y1);js(&j,",");jn(&j,b->x2);js(&j,",");jn(&j,b->y2);js(&j,"]}");}js(&j,"]}");
+ for(UINT32 i=0;i<copy->boxes_count;i++){YoloBox*b=&copy->boxes[i];if(i)js(&j,",");js(&j,"{\"classId\":");ju(&j,b->class_id);js(&j,",\"label\":");jq(&j,labels[b->class_id]);js(&j,",\"confidence\":");jn(&j,b->score);js(&j,",\"box\":[");jn(&j,b->x1);js(&j,",");jn(&j,b->y1);js(&j,",");jn(&j,b->x2);js(&j,",");jn(&j,b->y2);js(&j,"]}");}js(&j,"]");
+ js(&j,",\"tensorReuse\":");js(&j,YOLO_REUSE_TENSORS?"true":"false");js(&j,",\"bindingMs\":");jn(&j,copy->binding_ms);js(&j,",\"outputMs\":");jn(&j,copy->output_ms);js(&j,",\"postprocessMs\":");jn(&j,copy->postprocess_ms);js(&j,",\"evaluateThreadTimeError\":");ju(&j,copy->thread_error);js(&j,",\"evaluateThreadCpuMs\":");if(copy->thread_error)js(&j,"null");else jn(&j,copy->thread_ms);js(&j,"}");
  int chars=MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,buffer,j.count,NULL,0);WCHAR*wide=HeapAlloc(GetProcessHeap(),0,(chars+1)*sizeof(WCHAR));HRESULT hr=E_OUTOFMEMORY;if(wide){MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,buffer,j.count,wide,chars);hr=WindowsCreateString(wide,chars,out);HeapFree(GetProcessHeap(),0,wide);}HeapFree(GetProcessHeap(),0,copy);HeapFree(GetProcessHeap(),0,buffer);return hr;
 }
 static HRESULT STDMETHODCALLTYPE d_stop(Detector*self){(void)self;InterlockedExchange(&stop_requested,1);AcquireSRWLockExclusive(&guard);if(InterlockedCompareExchange(&active,0,0))wcopy(state.phase,32,L"stopping");if(work_event)SetEvent(work_event);ReleaseSRWLockExclusive(&guard);return S_OK;}

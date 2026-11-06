@@ -1,0 +1,12 @@
+{
+  "Attempted": true,
+  "At": "2026-11-06T14:41:09.9129641+08:00",
+  "Seconds": 380,
+  "WorkerSha256": "091E41A810B6952349218C621691EFB3017E68047A2C7ADCC17D944103292966",
+  "ReplayAllowed": false,
+  "RunId": "cooling-load-cycle",
+  "Output": "U:\\Users\\DefaultAccount\\AppData\\Local\\DevelopmentFiles\\RiceHoloLensFieldV1\\gpu-cooling-load-cycle.jsonl",
+  "Device": "HOLOLENS-I0IHKJ",
+  "Fingerprint": "53:64:BE:AA:A5:F8:32:FE:99:F3:92:F1:A0:22:D1:E3:1A:68:0E:6A",
+  "Worker": "U:\\Users\\DefaultAccount\\AppData\\Local\\DevelopmentFiles\\RiceHoloLensFieldV1\\gpu-probe-091E41A810B6.exe"
+}

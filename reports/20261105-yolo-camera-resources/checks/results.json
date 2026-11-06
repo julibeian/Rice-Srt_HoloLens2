@@ -1,0 +1,23 @@
+{
+  "at": "2026-11-06T11:06:04.3930671+08:00",
+  "node": {
+    "failed": 0,
+    "passed": 27,
+    "exit_code": 0,
+    "command": "node --test apps/field-app/tests/*.test.cjs",
+    "log": "checks/node-tests.txt"
+  },
+  "python": {
+    "failed": 0,
+    "passed": 6,
+    "exit_code": 0,
+    "command": "py -3.14 -B -m unittest discover -s apps/field-app/tests -p test_resource_analysis.py -v",
+    "log": "checks/analysis-tests.txt"
+  },
+  "powershell": {
+    "files": 5,
+    "evidence": "checks/syntax-and-diff.json",
+    "parse": "passed"
+  },
+  "git_diff_check": "passed"
+}

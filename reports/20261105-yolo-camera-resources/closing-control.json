@@ -1,0 +1,20 @@
+{
+  "schema": 1,
+  "canonical_run_id": "baseline48-restored-resume-20261106",
+  "status": "recorded",
+  "resumed_at": "2026-11-06T10:55:17.0558667+08:00",
+  "runtime_session": "c705f6b0fbd0d488f3139eee21a3f8a2",
+  "expected_original_package_sha256": "8F3E134CB5C787FB7ED39EF21221D5909A9B3D6D16EFCDF809558C8B5793EB19",
+  "previous_attempt": {
+    "metadata": "raw/baseline48-restored/run.json",
+    "run_id": "baseline48-restored",
+    "status": "failed",
+    "completed_rounds": 2,
+    "cause": "USB HTTPS network became unreachable at 2026-11-05T21:52:52+08:00",
+    "failed_round": 3
+  },
+  "comparison_scope": "New original-package control on 2026-11-06 after reconnect/restart; not the same continuous session or battery condition as the 2026-11-05 matrix. The failed original closing attempt is preserved.",
+  "same_session_as_matrix": false,
+  "finished_at": "2026-11-06T11:04:21.5653820+08:00",
+  "verification": "restored-verification.json"
+}

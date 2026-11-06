@@ -1,0 +1,4 @@
+{
+  "passed": false,
+  "error": "Device precision drift exceeds predefined tolerance: bacterial_blight_0.jpg"
+}

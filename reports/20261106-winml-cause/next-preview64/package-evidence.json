@@ -1,0 +1,44 @@
+{
+  "Version": "1.0.0.64",
+  "Package": "E:\\微信小程序开发软件\\hololens-terminal\\apps\\field-app\\.state\\packages\\20261106-201725-1.0.0.64\\Rice.HoloLens.Field_1.0.0.64_arm64.appx",
+  "Layout": "E:\\微信小程序开发软件\\hololens-terminal\\apps\\field-app\\.state\\packages\\20261106-201725-1.0.0.64\\layout",
+  "EntryPage": "index-1-0-0-64.html",
+  "ScriptFiles": [
+    {
+      "Deployed": "boot-a5504df55366.js",
+      "Source": "boot.js",
+      "Sha256": "A5504DF553662C5981606812569CDC1EEE4882D4C86B686F622230D290FA63BF"
+    },
+    {
+      "Deployed": "camera-controls-346e9b4766f1.js",
+      "Source": "camera-controls.js",
+      "Sha256": "346E9B4766F1E06DA09AE968A6ABB28F1BC9D6C480B283A4445797CE8763AC57"
+    },
+    {
+      "Deployed": "dynamic-5d41312f51e6.js",
+      "Source": "dynamic.js",
+      "Sha256": "5D41312F51E691CE3B64B71739C40FD028EE56A62402AF66AAB69AC838F52526"
+    },
+    {
+      "Deployed": "native-7806b3dcaaae.js",
+      "Source": "native.js",
+      "Sha256": "7806B3DCAAAE51EB112266932268FC75B33D92E9230B4CFF491F428C70A312FA"
+    },
+    {
+      "Deployed": "app-25a79137d1e3.js",
+      "Source": "app.js",
+      "Sha256": "25A79137D1E33E6B906591D8E18DEBECEDAD2ADA8D6F6826DBC68556063B3CCF"
+    }
+  ],
+  "Sha256": "16F2378A1785309829934C4401858691D1277EB5CF7024996BD54A2CBA00533D",
+  "Identity": "Rice.HoloLens.Field_r5420n6798s24!Field",
+  "RecognitionMode": "local-yolo",
+  "InputSize": 320,
+  "ModelSha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+  "ModelPrecision": "FP16 internal; FP32 IO",
+  "NativeDllSha256": "1918E0D15FED85928DA6A87FE3CE4A34EB944667C6B61683B1687C161A70E47B",
+  "ReuseTensors": true,
+  "IncludesDeviceKey": false,
+  "IncludesCampusCredentials": false,
+  "BuiltAt": "2026-11-06T20:17:26.0721660+08:00"
+}

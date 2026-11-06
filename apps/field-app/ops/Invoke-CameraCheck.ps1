@@ -1,4 +1,4 @@
-param([ValidateSet('dynamic_start','dynamic_stop','dynamic_asset','yolo_state')][string]$Action='yolo_state',[ValidateSet('','bacterial_blight_0.jpg','brown_spot_0.jpg','rice_blast_0.jpg','rice_water_weevil_0.jpg')][string]$Asset='', [ValidatePattern('^[A-Za-z0-9_-]{1,64}$')][string]$RunId=('yolo-'+[guid]::NewGuid().ToString('N')))
+param([ValidateSet('dynamic_start','dynamic_stop','dynamic_asset','yolo_state','performance_preview')][string]$Action='yolo_state',[ValidateSet('','bacterial_blight_0.jpg','brown_spot_0.jpg','rice_blast_0.jpg','rice_water_weevil_0.jpg')][string]$Asset='', [ValidateSet('visible','masked')][string]$PreviewMode='visible',[ValidatePattern('^[A-Za-z0-9_-]{1,64}$')][string]$RunId=('yolo-'+[guid]::NewGuid().ToString('N')))
 $ErrorActionPreference='Stop'
 $root=Split-Path -Parent $PSScriptRoot;$workspace=Split-Path -Parent (Split-Path -Parent $root)
 . (Join-Path $workspace 'usb-terminal/HoloLens.Common.ps1')
@@ -12,7 +12,7 @@ $installed=Get-Content -Raw -LiteralPath (Join-Path $root '.state/installed.json
 $remote=$installed.RemoteLayout+'\camera-check.json'
 if((Invoke-HlBridge @{action='stat';path=$remote}).Exists){throw 'Prior command remains; not overwritten or repeated'}
 [IO.Directory]::CreateDirectory($folder)|Out-Null
-$requestId=[guid]::NewGuid().ToString('N');$command=@{id=$requestId;session=$state.cameraSession;action=$Action;asset=$Asset}
+$requestId=[guid]::NewGuid().ToString('N');$command=@{id=$requestId;session=$state.cameraSession;action=$Action;asset=$Asset;previewMode=$PreviewMode}
 $commandPath=Join-Path $folder 'command.json';$command|ConvertTo-Json -Compress|Set-Content -LiteralPath $commandPath -Encoding utf8NoBOM
 $proof=@{RunId=$RunId;Id=$requestId;Action=$Action;Asset=$Asset;Session=$state.runtimeSession;Version=$runtime.Version;Attempted=$true;Completed=$false;ReplayAllowed=$false;Evidence=$folder}
 $proof|ConvertTo-Json|Set-Content -LiteralPath $record -Encoding utf8NoBOM

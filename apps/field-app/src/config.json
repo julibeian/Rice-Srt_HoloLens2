@@ -1,1 +1,1 @@
-{"version":"1.0.0.48","recognitionMode":"local-yolo","autoStart":true,"yoloDeviceKind":3,"yoloInputSize":320,"yoloSha256":"e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048","cameraDiagnostics":false}
+{"version":"1.0.0.63","recognitionMode":"local-yolo","autoStart":true,"yoloDeviceKind":3,"yoloInputSize":320,"yoloSha256":"bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171","yoloPrecision":"FP16 internal; FP32 IO","cameraDiagnostics":false}

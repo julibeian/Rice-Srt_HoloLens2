@@ -1,0 +1,12 @@
+{
+  "Fingerprint": "53:64:BE:AA:A5:F8:32:FE:99:F3:92:F1:A0:22:D1:E3:1A:68:0E:6A",
+  "At": "2026-11-06T14:48:11.5797284+08:00",
+  "Worker": "U:\\Users\\DefaultAccount\\AppData\\Local\\DevelopmentFiles\\RiceHoloLensFieldV1\\gpu-probe-091E41A810B6.exe",
+  "Output": "U:\\Users\\DefaultAccount\\AppData\\Local\\DevelopmentFiles\\RiceHoloLensFieldV1\\gpu-presence-cycle.jsonl",
+  "RunId": "presence-cycle",
+  "ReplayAllowed": false,
+  "Device": "HOLOLENS-I0IHKJ",
+  "Attempted": true,
+  "WorkerSha256": "091E41A810B6952349218C621691EFB3017E68047A2C7ADCC17D944103292966",
+  "Seconds": 120
+}

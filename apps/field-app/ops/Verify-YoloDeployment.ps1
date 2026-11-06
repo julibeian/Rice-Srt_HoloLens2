@@ -27,7 +27,7 @@ $config=Get-Content -LiteralPath (Join-Path $folder 'config.json') -Raw|ConvertF
 $manifest=[xml](Get-Content -LiteralPath (Join-Path $folder 'AppxManifest.xml') -Raw)
 $capabilities=@($manifest.Package.Capabilities.ChildNodes|Where-Object{$_.NodeType -eq 'Element'}|ForEach-Object{$_.GetAttribute('Name')})
 $html=Get-Content -LiteralPath (Join-Path $folder $package.EntryPage) -Raw
-if($config.cameraDiagnostics -ne $false -or $config.recognitionMode -cne 'local-yolo' -or $config.yoloSha256 -cne $package.ModelSha256 -or ($capabilities -join ',') -cne 'webcam' -or -not $html.Contains("connect-src 'none'")){throw 'Unexpected production network, diagnostics or model configuration'}
+if($config.cameraDiagnostics -ne $false -or ($config.PSObject.Properties['resourceTelemetry'] -and $config.resourceTelemetry) -or $config.recognitionMode -cne 'local-yolo' -or $config.yoloSha256 -cne $package.ModelSha256 -or ($capabilities -join ',') -cne 'webcam' -or -not $html.Contains("connect-src 'none'")){throw 'Unexpected production network, diagnostics or model configuration'}
 $runtime=& (Join-Path $PSScriptRoot 'Get-AppState.ps1')|ConvertFrom-Json
 $state=Get-Content -LiteralPath (Join-Path $runtime.Evidence 'app-state.json') -Raw|ConvertFrom-Json
 $native=$state.nativeDetector

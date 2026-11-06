@@ -1,0 +1,387 @@
+{
+  "arms": {
+    "original": {
+      "observed_latency_mean_ms": 2221.085416666667,
+      "observed_unique_results": 23,
+      "completed_frame_delta": 105,
+      "observation_seconds": 238.016886,
+      "completed_per_second": 0.44114517152367083
+    },
+    "improved": {
+      "observed_latency_mean_ms": 1781.2603571428572,
+      "observed_unique_results": 27,
+      "completed_frame_delta": 125,
+      "observation_seconds": 237.99369000000002,
+      "completed_per_second": 0.525224009090325
+    }
+  },
+  "observed_latency_reduction_percent": 19.802257771062436,
+  "completed_rate_increase_percent": 19.059221996299836,
+  "latency_scope": "Equal-weight round means of unique observed completed results; not an every-frame latency trace.",
+  "allocation_scope": "Per-process GPU allocation was not measured in these four trials. Equal engine utilization cannot establish equal allocation.",
+  "schema": 1,
+  "trials": [
+    {
+      "run_id": "ab60-original-1",
+      "status": "recorded",
+      "samples": 120,
+      "first_at": "2026-11-06T16:33:57.8290827+08:00",
+      "last_at": "2026-11-06T16:35:56.8312722+08:00",
+      "seconds": 119.00219,
+      "runtime_session": "81348967464f2bfaf5437d63ee2435b7",
+      "process_id": 10924,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [],
+      "fresh_results": 11,
+      "frame_delta": 50,
+      "detections_per_second": 0.4201603348644256,
+      "inference_mean_ms": 2235.8740000000003,
+      "inference_median_ms": 2250.101,
+      "inference_min_ms": 2077.944,
+      "inference_max_ms": 2366.896,
+      "preprocess_mean_ms": 6.586818181818182,
+      "binding_mean_ms": null,
+      "output_mean_ms": null,
+      "cpu_mean": 33.09166666666667,
+      "gpu0_mean": 98.31058745,
+      "distinct_input_signatures": 11,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": []
+    },
+    {
+      "run_id": "ab61-improved-1",
+      "status": "recorded",
+      "samples": 120,
+      "first_at": "2026-11-06T16:36:43.5074122+08:00",
+      "last_at": "2026-11-06T16:38:42.5042586+08:00",
+      "seconds": 118.996846,
+      "runtime_session": "117f0cc63ff86c2d4052e4973a419885",
+      "process_id": 10380,
+      "model_sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+      "camera_keys": [],
+      "fresh_results": 14,
+      "frame_delta": 65,
+      "detections_per_second": 0.5462329648636234,
+      "inference_mean_ms": 1766.7417142857144,
+      "inference_median_ms": 1775.3605,
+      "inference_min_ms": 1650.132,
+      "inference_max_ms": 1831.436,
+      "preprocess_mean_ms": 6.883214285714286,
+      "binding_mean_ms": 0.24814285714285714,
+      "output_mean_ms": 0.009071428571428572,
+      "cpu_mean": 33.125,
+      "gpu0_mean": 98.21294129166667,
+      "distinct_input_signatures": 14,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": []
+    },
+    {
+      "run_id": "ab62-original-2",
+      "status": "recorded",
+      "samples": 120,
+      "first_at": "2026-11-06T16:39:29.0710626+08:00",
+      "last_at": "2026-11-06T16:41:28.0857583+08:00",
+      "seconds": 119.014696,
+      "runtime_session": "829ac32e95e0864adb21d18c236b2b67",
+      "process_id": 12604,
+      "model_sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048",
+      "camera_keys": [],
+      "fresh_results": 12,
+      "frame_delta": 55,
+      "detections_per_second": 0.4621278031076095,
+      "inference_mean_ms": 2206.2968333333333,
+      "inference_median_ms": 2192.747,
+      "inference_min_ms": 2118.782,
+      "inference_max_ms": 2323.868,
+      "preprocess_mean_ms": 7.502833333333333,
+      "binding_mean_ms": null,
+      "output_mean_ms": null,
+      "cpu_mean": 33.44166666666667,
+      "gpu0_mean": 98.41158298333333,
+      "distinct_input_signatures": 12,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": []
+    },
+    {
+      "run_id": "ab63-improved-2",
+      "status": "recorded",
+      "samples": 120,
+      "first_at": "2026-11-06T16:42:14.0461161+08:00",
+      "last_at": "2026-11-06T16:44:13.0429603+08:00",
+      "seconds": 118.996844,
+      "runtime_session": "cdae302747c3cff0d44d3b709fa25c3a",
+      "process_id": 13036,
+      "model_sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+      "camera_keys": [],
+      "fresh_results": 13,
+      "frame_delta": 60,
+      "detections_per_second": 0.5042150529639257,
+      "inference_mean_ms": 1795.779,
+      "inference_median_ms": 1826.824,
+      "inference_min_ms": 1335.267,
+      "inference_max_ms": 1953.647,
+      "preprocess_mean_ms": 7.122076923076923,
+      "binding_mean_ms": 0.1849230769230769,
+      "output_mean_ms": 0.017923076923076924,
+      "cpu_mean": 33.86666666666667,
+      "gpu0_mean": 98.151735775,
+      "distinct_input_signatures": 13,
+      "input_source_dimensions": [
+        [
+          896,
+          504
+        ]
+      ],
+      "thermal_stages": [
+        0
+      ],
+      "low_power_states": [
+        false
+      ],
+      "errors": []
+    }
+  ],
+  "package_files": [
+    {
+      "trial": "ab60-original-1",
+      "file": "Rice.HoloLens.Field_1.0.0.60_arm64.appx",
+      "sha256": "895c6a7173936ff2bc7e442c3dec8ca4bf6e71156b8a1d087b6bfc9ade2c028b"
+    },
+    {
+      "trial": "ab60-original-1",
+      "file": "boot-a5504df55366.js",
+      "sha256": "a5504df553662c5981606812569cdc1eee4882d4c86b686f622230d290fa63bf"
+    },
+    {
+      "trial": "ab60-original-1",
+      "file": "camera-controls-346e9b4766f1.js",
+      "sha256": "346e9b4766f1e06da09ae968a6abb28f1bc9d6c480b283a4445797ce8763ac57"
+    },
+    {
+      "trial": "ab60-original-1",
+      "file": "dynamic-5d41312f51e6.js",
+      "sha256": "5d41312f51e691ce3b64b71739c40fd028ee56a62402af66aab69ac838f52526"
+    },
+    {
+      "trial": "ab60-original-1",
+      "file": "native-dfbddedd665b.js",
+      "sha256": "dfbddedd665ba67bc6f183d418b1023a1955a0c0711042108b8af74f83d4b279"
+    },
+    {
+      "trial": "ab60-original-1",
+      "file": "app-b5d93f9a2c8e.js",
+      "sha256": "b5d93f9a2c8e7fb3a542bf40f01eed42430528e610fd8c9b4ec7e1d350331b15"
+    },
+    {
+      "trial": "ab60-original-1",
+      "file": "model.onnx",
+      "sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048"
+    },
+    {
+      "trial": "ab60-original-1",
+      "file": "Rice.HoloLens.Yolo.dll",
+      "sha256": "30ae4ec839e7d5a50138b06ea46930948ba244effbb3118f1991ede642659529"
+    },
+    {
+      "trial": "ab60-original-1",
+      "file": "round-01.jsonl",
+      "sha256": "f05aeb10ecfc64ead646dacde881028d58ad96ce01d705ddd383bd753d5db606"
+    },
+    {
+      "trial": "ab61-improved-1",
+      "file": "Rice.HoloLens.Field_1.0.0.61_arm64.appx",
+      "sha256": "e2ddf4cbcbb55ff3a8acb9917c53c181b902607a44e0c4e5a7d8b9c616fe4ade"
+    },
+    {
+      "trial": "ab61-improved-1",
+      "file": "boot-a5504df55366.js",
+      "sha256": "a5504df553662c5981606812569cdc1eee4882d4c86b686f622230d290fa63bf"
+    },
+    {
+      "trial": "ab61-improved-1",
+      "file": "camera-controls-346e9b4766f1.js",
+      "sha256": "346e9b4766f1e06da09ae968a6abb28f1bc9d6c480b283a4445797ce8763ac57"
+    },
+    {
+      "trial": "ab61-improved-1",
+      "file": "dynamic-5d41312f51e6.js",
+      "sha256": "5d41312f51e691ce3b64b71739c40fd028ee56a62402af66aab69ac838f52526"
+    },
+    {
+      "trial": "ab61-improved-1",
+      "file": "native-9fc8b31ac9a1.js",
+      "sha256": "9fc8b31ac9a18b019c0cd804c4d4ae0d29708133f1a8f23f18a5e6614830b1e5"
+    },
+    {
+      "trial": "ab61-improved-1",
+      "file": "app-dc538b4a9b85.js",
+      "sha256": "dc538b4a9b8560ad1ea14aae613362f0a2af24ec57e8360667214c7c7cb1ed7c"
+    },
+    {
+      "trial": "ab61-improved-1",
+      "file": "model.onnx",
+      "sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171"
+    },
+    {
+      "trial": "ab61-improved-1",
+      "file": "Rice.HoloLens.Yolo.dll",
+      "sha256": "30de4638656ec299f998c5d33cf9684d0ed06da5daf4fcb59672c98871ee21c8"
+    },
+    {
+      "trial": "ab61-improved-1",
+      "file": "round-01.jsonl",
+      "sha256": "93a844ec3f333c08f6d5119be6ff472131e80ac28f48a791c85e3765683626c9"
+    },
+    {
+      "trial": "ab62-original-2",
+      "file": "Rice.HoloLens.Field_1.0.0.62_arm64.appx",
+      "sha256": "10326f41ef4a7bfb492c29ebe1a66edb171b7efbde1121e486878bb24a95d048"
+    },
+    {
+      "trial": "ab62-original-2",
+      "file": "boot-a5504df55366.js",
+      "sha256": "a5504df553662c5981606812569cdc1eee4882d4c86b686f622230d290fa63bf"
+    },
+    {
+      "trial": "ab62-original-2",
+      "file": "camera-controls-346e9b4766f1.js",
+      "sha256": "346e9b4766f1e06da09ae968a6abb28f1bc9d6c480b283a4445797ce8763ac57"
+    },
+    {
+      "trial": "ab62-original-2",
+      "file": "dynamic-5d41312f51e6.js",
+      "sha256": "5d41312f51e691ce3b64b71739c40fd028ee56a62402af66aab69ac838f52526"
+    },
+    {
+      "trial": "ab62-original-2",
+      "file": "native-dfbddedd665b.js",
+      "sha256": "dfbddedd665ba67bc6f183d418b1023a1955a0c0711042108b8af74f83d4b279"
+    },
+    {
+      "trial": "ab62-original-2",
+      "file": "app-b5d93f9a2c8e.js",
+      "sha256": "b5d93f9a2c8e7fb3a542bf40f01eed42430528e610fd8c9b4ec7e1d350331b15"
+    },
+    {
+      "trial": "ab62-original-2",
+      "file": "model.onnx",
+      "sha256": "e6b6d2f6baaae3b7970f1a4e425f2c2347a90fe6aab34c3da0aed738fcf1b048"
+    },
+    {
+      "trial": "ab62-original-2",
+      "file": "Rice.HoloLens.Yolo.dll",
+      "sha256": "e3503bd7d63b4cb20da93c53ad6f153ca6cf05f955b7c611b618cfbe05e6567b"
+    },
+    {
+      "trial": "ab62-original-2",
+      "file": "round-01.jsonl",
+      "sha256": "c0957d756771559a2fef972fb5eaf354d327243389ec883499b880f734ce2d7a"
+    },
+    {
+      "trial": "ab63-improved-2",
+      "file": "Rice.HoloLens.Field_1.0.0.63_arm64.appx",
+      "sha256": "f26c85631ba328b27b37308f86e9fe29a54911ef047465c9fdff91c88b7ca31c"
+    },
+    {
+      "trial": "ab63-improved-2",
+      "file": "boot-a5504df55366.js",
+      "sha256": "a5504df553662c5981606812569cdc1eee4882d4c86b686f622230d290fa63bf"
+    },
+    {
+      "trial": "ab63-improved-2",
+      "file": "camera-controls-346e9b4766f1.js",
+      "sha256": "346e9b4766f1e06da09ae968a6abb28f1bc9d6c480b283a4445797ce8763ac57"
+    },
+    {
+      "trial": "ab63-improved-2",
+      "file": "dynamic-5d41312f51e6.js",
+      "sha256": "5d41312f51e691ce3b64b71739c40fd028ee56a62402af66aab69ac838f52526"
+    },
+    {
+      "trial": "ab63-improved-2",
+      "file": "native-9fc8b31ac9a1.js",
+      "sha256": "9fc8b31ac9a18b019c0cd804c4d4ae0d29708133f1a8f23f18a5e6614830b1e5"
+    },
+    {
+      "trial": "ab63-improved-2",
+      "file": "app-dc538b4a9b85.js",
+      "sha256": "dc538b4a9b8560ad1ea14aae613362f0a2af24ec57e8360667214c7c7cb1ed7c"
+    },
+    {
+      "trial": "ab63-improved-2",
+      "file": "model.onnx",
+      "sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171"
+    },
+    {
+      "trial": "ab63-improved-2",
+      "file": "Rice.HoloLens.Yolo.dll",
+      "sha256": "1918e0d15fed85928da6a87fe3ce4a34eb944667c6b61683b1687c161a70e47b"
+    },
+    {
+      "trial": "ab63-improved-2",
+      "file": "round-01.jsonl",
+      "sha256": "91f620f61328861493432ad7cd63ea4ccd6cd2347a985880dee462b3cc4cdfd0"
+    }
+  ],
+  "original_source_provenance": [
+    {
+      "trial": "ab60-original-1",
+      "file": "app.js",
+      "source_commit": "58cbb9015ea90bc4eb222e4011326df16690f08d",
+      "newlines_normalized_match": true
+    },
+    {
+      "trial": "ab60-original-1",
+      "file": "native.js",
+      "source_commit": "58cbb9015ea90bc4eb222e4011326df16690f08d",
+      "newlines_normalized_match": true
+    },
+    {
+      "trial": "ab62-original-2",
+      "file": "app.js",
+      "source_commit": "58cbb9015ea90bc4eb222e4011326df16690f08d",
+      "newlines_normalized_match": true
+    },
+    {
+      "trial": "ab62-original-2",
+      "file": "native.js",
+      "source_commit": "58cbb9015ea90bc4eb222e4011326df16690f08d",
+      "newlines_normalized_match": true
+    }
+  ],
+  "original_source_commit": "58cbb9015ea90bc4eb222e4011326df16690f08d",
+  "passed": true
+}

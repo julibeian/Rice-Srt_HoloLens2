@@ -5,3 +5,16 @@ test('unsupported controls are skipped and a failing region is never reported as
 test('exposure compensation respects device steps and bounds instead of inventing unsupported values',async()=>{const d=device(),state=await C.initialize(d.W,d.controller,()=>{});await C.compensation(state,-.7,()=>{});assert.ok(state.ev>=-2&&state.ev<=2);assert.ok(Math.abs((state.ev+2)/d.controller.exposureCompensationControl.step-Math.round((state.ev+2)/d.controller.exposureCompensationControl.step))<.00001);await C.compensation(state,-20,()=>{});assert.equal(state.ev,-2);});
 test('unresponsive camera operations time out and are cancelled',async()=>{let cancelled=false;const operation=new Promise(()=>{});operation.cancel=()=>{cancelled=true;};await assert.rejects(C.bound(operation,10),/超时/);assert.equal(cancelled,true);});
 test('live targeting uses continuous focus without requesting unsupported exposure locking or resetting its correction',async()=>{const d=device();let locked;d.controller.regionsOfInterestControl.setRegionsAsync=async(_,lock)=>{locked=lock;if(lock)throw new Error('AutoExposureLock unsupported');};const state=await C.initialize(d.W,d.controller,()=>{});await C.compensation(state,-.7,()=>{});const held=state.ev,enabled=await C.target(d.W,state,{x:.2,y:.2,width:.4,height:.4},()=>{},{continuous:true,preserveExposure:true});assert.equal(locked,false);assert.equal(enabled.regionExposure,true);assert.equal(state.ev,held);assert.equal(d.calls.find(c=>c[0]==='focus')[1].mode,d.W.Media.Devices.FocusMode.continuous);});
+test('camera benchmark selects an exact advertised size and frame rate and refuses a silent fallback',async()=>{
+ const slow={width:1280,height:720,frameRate:15},fast={width:1280,height:720,frameRate:30},profile={id:'pv-profile',supportedPhotoMediaDescription:[{width:3904,height:2196}],supportedPreviewMediaDescription:[slow,fast]};
+ const W={Devices:{Enumeration:{DeviceClass:{videoCapture:1},DeviceInformation:{findAllAsync:async()=>[{id:'pv',name:'PV Camera'}]}}},Media:{Capture:{MediaCapture:{findAllVideoProfiles:()=>[profile]}}}};
+ const settings={},result=await C.selectProfile(W,settings,()=>{},{width:1280,height:720,fps:30});
+ assert.equal(settings.previewMediaDescription,fast);assert.equal(result.selected.fps,30);assert.equal(result.previews.length,2);
+ await assert.rejects(C.selectProfile(W,{},()=>{},{width:1920,height:1080,fps:30}),/不支持/);
+ await assert.rejects(C.selectProfile(W,{},()=>{},{width:1280,height:720,fps:60}),/不支持/);
+});
+test('camera readback preserves fractional driver frame rates',()=>{
+ const info=C.mediaInfo({width:1280,height:720,frameRate:{numerator:30000,denominator:1001}});
+ assert.ok(Math.abs(info.fps-29.97002997)<1e-7);assert.equal(info.frameRateNumerator,30000);assert.equal(info.frameRateDenominator,1001);
+ assert.throws(()=>C.validateCapture({width:1280,height:720,fps:NaN}),/无效/);
+});

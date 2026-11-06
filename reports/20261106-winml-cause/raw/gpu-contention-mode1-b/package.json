@@ -1,0 +1,27 @@
+{
+  "AppListEntry": 0,
+  "CanUninstall": true,
+  "Name": "稻视界",
+  "PackageDisplayName": "稻视界",
+  "PackageFamilyName": "Rice.HoloLens.Field",
+  "PackageFullName": "Rice.HoloLens.Field_1.0.0.50_arm64__r5420n6798s24",
+  "PackageOrigin": 4,
+  "PackageRelativeId": "Rice.HoloLens.Field_r5420n6798s24!Field",
+  "Publisher": "CN=RiceHoloLensCapture",
+  "Version": {
+    "Build": 0,
+    "Major": 1,
+    "Minor": 0,
+    "Revision": 50
+  },
+  "RegisteredUsers": [
+    {
+      "UserDisplayName": "HOLOLENS-I0IHKJ\\DefaultAccount",
+      "UserSID": "S-1-5-21-2702878673-795188819-444038987-503"
+    },
+    {
+      "UserDisplayName": "HOLOLENS-I0IHKJ\\lupen",
+      "UserSID": "S-1-5-21-2702878673-795188819-444038987-1000"
+    }
+  ]
+}

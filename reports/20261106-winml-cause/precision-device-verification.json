@@ -1,0 +1,51 @@
+{
+  "passed": true,
+  "model_sha256": "bf11d93c12fc6d24ff4cfd07a5fecaeb224c995b0f458c85c3d73149ea43c171",
+  "cases": [
+    {
+      "sample": "bacterial_blight_0.jpg",
+      "detections": 2,
+      "errors": [
+        {
+          "confidence_abs_error": 0.006000000000000005,
+          "box_max_abs_error": 0.24900000000002365
+        },
+        {
+          "confidence_abs_error": 0.007000000000000006,
+          "box_max_abs_error": 0.18000000000000682
+        }
+      ],
+      "passed": true
+    },
+    {
+      "sample": "brown_spot_0.jpg",
+      "detections": 0,
+      "errors": [],
+      "passed": true
+    },
+    {
+      "sample": "rice_blast_0.jpg",
+      "detections": 1,
+      "errors": [
+        {
+          "confidence_abs_error": 0.0040000000000000036,
+          "box_max_abs_error": 0.12000000000000455
+        }
+      ],
+      "passed": true
+    },
+    {
+      "sample": "rice_water_weevil_0.jpg",
+      "detections": 1,
+      "errors": [
+        {
+          "confidence_abs_error": 0.0010000000000000009,
+          "box_max_abs_error": 0.05700000000000216
+        }
+      ],
+      "passed": true
+    }
+  ],
+  "reference": "same ARM64 WinML FP32 and identical decoded inputs",
+  "scope": "Four built-in diagnostic cases through the real ARM64 WinML component, including changing inputs with reused tensors. Not a real-leaf accuracy test."
+}

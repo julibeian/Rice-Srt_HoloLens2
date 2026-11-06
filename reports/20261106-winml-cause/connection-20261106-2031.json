@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "observedAt": "2026-11-06T20:31:18.5086287+08:00",
+  "discoveredDevices": [],
+  "presentDeviceInterfaces": [],
+  "networkAdapters": [],
+  "bridge": {
+    "State": "waiting_for_device",
+    "Device": "HOLOLENS-I0IHKJ",
+    "Address": null,
+    "ConnectionMethod": null,
+    "LastConnectMs": null,
+    "ProcessId": 53924,
+    "StartedAt": "2026-11-06T20:22:55.7484044+08:00",
+    "UpdatedAt": "2026-11-06T20:31:17.5620412+08:00",
+    "ActiveOperation": null,
+    "LastHeartbeat": null,
+    "LastError": "Target HoloLens USB network is unavailable; waiting for the same device to reconnect. cached USB endpoint 169.254.112.215 did not answer on TCP 22",
+    "Connections": 0,
+    "Pipe": "HoloLensUsbBridge-S_1_5_21_2239020489_2475175307_1214261708_1001",
+    "SourceHashes": {
+      "HoloLens.Common.ps1": "2035191E8ACCB3D66E8561ADCA9EBBD089837FFA3FC7C58BBB29A0E6A38A3F54",
+      "HoloLens.Bridge.ps1": "CB5D5BF1D87C6FAC384332309E1948BCDAF7BBD27C654CEF5A0F20283651B38B",
+      "HoloLens.UsbPower.ps1": "7F4A92E923C4E394F0A33A5C2F25BEC9191088F60B75EA5068107ACDE6938D34"
+    },
+    "UsbPower": {
+      "State": "not_renewed",
+      "DeviceLeaseMs": 45000,
+      "Reason": "USB identity is not currently connected",
+      "LastVerifiedHeartbeat": null,
+      "CurrentDeviceStateVerified": false
+    }
+  },
+  "nameLookup": "HOLOLENS-I0IHKJ lookup timed out at 20:28",
+  "pcNetwork": [
+    {
+      "Name": "CMCC",
+      "InterfaceAlias": "WLAN",
+      "InterfaceIndex": 3
+    }
+  ],
+  "action": "Read-only connection audit; no pairing, network switch or device reboot",
+  "candidate64": "Built locally only; not deployed",
+  "lastVerifiedDeviceAt": "2026-11-06T16:45:00+08:00"
+}
