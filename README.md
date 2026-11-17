@@ -1,6 +1,6 @@
 # Rice-Srt · HoloLens2 
 
->SRT阶段项目：AR眼镜嵌入式开发
+>SRT子项目：AR眼镜嵌入式开发
 
 ### 菜单
 
